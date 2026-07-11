@@ -143,8 +143,14 @@ def _evaluate_body(html: str, markers: list[str]) -> str | None:
     return None  # app-shell / not enough signal — caller escalates
 
 
-def check_url(url: str, cfg: dict | None = None, use_headless: bool = True) -> dict:
-    """Check one URL. Returns {url, verdict, status, note}."""
+def check_url(url: str, cfg: dict | None = None, use_headless: bool = True,
+              _defer_render: dict | None = None) -> dict:
+    """Check one URL. Returns {url, verdict, status, note}.
+
+    _defer_render: internal — when a dict is passed, headless escalation is NOT run
+    inline; the URL is parked there and check_urls() batch-renders in ONE browser
+    (8 threads × concurrent Chromium launches = swallowed failures → false
+    Unverified/Blocked, found 2026-07-11 with 15 NoDesk leads)."""
     cfg = cfg or _load_config()
     platforms = cfg.get("platforms", [])
     markers = _markers_for(url, platforms)
@@ -186,20 +192,11 @@ def check_url(url: str, cfg: dict | None = None, use_headless: bool = True) -> d
             return {"url": url, "verdict": verdict, "status": status, "note": "direct body"}
         # app-shell 200 → headless escalation
         if use_headless:
-            try:
-                import render
-
-                html = render.render(url)
-            except Exception:
-                html = ""
-            if html:
-                verdict = _evaluate_body(html, markers)
-                if verdict:
-                    _log_evidence(url, status, html, verdict, "headless")
-                    return {"url": url, "verdict": verdict, "status": status, "note": "rendered body"}
-            _log_evidence(url, status, html or body, "unverifiable_direct", "headless")
-            return {"url": url, "verdict": "unverifiable_direct", "status": status,
-                    "note": "app-shell 200; render inconclusive"}
+            if _defer_render is not None:
+                _defer_render[url] = (status, body, markers)
+                return {"url": url, "verdict": "_deferred", "status": status, "note": ""}
+            html = _render_one(url)
+            return _finish_rendered(url, status, body, html, markers)
         _log_evidence(url, status, body, "unverifiable_direct", "direct")
         return {"url": url, "verdict": "unverifiable_direct", "status": status,
                 "note": "app-shell 200; headless disabled"}
@@ -207,31 +204,55 @@ def check_url(url: str, cfg: dict | None = None, use_headless: bool = True) -> d
     # 403-class bot blocks: headless render retry (delta row 9) — still the source URL,
     # so a rendered JD counts for liveness. Unresolved → unverifiable_direct.
     if status in (401, 403, 406, 429, 503) and use_headless:
-        try:
-            import render
-
-            html = render.render(url)
-        except Exception:
-            html = ""
-        if html:
-            verdict = _evaluate_body(html, markers)
-            if verdict:
-                _log_evidence(url, status, html, verdict, "headless")
-                return {"url": url, "verdict": verdict, "status": status,
-                        "note": f"HTTP {status} direct; rendered body"}
-        _log_evidence(url, status, html or body, "unverifiable_direct", "headless")
-        return {"url": url, "verdict": "unverifiable_direct", "status": status,
-                "note": f"HTTP {status}; render inconclusive"}
+        if _defer_render is not None:
+            _defer_render[url] = (status, body, markers)
+            return {"url": url, "verdict": "_deferred", "status": status, "note": ""}
+        html = _render_one(url)
+        return _finish_rendered(url, status, body, html, markers)
 
     _log_evidence(url, status, body, "unverifiable_direct", "direct")
     return {"url": url, "verdict": "unverifiable_direct", "status": status, "note": f"HTTP {status}"}
 
 
+def _render_one(url: str) -> str:
+    try:
+        import render
+
+        return render.render(url)
+    except Exception:
+        return ""
+
+
+def _finish_rendered(url: str, status: int, body: str, html: str, markers: list[str]) -> dict:
+    if html:
+        verdict = _evaluate_body(html, markers)
+        if verdict:
+            _log_evidence(url, status, html, verdict, "headless")
+            return {"url": url, "verdict": verdict, "status": status, "note": "rendered body"}
+    _log_evidence(url, status, html or body, "unverifiable_direct", "headless")
+    return {"url": url, "verdict": "unverifiable_direct", "status": status,
+            "note": f"HTTP {status}; render inconclusive"}
+
+
 def check_urls(urls: list[str], cfg: dict | None = None, use_headless: bool = True) -> list[dict]:
+    """Parallel HTTP pass, then ONE shared browser for every headless escalation
+    (concurrent per-thread Chromium launches silently fail under load)."""
     cfg = cfg or _load_config()
     parallelism = int(cfg.get("caps", {}).get("link_check_parallelism", 8))
+    deferred: dict[str, tuple] = {}
     with ThreadPoolExecutor(max_workers=parallelism) as pool:
-        return list(pool.map(lambda u: check_url(u, cfg, use_headless), urls))
+        results = list(pool.map(lambda u: check_url(u, cfg, use_headless, deferred), urls))
+    if deferred:
+        try:
+            import render
+
+            rendered = render.render_many([(u, None) for u in deferred])
+        except Exception:
+            rendered = {u: "" for u in deferred}
+        finished = {u: _finish_rendered(u, st, body, rendered.get(u, ""), markers)
+                    for u, (st, body, markers) in deferred.items()}
+        results = [finished.get(r["url"], r) if r["verdict"] == "_deferred" else r for r in results]
+    return results
 
 
 if __name__ == "__main__":

@@ -198,8 +198,11 @@ platforms:
     urls:
       - https://nodesk.co/remote-jobs/project-management/
     mirrors: []
-    expired_markers: []
-    quirks: "JS-rendered; undated listings are unverified-by-default (v2.10.0)."
+    expired_markers: ["Job Expired", "career opportunity is no longer available"]
+    quirks: >-
+      JS-rendered; undated listings unverified-by-default (v2.10.0). Category page KEEPS
+      expired postings listed (2026-07-11: 15/16 harvested PM links were "Job Expired" on
+      their own pages) — liveness comes from the posting page only, never the listing.
     notion_platform_name: { tracker: "NoDesk", passed_seen: "NoDesk" }
 
   - id: 15

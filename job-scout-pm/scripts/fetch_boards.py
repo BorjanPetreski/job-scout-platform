@@ -58,9 +58,9 @@ def _polite(url: str, min_delay: float = 1.0) -> None:
     host = re.sub(r"^https?://", "", url).split("/")[0]
     with _host_lock:
         wait = min_delay - (time.time() - _host_last.get(host, 0.0))
-        if wait > 0:
-            time.sleep(wait)
-        _host_last[host] = time.time()
+        _host_last[host] = time.time() + max(wait, 0)
+    if wait > 0:  # sleep OUTSIDE the lock — other hosts must not stall behind it
+        time.sleep(wait)
 
 
 def _get(url: str, timeout: int = 25, **kw) -> requests.Response:
