@@ -5,7 +5,7 @@
 
 ## Blocker
 
-❗ **v2.10.0 skill source (SKILL.md + references/pitching.md + references/gemini-prompt.md) is NOT available** — not in repo, uploads, or Notion (searched 2026-07-11). Borjan must upload the v2.10.0 skill zip. Blocks: SKILL.md v3 rewrite (step 9), CHANGELOG 1.0.0→2.10.0 history (step 10), config keywords/hard-filter fine print (partially mitigated: spec §1 enumerates all 13 filters + numbers). Everything else proceeds from spec r2.
+~~v2.10.0 skill source missing~~ **RESOLVED 2026-07-11 (second session): zip uploaded, all blocked steps completed.** Remaining for sign-off: NOTION_TOKEN on Borjan's machine (criterion 5 REST path + criterion 6 unattended proof) and the Delta Log closure entry (criterion 9, after Borjan accepts).
 
 ## Build order (spec §9)
 
