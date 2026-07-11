@@ -14,8 +14,8 @@
 | 1 | BUILD_PROGRESS.md | ✅ done | This file. Repo layout created under `job-scout-pm/` (subdir of job-scout-platform repo). |
 | 2 | config.yaml | ✅ done | Full 23-platform registry, tiers, caps, filters-as-data, Notion IDs. Live-verified: Remotive + Working Nomads APIs up. Schemas verified: Passed/Seen platform option is "Welcome to the Jungle" (config fixed); Tracker select missing MANY options (not just Pinpoint/Deel/Crossover) → generic select pre-check required. Keywords/rejected-reasons carry TODO(v2.10.0 port) markers. |
 | 3 | dedup.py (+ Notion backfill) | ✅ done | 203 rows backfilled via Notion MCP (188 Passed/Seen + 15 Tracker) into state/seen.jsonl; last-wins append semantics; URL-exact + 3-part-key match verified incl. Andersen both-log case. |
-| 4 | check_links.py | ❌ not started | |
-| 5 | headless render wrapper | ❌ not started | Chromium preinstalled at /opt/pw-browsers; `pip install playwright` needed; use executablePath, do NOT run playwright install. |
+| 4 | check_links.py | ✅ done | Live ✅ / stale ❌ (410) verified against real Remotive postings; 403-class → headless retry; evidence rows land in fetch_evidence.jsonl. RR per-job 403s even headless → unverifiable_direct (honest). Positive app-shell→rendered-live demo pending a fresh JS posting (do during step 6). |
+| 5 | render.py (headless wrapper) | ✅ done | API surface = render/render_many only (ban structural). IMPORTANT env finding: agent proxy resets Chromium TLS 1.3 ClientHello → when HTTPS_PROXY set, wrapper passes --ssl-version-max=tls1.2 + proxy launch arg (lossless; proxy re-terminates TLS). Chromium at /opt/pw-browsers/chromium via executable_path. NoDesk/Crossover/Landing.jobs all render. |
 | 6 | fetch_boards.py | ❌ not started | Tier 1 first; verify every API endpoint live before writing fallbacks. |
 | 7 | linkedin_tripwire.py | ❌ not started | Verify guest endpoint live. |
 | 8 | scan.py | ❌ not started | |
