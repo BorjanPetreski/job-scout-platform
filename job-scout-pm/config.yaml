@@ -70,7 +70,10 @@ platforms:
       - https://www.remoterocketship.com/jobs/scrum-master
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
-    quirks: "Per-job pages JS-rendered AND intermittently 403 — per-job reads go straight to headless."
+    quirks: >-
+      DEGRADED 2026-07-11: Cloudflare now 403s list pages AND sitemap, direct and headless
+      alike (was: per-job 403s only). Source reports down until RR loosens up; roles mostly
+      mirror in from teamtailor/ATS anyway. Candidate for tier demotion at next recompute.
     per_job_fetch_mode: headless
     notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
 
@@ -83,7 +86,7 @@ platforms:
       - https://www.remoterocketship.com/jobs/project-manager?locations=Europe
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
-    quirks: "Same engine as id 5."
+    quirks: "Same engine as id 5 — same 2026-07-11 Cloudflare degradation."
     per_job_fetch_mode: headless
     notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
 
@@ -140,8 +143,10 @@ platforms:
     mirrors: []
     expired_markers: ["This job listing has expired"]
     quirks: >-
-      HTML masks company names for anonymous fetches and truncates category pages —
-      API returns full unmasked set (delta row 5). Verified live 2026-07-11.
+      REGRESSED 2026-07-11 (post-delta): API now a 41-job stub (params ignored, 0 PM);
+      anonymous category HTML masks companies AND carries no per-job links, rendered or not.
+      Fetcher returns the stub; platform effectively degraded for enumeration. Per-job pages
+      remain public (liveness checks fine). ❓ NEEDS BORJAN at next recompute.
     notion_platform_name: { tracker: "Remotive", passed_seen: "Remotive" }
 
   - id: 11
@@ -153,7 +158,10 @@ platforms:
       - https://www.welcometothejungle.com/en/jobs?query=project%20manager&refinementList%5Boffices.country_code%5D%5B%5D=remote
     mirrors: []
     expired_markers: ["This job is no longer available"]
-    quirks: "Search pages robots-blocked (row 9) — use category/company pages; France-skew. Absorbed Otta (#16)."
+    quirks: >-
+      Search pages robots-blocked (row 9); rendered search results are Algolia/consent-gated
+      (verified 2026-07-11) — no anonymous enumeration channel. WttJ roles reach us via
+      mirrors (Remotive/app.wttj links in history). France-skew. Absorbed Otta (#16).
     notion_platform_name: { tracker: "Welcome to the Jungle", passed_seen: "Welcome to the Jungle" }
 
   - id: 12
@@ -177,7 +185,9 @@ platforms:
       - https://justremote.co/remote-project-management-jobs
     mirrors: []
     expired_markers: ["This position is no longer available"]
-    quirks: "Category pages JS-rendered (v2.10.0)."
+    quirks: >-
+      DEGRADED 2026-07-11: listings lazy-load on scroll — headless snapshot carries zero
+      postings; no API/page-data channel found. Reports source_down until they change engines.
     notion_platform_name: { tracker: "JustRemote", passed_seen: "JustRemote" }
 
   - id: 14
@@ -414,7 +424,8 @@ hard_filters:
 caps:
   linkedin_requests_per_run: 10
   linkedin_min_delay_s: 3
-  max_full_reads_per_run: 15     # raise freely — local parses, not context tokens; kept for politeness
+  max_full_reads_per_run: 60     # local parses, not context tokens; cap is politeness only
+                                 # (first post-migration runs carry a backlog; steady-state delta is small)
   link_check_parallelism: 8
   min_delay_same_host_s: 1
   headless_parallelism: 3

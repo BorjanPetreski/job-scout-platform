@@ -92,6 +92,9 @@ def match(candidate: dict, seen: dict) -> dict | None:
         hit = seen["by_url"].get(norm_url(candidate["url"]))
         if hit:
             return hit
+    if not norm_company(candidate.get("company", "")):
+        return None  # company-less discovery rows would form degenerate keys ("|title|")
+                     # that cross-match unrelated postings — URL match only for those
     key = make_key(candidate.get("company", ""), candidate.get("role", ""), candidate.get("locdom", ""))
     return seen["by_key"].get(key)
 

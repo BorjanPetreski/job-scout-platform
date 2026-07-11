@@ -1,0 +1,580 @@
+#!/usr/bin/env python3
+"""fetch_boards.py — per-platform fetchers: API-first, deterministic HTML parse,
+headless render, mirror pipeline. No free-text summarization anywhere (delta row 10).
+
+Every fetcher returns either candidates or a structured source_down marker —
+NO silent empty results. Fallback chain on failure: api/direct → headless render
+→ mirrors → unresolved leads emitted as `unverified_blocked` candidates for
+immediate seen.jsonl logging (SysMap lesson).
+
+Endpoint state as verified live 2026-07-11 (endpoints drift — see BUILD findings):
+  Remotive api/remote-jobs        → REGRESSED: 41-job stub, params ignored, 0 PM jobs;
+                                    anonymous category HTML has masked companies and NO
+                                    per-job links (headless render identical). Platform
+                                    marked degraded; per-job pages remain public.
+  Working Nomads exposed_jobs     → 33-job sample, category param ignored (still useful)
+  Remote OK /api                  → full list, first element is a legal notice
+  JustJoin.it                     → NEW endpoint /v2/user-panel/offers/by-cursor,
+                                    categories[]=15 (=PM), perPage caps at 20, cursor pages
+  Greenhouse boards-api           → works (content=true)
+  Lever api.lever.co/v0/postings  → works
+  Workable apply.workable.com/api/v3/accounts/{slug}/jobs (POST) → works, nextPage token
+  Pinpoint {board}.pinpointhq.com/postings.json → works
+  Ashby posting-api               → works generally; Deel DISABLED it (board hidden) —
+                                    Deel jobs parsed from careers-page embedded JSON instead
+  WWR category RSS                → 301s to nothing; /remote-jobs.rss (all jobs) works and
+                                    doubles as the cross-category pass
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import threading
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urljoin
+
+import requests
+
+ROOT = Path(__file__).resolve().parent.parent
+
+UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+)
+HEADERS = {
+    "User-Agent": UA,
+    "Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+_host_last: dict[str, float] = {}
+_host_lock = threading.Lock()
+
+
+def _polite(url: str, min_delay: float = 1.0) -> None:
+    host = re.sub(r"^https?://", "", url).split("/")[0]
+    with _host_lock:
+        wait = min_delay - (time.time() - _host_last.get(host, 0.0))
+        if wait > 0:
+            time.sleep(wait)
+        _host_last[host] = time.time()
+
+
+def _get(url: str, timeout: int = 25, **kw) -> requests.Response:
+    _polite(url)
+    return requests.get(url, headers=HEADERS, timeout=timeout, **kw)
+
+
+def _cand(title, company, loc, url, platform, posted_at=None, salary=None, jd=None) -> dict:
+    return {
+        "title": (title or "").strip(),
+        "company": (company or "").strip(),
+        "loc": (loc or "").strip(),
+        "url": url,
+        "platform": platform,
+        "posted_at": posted_at,
+        "salary": salary,
+        "jd_text": jd,  # full JD text when the enumeration already carries it
+    }
+
+
+def _ok(platform: str, candidates: list[dict], note: str = "") -> dict:
+    return {"platform": platform, "candidates": candidates, "source_down": False, "note": note}
+
+
+def _down(platform: str, note: str) -> dict:
+    return {"platform": platform, "candidates": [], "source_down": True, "note": note}
+
+
+def _text_of(html_fragment: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html_fragment)).strip()
+
+
+# ---------------------------------------------------------------- API fetchers
+
+def fetch_remotive(p: dict, cfg: dict) -> dict:
+    """Degraded platform (2026-07-11 regression): API is a ~41-job stub. We still take
+    what it gives — title filter happens in scan.py — and surface the degradation."""
+    try:
+        r = _get("https://remotive.com/api/remote-jobs")
+        jobs = r.json().get("jobs", [])
+    except Exception as exc:
+        return _down(p["name"], f"API error: {type(exc).__name__}")
+    cands = [
+        _cand(j.get("title"), j.get("company_name"), j.get("candidate_required_location"),
+              j.get("url"), p["name"], j.get("publication_date"), j.get("salary"),
+              _text_of(j.get("description", "")) or None)
+        for j in jobs
+    ]
+    return _ok(p["name"], cands,
+               "DEGRADED: anonymous API is a stub (41 jobs, no PM category); "
+               "category HTML masks companies and carries no job links")
+
+
+def fetch_workingnomads(p: dict, cfg: dict) -> dict:
+    try:
+        jobs = _get("https://www.workingnomads.com/api/exposed_jobs/").json()
+    except Exception as exc:
+        return _down(p["name"], f"API error: {type(exc).__name__}")
+    cands = [
+        _cand(j.get("title"), j.get("company_name"), j.get("location"), j.get("url"),
+              p["name"], j.get("pub_date"), None, _text_of(j.get("description", "")) or None)
+        for j in jobs
+    ]
+    return _ok(p["name"], cands, "exposed_jobs sample (~33 rows; category param ignored)")
+
+
+def fetch_remoteok(p: dict, cfg: dict) -> dict:
+    try:
+        data = _get("https://remoteok.com/api").json()
+    except Exception as exc:
+        return _down(p["name"], f"API error: {type(exc).__name__}")
+    cands = []
+    for j in data:
+        if not isinstance(j, dict) or not j.get("position"):
+            continue  # first element is a legal notice
+        cands.append(_cand(j.get("position"), j.get("company"), j.get("location"),
+                           j.get("url"), p["name"], j.get("date"),
+                           f"{j.get('salary_min') or ''}-{j.get('salary_max') or ''}".strip("-") or None,
+                           _text_of(j.get("description", "")) or None))
+    return _ok(p["name"], cands)
+
+
+def fetch_justjoinit(p: dict, cfg: dict) -> dict:
+    """Cursor-paginated PM category (id 15). List data is for DISCOVERY ONLY —
+    liveness comes exclusively from the offer page (invariant #6; chips lie)."""
+    base = "https://api.justjoin.it/v2/user-panel/offers/by-cursor?categories[]=15&perPage=20"
+    cands, cursor, pages = [], None, 0
+    seen_slugs: set[str] = set()
+    try:
+        while pages < 60:
+            # pagination param is `from` (the meta.next.cursor VALUE, verified 2026-07-11;
+            # a `cursor=` param is silently ignored and loops page 1 forever)
+            url = base + (f"&from={cursor}" if cursor is not None else "")
+            d = _get(url).json()
+            for o in d.get("data", []):
+                if o["slug"] in seen_slugs:
+                    continue
+                seen_slugs.add(o["slug"])
+                city = o.get("city") or ""
+                wp = o.get("workplaceType") or ""
+                loc = f"{city} ({wp})".strip()
+                sal = None
+                for et in o.get("employmentTypes") or []:
+                    if et.get("from") or et.get("to"):
+                        sal = f"{et.get('from')}-{et.get('to')} {et.get('currency', '')} ({et.get('type', '')})"
+                        break
+                cands.append(_cand(o.get("title"), o.get("companyName"), loc,
+                                   f"https://justjoin.it/job-offer/{o['slug']}", p["name"],
+                                   o.get("publishedAt"), sal))
+            nxt = (d.get("meta") or {}).get("next") or {}
+            cursor = nxt.get("cursor")
+            pages += 1
+            if cursor is None or not nxt.get("itemsCount"):
+                break
+    except Exception as exc:
+        if not cands:
+            return _down(p["name"], f"API error: {type(exc).__name__}")
+        return _ok(p["name"], cands, f"partial: cursor pagination broke after {pages} pages")
+    return _ok(p["name"], cands, f"{pages} cursor pages")
+
+
+def fetch_himalayas(p: dict, cfg: dict) -> dict:
+    """Public API at /jobs/api (verified 2026-07-11: offset/limit, totalCount ~100k,
+    newest-first). HTML listing 403s on direct fetch now — API replaces it. We take the
+    newest pages and pre-filter to PM-ish categories/titles so a Tier 1 platform doesn't
+    flood the pipeline with 100k rows; scan.py still applies the real keyword filter."""
+    kw = [k.lower() for k in (cfg.get("keywords", {}).get("core", []) + cfg.get("keywords", {}).get("expanded", []))]
+    cands = []
+    try:
+        for page in range(10):
+            d = _get(f"https://himalayas.app/jobs/api?limit=100&offset={page * 100}", timeout=30).json()
+            jobs = d.get("jobs", [])
+            for j in jobs:
+                hay = (j.get("title", "") + " " + " ".join(j.get("categories") or [])
+                       + " " + " ".join(j.get("parentCategories") or [])).lower()
+                if not any(k in hay for k in kw) and "project management" not in hay:
+                    continue
+                sal = None
+                if j.get("minSalary") or j.get("maxSalary"):
+                    sal = f"{j.get('minSalary')}-{j.get('maxSalary')} {j.get('currency', '')}/{j.get('salaryPeriod', '')}"
+                loc = ", ".join((j.get("locationRestrictions") or [])[:4]) or "Worldwide"
+                posted = j.get("pubDate")
+                if isinstance(posted, (int, float)):
+                    posted = datetime.fromtimestamp(posted, tz=timezone.utc).isoformat()
+                url = j.get("guid") or f"https://himalayas.app/companies/{j.get('companySlug')}/jobs"
+                cands.append(_cand(j.get("title"), j.get("companyName"), loc, url, p["name"],
+                                   posted, sal, _text_of(j.get("description", ""))[:5000] or None))
+            if not jobs:
+                break
+    except Exception as exc:
+        if not cands:
+            return _down(p["name"], f"API error: {type(exc).__name__}")
+    return _ok(p["name"], cands, "jobs/api newest 1000, PM-prefiltered (HTML listing 403s)")
+
+
+def fetch_greenhouse(p: dict, cfg: dict) -> dict:
+    boards = p.get("boards") or []
+    if not boards:
+        return _ok(p["name"], [], "no boards configured yet (boards[] empty)")
+    cands, down = [], []
+    for b in boards:
+        try:
+            d = _get(f"https://boards-api.greenhouse.io/v1/boards/{b}/jobs?content=true").json()
+            for j in d.get("jobs", []):
+                cands.append(_cand(j.get("title"), b, (j.get("location") or {}).get("name"),
+                                   j.get("absolute_url"), p["name"], j.get("updated_at"),
+                                   None, _text_of(j.get("content", "")) or None))
+        except Exception as exc:
+            down.append(f"{b}:{type(exc).__name__}")
+    note = f"boards down: {down}" if down else ""
+    if down and not cands:
+        return _down(p["name"], note)
+    return _ok(p["name"], cands, note)
+
+
+def fetch_lever(p: dict, cfg: dict) -> dict:
+    boards = p.get("boards") or []
+    if not boards:
+        return _ok(p["name"], [], "no boards configured yet (boards[] empty)")
+    cands, down = [], []
+    for b in boards:
+        try:
+            jobs = _get(f"https://api.lever.co/v0/postings/{b}?mode=json").json()
+            for j in jobs:
+                cat = j.get("categories") or {}
+                posted = j.get("createdAt")
+                if isinstance(posted, (int, float)):
+                    posted = datetime.fromtimestamp(posted / 1000, tz=timezone.utc).isoformat()
+                cands.append(_cand(j.get("text"), b, cat.get("location"), j.get("hostedUrl"),
+                                   p["name"], posted, None, j.get("descriptionPlain")))
+        except Exception as exc:
+            down.append(f"{b}:{type(exc).__name__}")
+    note = f"boards down: {down}" if down else ""
+    if down and not cands:
+        return _down(p["name"], note)
+    return _ok(p["name"], cands, note)
+
+
+def fetch_workable(p: dict, cfg: dict) -> dict:
+    boards = p.get("boards") or []
+    if not boards:
+        return _ok(p["name"], [], "no boards configured yet (boards[] empty)")
+    cands, down = [], []
+    for b in boards:
+        try:
+            token, pages = None, 0
+            while pages < 20:
+                body = {"query": "", "location": [], "department": [], "worktype": [], "remote": []}
+                if token:
+                    body["token"] = token
+                _polite(f"https://apply.workable.com/{b}")
+                r = requests.post(f"https://apply.workable.com/api/v3/accounts/{b}/jobs",
+                                  json=body, headers=HEADERS, timeout=25)
+                d = r.json()
+                for j in d.get("results", []):
+                    loc = (j.get("location") or {}).get("city") or ""
+                    country = (j.get("location") or {}).get("country") or ""
+                    remote = "remote" if j.get("remote") else ""
+                    cands.append(_cand(j.get("title"), b, " ".join(x for x in (loc, country, remote) if x),
+                                       f"https://apply.workable.com/{b}/j/{j['shortcode']}/",
+                                       p["name"], j.get("published")))
+                token = d.get("nextPage")
+                pages += 1
+                if not token:
+                    break
+        except Exception as exc:
+            down.append(f"{b}:{type(exc).__name__}")
+    note = f"boards down: {down}" if down else ""
+    if down and not cands:
+        return _down(p["name"], note)
+    return _ok(p["name"], cands, note)
+
+
+def fetch_pinpoint(p: dict, cfg: dict) -> dict:
+    boards = p.get("boards") or []
+    if not boards:
+        return _ok(p["name"], [], "no boards configured yet (boards[] empty)")
+    cands, down = [], []
+    for b in boards:
+        try:
+            d = _get(f"https://{b}.pinpointhq.com/postings.json").json()
+            for j in d.get("data", []):
+                loc = j.get("location")
+                if isinstance(loc, dict):
+                    loc = loc.get("name") or loc.get("city") or ""
+                cands.append(_cand(j.get("title"), b, f"{loc} ({j.get('workplace_type', '')})",
+                                   j.get("url"), p["name"], j.get("published_at") or j.get("created_at"),
+                                   None, _text_of(j.get("description", "")) or None))
+        except Exception as exc:
+            down.append(f"{b}:{type(exc).__name__}")
+    note = f"boards down: {down}" if down else ""
+    if down and not cands:
+        return _down(p["name"], note)
+    return _ok(p["name"], cands, note)
+
+
+def fetch_deel(p: dict, cfg: dict) -> dict:
+    """Deel disabled Ashby's public posting API (verified empty via REST and GraphQL,
+    2026-07-11). Their careers page embeds the full job set as escaped Strapi JSON —
+    parse that. Fallback order: Ashby API (in case they re-enable) → careers JSON."""
+    try:
+        d = _get("https://api.ashbyhq.com/posting-api/job-board/deel").json()
+        jobs = d.get("jobs") or []
+        if jobs:
+            cands = [_cand(j.get("title"), "Deel", j.get("location"), j.get("jobUrl") or j.get("applyUrl"),
+                           p["name"], j.get("publishedAt")) for j in jobs]
+            return _ok(p["name"], cands, "ashby posting API (re-enabled)")
+    except Exception:
+        pass
+    try:
+        html = _get("https://www.deel.com/careers/", timeout=40).text
+    except Exception as exc:
+        return _down(p["name"], f"careers page error: {type(exc).__name__}")
+    # Escaped-JSON job objects: {"id":N,"attributes":{"ashby_id":"...", ... "slug":"/careers/position/?ashby_jid=..."}}
+    cands = []
+    for m in re.finditer(r'\{\\"id\\":\d+,\\"attributes\\":\{\\"ashby_id\\":\\"([\w-]+)\\"(.{0,4000}?)\\"slug\\":\\"([^"\\]+)\\"', html):
+        jid, blob, slug = m.groups()
+        title_m = re.search(r'\\"(?:job_title|title)\\":\\"([^"\\]{3,90})\\"', blob)
+        locs = re.findall(r'\\"location\\":\\"([^"\\]{2,60})\\"', blob)
+        updated = re.search(r'\\"ashby_updated_at\\":\\"([^"\\]+)\\"', blob)
+        comp = re.search(r'\\"compensation_tier_summary\\":\\"([^"\\]+)\\"', blob)
+        if not title_m:
+            seo = re.search(r'\\"SEO\\":\{\\"title\\":\\"([^"\\|]{3,90})', blob)
+            title_m = seo
+        if title_m:
+            cands.append(_cand(title_m.group(1).strip(), "Deel", ", ".join(locs[:4]),
+                               urljoin("https://www.deel.com", slug.replace("\\", "")),
+                               p["name"], updated.group(1) if updated else None,
+                               comp.group(1) if comp else None))
+    if not cands:
+        return _down(p["name"], "careers-page JSON parse yielded 0 jobs (layout drifted?)")
+    return _ok(p["name"], cands, "careers-page embedded JSON (Ashby API disabled by Deel)")
+
+
+# ------------------------------------------------------- RSS / HTML fetchers
+
+def fetch_wwr(p: dict, cfg: dict) -> dict:
+    """All-jobs RSS (category RSS 301s to nowhere). All categories = the v2.10.0
+    cross-category pass is inherent. Title format: 'Company: Role'."""
+    try:
+        xml = _get("https://weworkremotely.com/remote-jobs.rss", timeout=30).text
+    except Exception as exc:
+        return _down(p["name"], f"RSS error: {type(exc).__name__}")
+    cands = []
+    for item in re.findall(r"<item>(.*?)</item>", xml, re.S):
+        def tag(name):
+            m = re.search(rf"<{name}>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</{name}>", item, re.S)
+            return (m.group(1).strip() if m else "")
+        raw_title = tag("title")
+        company, _, role = raw_title.partition(":")
+        if not role:
+            role, company = raw_title, ""
+        region = tag("region") or tag("category")
+        cands.append(_cand(role.strip(), company.strip(), region, tag("link"), p["name"],
+                           tag("pubDate"), None, _text_of(tag("description"))[:5000] or None))
+    if not cands:
+        return _down(p["name"], "RSS parsed to 0 items")
+    return _ok(p["name"], cands, "all-jobs RSS (cross-category inherent)")
+
+
+# Per-platform link-harvest specs for listing pages (deterministic, testable).
+# href: full-match regex on the anchor's href (path or absolute)
+# company_idx: path segment carrying the company slug (None = unknown from URL)
+# min_hyphens: minimum hyphens in the final slug — separates postings from category links
+HARVEST_SPECS: dict[str, dict] = {
+    "Himalayas": {"href": r"/companies/[^/]+/jobs/[^/]+/?", "base": "https://himalayas.app", "company_idx": 2},
+    "Jobgether": {"href": r"/offer/[\w-]{10,}", "base": "https://jobgether.com"},
+    "Arc.dev": {"href": r"/remote-jobs/details/[\w-]+", "base": "https://arc.dev"},
+    "Remote Rocketship (SM worldwide)": {"href": r"/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 2},
+    "Remote Rocketship (PM Europe)": {"href": r"/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 2},
+    "Welcome to the Jungle": {"href": r"/en/companies/[^/]+/jobs/[^/]+", "base": "https://www.welcometothejungle.com", "company_idx": 3},
+    "NoDesk": {"href": r"/remote-jobs/[a-z0-9-]+/?", "base": "https://nodesk.co", "min_hyphens": 3},
+    "Dynamite Jobs": {"href": r"(?:https://dynamitejobs\.com)?/company/[^/]+/remote-job/[\w-]+/?", "base": "https://dynamitejobs.com", "company_idx": 2},
+    "JustRemote": {"href": r"/remote-jobs/[a-z-]+/[\w-]+", "base": "https://justremote.co"},
+    "Landing.jobs": {"href": r"(?:https://landing\.jobs)?/at/[^/]+/[\w-]+", "base": "https://landing.jobs", "company_idx": 2},
+    "Crossover": {"href": r"/jobs/\d+/[\w-]+/[\w-]+", "base": "https://www.crossover.com", "company_idx": 3},
+}
+
+
+def _slug_title(url: str) -> str:
+    slug = url.rstrip("/").split("/")[-1]
+    return re.sub(r"[-_]+", " ", re.sub(r"\b[0-9a-f]{6,}\b", "", slug)).strip()
+
+
+def _harvest_links(html: str, platform: str) -> list[dict]:
+    spec = HARVEST_SPECS[platform]
+    href_re = re.compile(rf"^{spec['href']}$")
+    cands: dict[str, dict] = {}
+    try:
+        from selectolax.parser import HTMLParser
+
+        anchors = [(a.attributes.get("href") or "", re.sub(r"\s+", " ", a.text()).strip())
+                   for a in HTMLParser(html).css("a")]
+    except Exception:
+        anchors = [(h, "") for h in re.findall(r'href="([^"]+)"', html)]
+    for href, text in anchors:
+        path = re.sub(r"^https?://[^/]+", "", href.split("?")[0])
+        if not href_re.match(path) and not href_re.match(href.split("?")[0]):
+            continue
+        slug = path.rstrip("/").split("/")[-1]
+        if slug.count("-") < spec.get("min_hyphens", 0):
+            continue  # category/nav link, not a posting
+        url = href if href.startswith("http") else urljoin(spec["base"], path)
+        company = ""
+        if spec.get("company_idx") is not None:
+            parts = [s for s in path.split("/") if s]
+            if len(parts) > spec["company_idx"] - 1:
+                company = parts[spec["company_idx"] - 1].replace("-", " ")
+        # anchor text is the title when it looks like one; slug otherwise
+        title = text if 3 < len(text) < 90 and not re.match(r"(?i)(view|apply|read|see) ", text) else _slug_title(url)
+        prev = cands.get(url)
+        if prev is None or (prev["title"] == _slug_title(url) and title != prev["title"]):
+            cands[url] = _cand(title, company, "", url, platform)
+    return list(cands.values())
+
+
+def fetch_html_listing(p: dict, cfg: dict, headless: bool = False) -> dict:
+    urls = p.get("urls") or []
+    if not urls:
+        return _down(p["name"], "no listing urls configured")
+    all_cands: dict[str, dict] = {}
+    notes = []
+    for u in urls:
+        html = ""
+        if not headless:
+            try:
+                r = _get(u)
+                if r.status_code == 200:
+                    html = r.text
+                else:
+                    notes.append(f"HTTP {r.status_code} on {u}")
+            except Exception as exc:
+                notes.append(f"{type(exc).__name__} on {u}")
+        if not html or p["name"] not in HARVEST_SPECS or not _harvest_links(html, p["name"]):
+            # direct failed or produced nothing harvestable → headless render
+            try:
+                import render
+
+                html = render.render(u) or html
+                if html:
+                    notes.append(f"headless render used for {u}")
+            except Exception as exc:
+                notes.append(f"render {type(exc).__name__} on {u}")
+        if html and p["name"] in HARVEST_SPECS:
+            for c in _harvest_links(html, p["name"]):
+                all_cands.setdefault(c["url"], c)
+    if not all_cands:
+        return _down(p["name"], "; ".join(notes) or "no candidates harvested")
+    return _ok(p["name"], list(all_cands.values()), "; ".join(notes))
+
+
+# ----------------------------------------------------------- JD fetch + mirrors
+
+ATS_URL_PATTERNS = re.compile(
+    r"https?://(?:boards|job-boards)(?:\.eu)?\.greenhouse\.io/[^\s\"']+|"
+    r"https?://jobs\.lever\.co/[^\s\"']+|"
+    r"https?://apply\.workable\.com/[^\s\"']+|"
+    r"https?://[\w-]+\.pinpointhq\.com/[^\s\"']+|"
+    r"https?://jobs\.ashbyhq\.com/[^\s\"']+"
+)
+
+
+def resolve_source_url(html_or_text: str) -> str | None:
+    """Detect the source ATS URL inside a mirror/aggregator page (2.7.0: the source
+    ATS URL is the liveness authority)."""
+    m = ATS_URL_PATTERNS.search(html_or_text)
+    return m.group(0).rstrip('\\"\'>).,') if m else None
+
+
+def fetch_jd(url: str) -> tuple[str, str, str]:
+    """Fetch full JD for one posting. Returns (jd_text, raw_html, method).
+    Chain: direct → headless. Mirror resolution is the caller's job
+    (resolve_source_url on the raw html + config mirrors[])."""
+    try:
+        r = _get(url, timeout=30)
+        if r.status_code == 200:
+            text = _visible_text(r.text)
+            if len(text) > 600:
+                return text, r.text, "direct"
+    except Exception:
+        pass
+    try:
+        import render
+
+        html = render.render(url)
+        text = _visible_text(html)
+        if len(text) > 600:
+            return text, html, "headless"
+    except Exception:
+        pass
+    return "", "", "failed"
+
+
+def _visible_text(html: str) -> str:
+    try:
+        from selectolax.parser import HTMLParser
+
+        tree = HTMLParser(html)
+        for tag in ("script", "style", "noscript", "nav", "footer", "header"):
+            for node in tree.css(tag):
+                node.decompose()
+        return re.sub(r"\s+", " ", tree.body.text(separator=" ")).strip() if tree.body else ""
+    except Exception:
+        return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html)).strip()
+
+
+# ----------------------------------------------------------------- dispatcher
+
+HANDLERS = {
+    "We Work Remotely": fetch_wwr,
+    "Himalayas": fetch_himalayas,
+    "Remotive": fetch_remotive,
+    "Working Nomads": fetch_workingnomads,
+    "Remote OK": fetch_remoteok,
+    "JustJoin.it": fetch_justjoinit,
+    "Greenhouse (ATS boards)": fetch_greenhouse,
+    "Lever (ATS boards)": fetch_lever,
+    "Workable (ATS boards)": fetch_workable,
+    "Pinpoint HQ (ATS boards)": fetch_pinpoint,
+    "Deel": fetch_deel,
+}
+
+
+def fetch_platform(p: dict, cfg: dict) -> dict:
+    name = p["name"]
+    try:
+        if name in HANDLERS:
+            return HANDLERS[name](p, cfg)
+        if p.get("fetch_mode") == "headless":
+            return fetch_html_listing(p, cfg, headless=True)
+        return fetch_html_listing(p, cfg, headless=False)
+    except Exception as exc:  # a fetcher bug must never take down the whole run
+        return _down(name, f"handler crashed: {type(exc).__name__}: {exc}")
+
+
+def fetch_all(cfg: dict) -> list[dict]:
+    """Fetch every active platform in tier order. Returns one result dict per platform."""
+    platforms = [p for p in cfg["platforms"] if p.get("active")]
+    platforms.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
+    return [fetch_platform(p, cfg) for p in platforms]
+
+
+if __name__ == "__main__":
+    import sys
+
+    import yaml
+
+    cfg = yaml.safe_load((ROOT / "config.yaml").read_text(encoding="utf-8"))
+    only = sys.argv[1] if len(sys.argv) > 1 else None
+    for p in cfg["platforms"]:
+        if not p.get("active") or (only and only.lower() not in p["name"].lower()):
+            continue
+        res = fetch_platform(p, cfg)
+        flag = "DOWN" if res["source_down"] else "ok"
+        print(f"{res['platform']:36} {flag:5} {len(res['candidates']):4} candidates  {res['note'][:90]}")
+        for c in res["candidates"][:3]:
+            print(f"    - {c['title'][:60]!r} @ {c['company'][:25]!r} [{c['loc'][:30]}]")
