@@ -20,8 +20,8 @@
 | 7 | linkedin_tripwire.py | ✅ done | Guest endpoint live; 46-52 cards from 6 requests (caps: ≤10 req, ≥3s); title/company/loc/date parsed; 429/999 immediate stop coded. |
 | 8 | scan.py | ✅ done | First full rotation: 5m55s, 210 candidates (first-run backlog), 17 auto-drops + 1 link-dead logged, ledger printed, runs.json + recompute counter. Seeded dedup proof passed (Andersen applied + OSF passed both suppressed). Fixed: degenerate empty-company dedup keys; read cap → 60. NOTE: unscored candidates re-emit on re-run BY DESIGN (crash resilience); "zero dupes on re-run" holds once the session logs decisions — drops/link-dead/unverified_blocked are suppressed immediately. |
 | 9 | notion_sync.py | ✅ done (REST path untested-live) | Typed wrapper (hard-coded data_source parent + post-write assertion; parentless write raises), generic select pre-check, backoff, digest append w/ anti-race, --applied Tracker flow gated on status=applied. No NOTION_TOKEN in env → tokenless path exports state/notion_pending.json for MCP push (exercised: 18 real rows pushed via MCP to Passed/Seen, digest line appended to Runs page, 📥 "New — Unreviewed" review view created on the DB). ❗ REST path needs NOTION_TOKEN to be verified + required for unattended runs. |
-| 10 | SKILL.md v3 rewrite | 🚫 blocked | Needs v2.10.0 SKILL.md upload (also blocks references/pitching.md + gemini-prompt.md, config keyword reconciliation, [port] rejected-platform reasons). |
-| 11 | CHANGELOG.md | 🔨 partial | 3.0.0 entry written (incl. all 2026-07-11 platform findings); 1.0.0→2.10.0 history section is a TODO pending upload. |
+| 10 | SKILL.md v3 rewrite | ✅ done | v2.10.0 received 2026-07-11 (2nd session). Two lanes: Code-lane Execution Protocol + full policy layer (13 filters, scoring, archetypes, country-clone, multi-req, EOR knowledge) verbatim-in-meaning; Appendix A = compressed chat-native v2.10.0 lane (clusters, execution log, PROVENANCE handling, MCP write rules, session-resume provenance). Delta-log ritual retired per spec §2. references/ copied byte-identical from v2.10.0. Config reconciled: exact 1.8.0 keyword sets, ported rejected-platform reasons, v2.10.0 canonical URLs, tool-lockin/travel/E-Verify regexes. |
+| 11 | CHANGELOG.md | ✅ done | Full 1.0.0→2.10.0 history ported verbatim + 3.0.0 entry. |
 
 ## Acceptance criteria (§9) status
 
@@ -31,8 +31,8 @@
 4. ✅ tripwire: 46-52 cards, 6 requests, caps enforced; 429/999 stop + graceful degrade coded.
 5. ✅ MCP-fallback path: 18 real rows written to Passed/Seen w/ correct formats + per-DB naming, properties echoed/asserted; parentless write raises ValueError (tested). ❗ REST path pending NOTION_TOKEN. Borjan: verify test rows in Notion (marked "v3.0.0 BUILD TEST ROW" on the Trimark row).
 6. ❌ Unattended proof — needs Borjan's machine: NOTION_TOKEN + copy claude-settings.example.json → .claude/settings.json + scheduled task. (Auto-mode classifier refused an in-repo live settings.json as self-granting; shipped as example template instead.)
-7. 🚫 skill-tools audit — needs SKILL.md (blocked on v2.10.0).
-8. 🔨 semver/CHANGELOG partial; zip after SKILL.md.
+7. ✅ audit_skill.py written (validator replica) — PASSES, incl. on the unzipped deliverable.
+8. ✅ 3.0.0 + full changelog; clean zip built (job-scout-pm-v3.0.0.zip, no pycache/pyc, state/logs empty skeletons).
 9. ⏸ Delta Log closure — after Borjan's acceptance (page content already retrieved this session for the entry).
 
 ## Open questions (spec §10) — defaults adopted, Borjan may override

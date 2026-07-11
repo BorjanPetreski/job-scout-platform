@@ -31,7 +31,9 @@ platforms:
     active: true
     fetch_mode: direct
     urls:
-      - https://jobgether.com/remote-jobs
+      - https://jobgether.com/remote-jobs/emea/project-manager
+      - https://jobgether.com/remote-jobs/emea/scrum-master
+      - https://jobgether.com/remote-jobs/emea/agile-delivery-manager
     mirrors: []
     expired_markers: ["This offer is no longer available"]
     quirks: "Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no retry."
@@ -55,7 +57,7 @@ platforms:
     active: true
     fetch_mode: direct
     urls:
-      - https://arc.dev/remote-jobs/project-management
+      - https://arc.dev/remote-jobs/project-manager
     mirrors: []
     expired_markers: ["This job is no longer available"]
     quirks: ""
@@ -67,7 +69,7 @@ platforms:
     active: true
     fetch_mode: direct
     urls:
-      - https://www.remoterocketship.com/jobs/scrum-master
+      - https://www.remoterocketship.com/jobs/anywhere-in-the-world/scrum-master/
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
     quirks: >-
@@ -83,7 +85,7 @@ platforms:
     active: true
     fetch_mode: direct
     urls:
-      - https://www.remoterocketship.com/jobs/project-manager?locations=Europe
+      - https://www.remoterocketship.com/country/europe/jobs/project-management/
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
     quirks: "Same engine as id 5 — same 2026-07-11 Cloudflare degradation."
@@ -98,7 +100,7 @@ platforms:
     api:
       - https://www.workingnomads.com/api/exposed_jobs/
     urls:
-      - https://www.workingnomads.com/jobs?category=management
+      - https://www.workingnomads.com/remote-project-management-jobs-europe
     mirrors: []
     expired_markers: []
     quirks: "Category HTML now JS-rendered (2.10.0 regression) — API only, skip HTML. Verified live 2026-07-11."
@@ -110,7 +112,7 @@ platforms:
     active: true
     fetch_mode: direct
     urls:
-      - https://himalayas.app/jobs/project-management
+      - https://himalayas.app/jobs/remote/project-management
     mirrors: []
     expired_markers: ["This job posting is no longer available"]
     quirks: >-
@@ -170,7 +172,7 @@ platforms:
     active: true
     fetch_mode: headless
     urls:
-      - https://landing.jobs/jobs?remote=true
+      - https://landing.jobs/jobs?q=project+manager
     mirrors: []
     expired_markers: ["This job is closed"]
     quirks: "robots.txt hard block on direct fetch (delta row 9)."
@@ -342,7 +344,9 @@ linkedin_tripwire:
   freshness: "f_TPR=r86400"
 
 tiers:
-  # 2.8.0 recompute state (2026-07-10, 5 logged sessions, Tracker conversion rate primary signal).
+  # 2.8.0 recompute state (2026-07-10, 5 logged sessions, Tracker conversion rate primary signal:
+  # Himalayas 25% (2/8), Workable 9% (1/11), Greenhouse 5% (1/19), Lever 5% (1/19),
+  # JustJoin.it 2% (1/43) despite highest volume; Tier 3 = 0% across all 9 (41 logged, 0 converted)).
   # Tiers are DATA, not opinion. Next recompute after 5 more logged sessions (runs.json counter).
   1: [JustJoin.it, Remotive, "Workable (ATS boards)", "Lever (ATS boards)", Himalayas]
   2: ["Remote Rocketship (SM worldwide)", "Remote Rocketship (PM Europe)", NoDesk, "Greenhouse (ATS boards)"]
@@ -351,46 +355,39 @@ tiers:
       "Pinpoint HQ (ATS boards)", Deel, Crossover, EuropeRemotely, Otta]
 
 rejected_platforms:
-  # Do-NOT-re-add without new evidence (invariant #15). New platforms earn placement via the
-  # same 5-session conversion-rate bar.
-  # TODO(v2.10.0 port): reasons marked [port] are recorded in v2.10.0 SKILL.md — port verbatim on upload.
-  - { name: Rippling,             reason: "EMEA-title/US-employee bait-and-switch" }
-  - { name: Built In,             reason: "~90% US dominance" }
-  - { name: Remote.com,           reason: "[port] rejected in v2.x EOR testing" }
-  - { name: Oyster,               reason: "[port] rejected in v2.x EOR testing" }
-  - { name: Multiplier,           reason: "[port] rejected in v2.x EOR testing" }
-  - { name: Velocity Global,      reason: "[port] rejected in v2.x EOR testing" }
-  - { name: Globalization Partners, reason: "[port] rejected in v2.x EOR testing" }
-  - { name: Wellfound,            reason: "[port] rejected in v2.x testing" }
-  - { name: PowerToFly,           reason: "[port] rejected in v2.x testing" }
-  - { name: Braintrust,           reason: "[port] rejected in v2.x testing" }
-  - { name: Contra,               reason: "[port] rejected in v2.x testing" }
-  - { name: FlexJobs,             reason: "[port] rejected in v2.x testing" }
-  - { name: Jobspresso,           reason: "[port] rejected in v2.x testing" }
-  - { name: Remote.co,            reason: "[port] rejected in v2.x testing" }
+  # Do-NOT-re-add without new evidence (invariant #15; reasons verbatim from v2.10.0).
+  # New platforms earn tier placement via the same 5-session conversion-rate bar.
+  - { name: Rippling,             reason: "EMEA-title/US-employee bait-and-switch — confirmed via the company's own Himalayas listing tags (retested fully 2026-07-10)" }
+  - { name: Built In,             reason: "~90%+ US-dominated across 3 query passes; one EMEA-tagged role was UK-only bait-and-switch (retested fully 2026-07-10)" }
+  - { name: Remote.com,           reason: "real EMEA signal but its own Greenhouse links die on fetch (2/2 tested) — unreliable without a mirror-check discipline; revisit if a reliable mirror pattern emerges" }
+  - { name: Oyster,               reason: "zero PM/SM/DM openings found, any mirror" }
+  - { name: Multiplier,           reason: "zero search footprint for this role type" }
+  - { name: Velocity Global,      reason: "zero signal" }
+  - { name: Globalization Partners, reason: "only surfaced an already-logged India-tagged duplicate" }
+  - { name: Wellfound,            reason: "US-or-nearshore-only (same profile as Indeed/Glassdoor)" }
+  - { name: PowerToFly,           reason: "US-or-nearshore-only" }
+  - { name: Braintrust,           reason: "US-or-nearshore-only" }
+  - { name: Contra,               reason: "not a job board — freelancer-profile marketplace, no searchable PM postings" }
+  - { name: FlexJobs,             reason: "paywalled, high-volume-low-signal (but source of the EU-country-list filter insight)" }
+  - { name: Jobspresso,           reason: "sparse volume, restricted to US/Canada/UK/Germany hiring jurisdictions" }
+  - { name: Remote.co,            reason: "US/Poland-dominated; one Skopje listing found was dated 2024, not a standing signal" }
 
 keywords:
   # With full enumeration (delta row 3) these are LOCAL TITLE-MATCH FILTERS, not search queries.
-  # Candidates record the title variant ON THE POSTING, not the keyword that matched (promote/demote data).
-  # TODO(v2.10.0 port): reconcile against the 2.10.0 core+expanded sets on upload.
+  # Sets ported verbatim from v2.10.0 (1.8.0 core set; expanded tracked for promote/demote).
+  # Candidates record the title variant ON THE POSTING, not the keyword that matched.
+  # Substring matching applies: "project manager" catches Digital/Agile/Technical/IT variants.
   core:
-    - project manager
-    - it project manager
-    - technical project manager
-    - delivery manager
-    - service delivery manager
-    - client delivery manager
+    - project manager        # substring covers digital/agile/technical/IT/senior project manager
     - scrum master
-    - product owner
-  expanded:
-    - program manager
-    - engagement manager
+    - delivery manager       # substring covers product/client/solutions/digital/technical delivery manager
+    - agile delivery lead
+    - program manager        # substring covers technical/IT program manager
+  expanded:                  # promote/demote dataset — Borjan-triggered review, never automated
     - implementation manager
-    - agile coach
-    - delivery lead
-    - project lead
-    - agile project manager
-    - digital project manager
+    - release manager
+    - proxy product owner
+    - service delivery manager
 
 hard_filters:
   # MACHINE FIRST-PASS ONLY. Regexes flag/drop the mechanical cases; Claude still does the
@@ -402,14 +399,14 @@ hard_filters:
     eur_gross_month: 3000
     usd_year: 35000
   auto_drop_patterns:      # confident drops — logged "Filtered Out" with matched pattern
-    us_only: '(?i)\b(US[- ]only|United States only|must (be located|reside) in the (US|United States)|authorized to work in the (US|U\.S\.)|W-?2\b)'
+    us_only: '(?i)\b(US[- ]only|United States only|must (be located|reside) in the (US|United States)|authorized to work in the (US|U\.S\.)|E-?Verify|W-?2\b)'
     clearance: '(?i)\b(security clearance|TS/SCI|secret clearance|public trust)\b'
-    travel: '(?i)\b(travel (up to |approximately |~)?\d{1,3}\s?%|\d{1,3}\s?% travel)\b'
+    travel: '(?i)\b(travel (up to |approximately |~)?\d{1,3}\s?%|\d{1,3}\s?% travel|occasional travel|willingness to travel|travel (is |will be )?(required|expected)|travel as needed)\b'
     grind_culture: '(?i)\b(996|70[- ]hour|60\+? ?hours?/?week|work hard,? play hard|hustle culture)\b'
   flag_patterns:           # NOT auto-drops — surfaced to the judgment layer with a flag
     timezone: '(?i)\b(EST|EDT|PST|PDT|CST|CDT|MST|Eastern Time|Pacific Time|Mountain Time|Central Time|[0-9]{1,2}\s?(am|pm)\s?(ET|EST|PT|PST|CT|CST|MT))\b'
     eu_citizenship: '(?i)\b(EU (citizenship|citizen|passport)|European Union citizenship|EU work permit required)\b'
-    tool_lockin: '(?i)\b(certified (salesforce|servicenow|sap|workday|netsuite)|(salesforce|servicenow|sap|workday|netsuite) (administrator|certification required))\b'
+    tool_lockin: '(?i)\b(dynamics 365|(salesforce|servicenow|sap|workday|oracle|dynamics) (administrator|consultant|architect|certification|certified))\b'
     latam_payroll: '(?i)\b(LATAM|Latin America)\b.{0,80}\b(payroll|contract|entity|salary in local currency)\b'
     pure_ba: '(?i)\bbusiness analyst\b'
   eu_country_list_detector:
