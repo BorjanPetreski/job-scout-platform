@@ -1,0 +1,40 @@
+# BUILD_PROGRESS — job-scout-pm v3.0.0 (spec r2, 2026-07-11)
+
+> Read this FIRST on any session start/resume. Continue from state below; never redo ✅ steps.
+> Delete this file only after ALL acceptance criteria (§9) pass. Not shipped in the skill zip.
+
+## Blocker
+
+❗ **v2.10.0 skill source (SKILL.md + references/pitching.md + references/gemini-prompt.md) is NOT available** — not in repo, uploads, or Notion (searched 2026-07-11). Borjan must upload the v2.10.0 skill zip. Blocks: SKILL.md v3 rewrite (step 9), CHANGELOG 1.0.0→2.10.0 history (step 10), config keywords/hard-filter fine print (partially mitigated: spec §1 enumerates all 13 filters + numbers). Everything else proceeds from spec r2.
+
+## Build order (spec §9)
+
+| # | Step | Status | State / findings |
+|---|------|--------|------------------|
+| 1 | BUILD_PROGRESS.md | ✅ done | This file. Repo layout created under `job-scout-pm/` (subdir of job-scout-platform repo). |
+| 2 | config.yaml | ✅ done | Full 23-platform registry, tiers, caps, filters-as-data, Notion IDs. Live-verified: Remotive + Working Nomads APIs up. Schemas verified: Passed/Seen platform option is "Welcome to the Jungle" (config fixed); Tracker select missing MANY options (not just Pinpoint/Deel/Crossover) → generic select pre-check required. Keywords/rejected-reasons carry TODO(v2.10.0 port) markers. |
+| 3 | dedup.py (+ Notion backfill) | ✅ done | 203 rows backfilled via Notion MCP (188 Passed/Seen + 15 Tracker) into state/seen.jsonl; last-wins append semantics; URL-exact + 3-part-key match verified incl. Andersen both-log case. |
+| 4 | check_links.py | ❌ not started | |
+| 5 | headless render wrapper | ❌ not started | Chromium preinstalled at /opt/pw-browsers; `pip install playwright` needed; use executablePath, do NOT run playwright install. |
+| 6 | fetch_boards.py | ❌ not started | Tier 1 first; verify every API endpoint live before writing fallbacks. |
+| 7 | linkedin_tripwire.py | ❌ not started | Verify guest endpoint live. |
+| 8 | scan.py | ❌ not started | |
+| 9 | notion_sync.py | ❌ not started | No NOTION_TOKEN here → REST code + MCP-fallback instructions; select pre-check for Pinpoint HQ/Deel/Crossover. |
+| 10 | SKILL.md v3 rewrite | 🚫 blocked | Needs v2.10.0 SKILL.md upload. |
+| 11 | CHANGELOG.md | 🚫 blocked (3.0.0 entry can be drafted) | Needs v2.10.0 changelog history. |
+
+## Open questions (spec §10) — defaults adopted, Borjan may override
+
+1. NOTION_TOKEN: not present in build env → notion_sync.py takes token via env, MCP fallback documented. **Needs token for unattended runs.**
+2. Full rotation per run: **adopted** (spec r2 default).
+3. Host OS: unknown → both Desktop-task and cron instructions shipped.
+4. LinkedIn locations: "European Union" + "Worldwide" (N. Macedonia third slot left as config comment).
+5. Weekly full sweep: Monday (default).
+6. 2x/day schedule: adopted as documented default.
+7. Delta Log closure entry: deferred to acceptance (§9 crit. 9) — needs Borjan sign-off anyway.
+
+## Environment notes (build session, 2026-07-11)
+
+- Build runs in Claude Code remote session, repo `borjanpetreski/job-scout-platform`, branch `claude/job-scout-pm-migration-ypek3r`.
+- Outbound HTTPS via agent proxy (CA bundle /root/.ccr/ca-bundle.crt) — live-fetch tests must set `REQUESTS_CA_BUNDLE` if TLS errors appear; never disable verification.
+- Python 3.11.15; requests + PyYAML present; selectolax/playwright to install.
