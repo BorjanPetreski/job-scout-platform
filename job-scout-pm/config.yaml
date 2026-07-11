@@ -1,0 +1,455 @@
+# job-scout-pm v3.0.0 — single source of truth for platforms, keywords, filters-as-data,
+# caps, and Notion targets. Scripts consume this directly; SKILL.md holds policy/judgment only.
+#
+# fetch_mode = FIRST-CHOICE strategy per platform. Runtime fallback chain is always:
+#   api -> direct -> headless -> mirrors -> unverified_blocked
+# tier: every ACTIVE platform MUST have one (invariant #14 — Pinpoint HQ lesson).
+#   Config validation errors out otherwise (see scripts/scan.py validate_config).
+
+version: "3.0.0"
+
+platforms:
+  - id: 1
+    name: We Work Remotely
+    tier: 3
+    active: true
+    fetch_mode: direct
+    urls:
+      - https://weworkremotely.com/categories/remote-project-management-jobs
+    rss:
+      - https://weworkremotely.com/categories/remote-project-management-jobs.rss
+    mirrors: []
+    expired_markers: ["This job has been closed", "no longer accepting applications"]
+    quirks: "Cross-category pass required (PM roles appear outside the PM category)."
+    notion_platform_name:
+      tracker: "WeWorkRemotely"
+      passed_seen: "We Work Remotely"
+
+  - id: 2
+    name: Jobgether
+    tier: 3
+    active: true
+    fetch_mode: direct
+    urls:
+      - https://jobgether.com/remote-jobs/emea/project-manager
+      - https://jobgether.com/remote-jobs/emea/scrum-master
+      - https://jobgether.com/remote-jobs/emea/agile-delivery-manager
+    mirrors: []
+    expired_markers: ["This offer is no longer available"]
+    quirks: "Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no retry."
+    notion_platform_name: { tracker: "Jobgether", passed_seen: "Jobgether" }
+
+  - id: 3
+    name: Dynamite Jobs
+    tier: 3
+    active: true
+    fetch_mode: headless
+    urls:
+      - https://dynamitejobs.com/remote-jobs/project-management
+    mirrors: []
+    expired_markers: ["This job is no longer available"]
+    quirks: "Category pages JS-rendered (v2.10.0)."
+    notion_platform_name: { tracker: "Dynamite Jobs", passed_seen: "Dynamite Jobs" }
+
+  - id: 4
+    name: Arc.dev
+    tier: 3
+    active: true
+    fetch_mode: direct
+    urls:
+      - https://arc.dev/remote-jobs/project-manager
+    mirrors: []
+    expired_markers: ["This job is no longer available"]
+    quirks: ""
+    notion_platform_name: { tracker: "Arc.dev", passed_seen: "Arc.dev" }
+
+  - id: 5
+    name: Remote Rocketship (SM worldwide)
+    tier: 2
+    active: true
+    fetch_mode: direct
+    urls:
+      - https://www.remoterocketship.com/jobs/anywhere-in-the-world/scrum-master/
+    mirrors: []
+    expired_markers: ["This job is no longer accepting applications"]
+    quirks: >-
+      DEGRADED 2026-07-11: Cloudflare now 403s list pages AND sitemap, direct and headless
+      alike (was: per-job 403s only). Source reports down until RR loosens up; roles mostly
+      mirror in from teamtailor/ATS anyway. Candidate for tier demotion at next recompute.
+    per_job_fetch_mode: headless
+    notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
+
+  - id: 6
+    name: Remote Rocketship (PM Europe)
+    tier: 2
+    active: true
+    fetch_mode: direct
+    urls:
+      - https://www.remoterocketship.com/country/europe/jobs/project-management/
+    mirrors: []
+    expired_markers: ["This job is no longer accepting applications"]
+    quirks: "Same engine as id 5 — same 2026-07-11 Cloudflare degradation."
+    per_job_fetch_mode: headless
+    notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
+
+  - id: 7
+    name: Working Nomads
+    tier: 3
+    active: true
+    fetch_mode: api
+    api:
+      - https://www.workingnomads.com/api/exposed_jobs/
+    urls:
+      - https://www.workingnomads.com/remote-project-management-jobs-europe
+    mirrors: []
+    expired_markers: []
+    quirks: "Category HTML now JS-rendered (2.10.0 regression) — API only, skip HTML. Verified live 2026-07-11."
+    notion_platform_name: { tracker: "Working Nomads", passed_seen: "Working Nomads" }
+
+  - id: 8
+    name: Himalayas
+    tier: 1
+    active: true
+    fetch_mode: direct
+    urls:
+      - https://himalayas.app/jobs/remote/project-management
+    mirrors: []
+    expired_markers: ["This job posting is no longer available"]
+    quirks: >-
+      Company-URL bounce (redirect to company page) is a platform quirk, NOT staleness —
+      special-cased in check_links. Promoted Tier 1 on 2026-07-10 recompute (25% conversion, 2/8).
+    notion_platform_name: { tracker: "Himalayas", passed_seen: "Himalayas" }
+
+  - id: 9
+    name: EuropeRemotely
+    tier: 3
+    active: false
+    recheck_after: "2026-10-01"
+    fetch_mode: direct
+    urls:
+      - https://europeremotely.com/
+    mirrors: []
+    expired_markers: []
+    quirks: "Demoted to quarterly recheck (2.x) — low volume/stale inventory."
+    notion_platform_name: { tracker: "EuropeRemotely", passed_seen: "EuropeRemotely" }
+
+  - id: 10
+    name: Remotive
+    tier: 1
+    active: true
+    fetch_mode: api
+    api:
+      - https://remotive.com/api/remote-jobs?category=project-management
+    urls:
+      - https://remotive.com/remote-jobs/project-management
+    mirrors: []
+    expired_markers: ["This job listing has expired"]
+    quirks: >-
+      REGRESSED 2026-07-11 (post-delta): API now a 41-job stub (params ignored, 0 PM);
+      anonymous category HTML masks companies AND carries no per-job links, rendered or not.
+      Fetcher returns the stub; platform effectively degraded for enumeration. Per-job pages
+      remain public (liveness checks fine). ❓ NEEDS BORJAN at next recompute.
+    notion_platform_name: { tracker: "Remotive", passed_seen: "Remotive" }
+
+  - id: 11
+    name: Welcome to the Jungle
+    tier: 3
+    active: true
+    fetch_mode: direct
+    urls:
+      - https://www.welcometothejungle.com/en/jobs?query=project%20manager&refinementList%5Boffices.country_code%5D%5B%5D=remote
+    mirrors: []
+    expired_markers: ["This job is no longer available"]
+    quirks: >-
+      Search pages robots-blocked (row 9); rendered search results are Algolia/consent-gated
+      (verified 2026-07-11) — no anonymous enumeration channel. WttJ roles reach us via
+      mirrors (Remotive/app.wttj links in history). France-skew. Absorbed Otta (#16).
+    notion_platform_name: { tracker: "Welcome to the Jungle", passed_seen: "Welcome to the Jungle" }
+
+  - id: 12
+    name: Landing.jobs
+    tier: 3
+    active: true
+    fetch_mode: headless
+    urls:
+      - https://landing.jobs/jobs?q=project+manager
+    mirrors: []
+    expired_markers: ["This job is closed"]
+    quirks: "robots.txt hard block on direct fetch (delta row 9)."
+    notion_platform_name: { tracker: "Landing.jobs", passed_seen: "Landing.jobs" }
+
+  - id: 13
+    name: JustRemote
+    tier: 3
+    active: true
+    fetch_mode: headless
+    urls:
+      - https://justremote.co/remote-project-management-jobs
+    mirrors: []
+    expired_markers: ["This position is no longer available"]
+    quirks: >-
+      DEGRADED 2026-07-11: listings lazy-load on scroll — headless snapshot carries zero
+      postings; no API/page-data channel found. Reports source_down until they change engines.
+    notion_platform_name: { tracker: "JustRemote", passed_seen: "JustRemote" }
+
+  - id: 14
+    name: NoDesk
+    tier: 2
+    active: true
+    fetch_mode: headless
+    urls:
+      - https://nodesk.co/remote-jobs/project-management/
+    mirrors: []
+    expired_markers: ["Job Expired", "career opportunity is no longer available"]
+    quirks: >-
+      JS-rendered; undated listings unverified-by-default (v2.10.0). Category page KEEPS
+      expired postings listed (2026-07-11: 15/16 harvested PM links were "Job Expired" on
+      their own pages) — liveness comes from the posting page only, never the listing.
+    notion_platform_name: { tracker: "NoDesk", passed_seen: "NoDesk" }
+
+  - id: 15
+    name: Remote OK
+    tier: 3
+    active: true
+    fetch_mode: api
+    api:
+      - https://remoteok.com/api
+    urls:
+      - https://remoteok.com/remote-project-manager-jobs
+    mirrors: []
+    expired_markers: []
+    quirks: "HTML is JS-rendered; public JSON API exists — verify at build, else headless."
+    notion_platform_name: { tracker: "Remote OK", passed_seen: "Remote OK" }
+
+  - id: 16
+    name: Otta
+    tier: 3
+    active: false
+    fetch_mode: direct
+    urls: []
+    mirrors: []
+    expired_markers: []
+    quirks: "Merged into Welcome to the Jungle (#11) — do not fetch."
+    notion_platform_name: { tracker: "Otta", passed_seen: "Otta" }
+
+  - id: 17
+    name: JustJoin.it
+    tier: 1
+    active: true
+    fetch_mode: api
+    api:
+      - https://api.justjoin.it/v2/user-panel/offers?categories[]=13&page=1&sortBy=published&orderBy=DESC&perPage=100
+    urls:
+      - https://justjoin.it/job-offers/all-locations/pm
+    mirrors: []
+    expired_markers: ["Offer expired"]
+    quirks: >-
+      LIST CHIPS LIE (2026-07-10: "New" badge + day-counters on expired offers) — liveness
+      ONLY from the offer page/offer JSON expired marker, never list-view data. High density of
+      EU-citizenship / Poland-residency requirements — filter layer must read carefully.
+      Posting age 2+ months = soft-stale. B2B salary transparency is why it stays Tier 1 despite 2% conversion.
+    notion_platform_name: { tracker: "JustJoin.it", passed_seen: "JustJoin.it" }
+
+  - id: 18
+    name: Greenhouse (ATS boards)
+    tier: 2
+    active: true
+    fetch_mode: api
+    api_pattern: "https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true"
+    boards: []   # per-company board tokens, discovered + appended over time (delta row 4)
+    mirrors: []
+    expired_markers: []
+    quirks: "Public JSON board API — enumerate per known board; site: sampling retired."
+    notion_platform_name: { tracker: "Greenhouse", passed_seen: "Greenhouse" }
+
+  - id: 19
+    name: Lever (ATS boards)
+    tier: 1
+    active: true
+    fetch_mode: api
+    api_pattern: "https://api.lever.co/v0/postings/{board}?mode=json"
+    boards: []   # per-company tokens, discovered + appended over time
+    mirrors: []
+    expired_markers: []
+    quirks: >-
+      Public JSON postings API per company. Per-company bot-detection on HTML pages is
+      inconsistent (Mistral 2026-07-09, Zuri Group 2026-07-10) — not a fixed list; the JSON API
+      usually bypasses it, else headless retry then mirrors (delta row 9).
+    notion_platform_name: { tracker: "Lever", passed_seen: "Lever" }
+
+  - id: 20
+    name: Workable (ATS boards)
+    tier: 1
+    active: true
+    fetch_mode: api
+    api_pattern: "https://apply.workable.com/api/v3/accounts/{board}/jobs"
+    boards: []   # per-company account slugs
+    mirrors: []
+    expired_markers: []
+    quirks: "apply.workable.com HTML is JS-rendered — job-board JSON endpoint only (POST, paginated)."
+    notion_platform_name: { tracker: "Workable", passed_seen: "Workable" }
+
+  - id: 21
+    name: Pinpoint HQ (ATS boards)
+    tier: 3
+    active: true
+    fetch_mode: api
+    api_pattern: "https://{board}.pinpointhq.com/postings.json"
+    boards: []   # per-company subdomains
+    mirrors: []
+    expired_markers: []
+    quirks: >-
+      JS-rendered HTML; postings.json endpoint to verify at build — else headless.
+      2.7.1 lesson: this platform previously had NO tier and was silently skipped — config
+      validation now makes tierless platforms an error.
+    notion_platform_name: { tracker: "Pinpoint HQ", passed_seen: "Pinpoint HQ" }
+
+  - id: 22
+    name: Deel
+    tier: 3
+    active: true
+    fetch_mode: api
+    api:
+      - https://api.ashbyhq.com/posting-api/job-board/deel?includeCompensation=true
+    urls:
+      - https://www.deel.com/careers/
+    mirrors:
+      - builtin.com
+      - colorwavecareers.com
+      - euremotejobs.com
+    expired_markers: []
+    quirks: "Ashby-hosted (JS chrome on HTML) — Ashby public posting API first (delta row 7)."
+    notion_platform_name: { tracker: "Deel", passed_seen: "Deel" }
+
+  - id: 23
+    name: Crossover
+    tier: 3
+    active: true
+    fetch_mode: headless
+    urls:
+      - https://www.crossover.com/jobs
+    mirrors:
+      - linkedin-snippets
+    expired_markers: []
+    quirks: "JS-rendered SPA; mirrors = LinkedIn snippets as last resort. Grind-culture flags common — judgment layer reads every JD."
+    notion_platform_name: { tracker: "Crossover", passed_seen: "Crossover" }
+
+# LinkedIn is NOT a platform entry: it is a discovery tripwire only (scripts/linkedin_tripwire.py).
+# No login, no cookies, guest endpoint only. Auth-walled JDs -> "login-walled — open manually".
+linkedin_tripwire:
+  enabled: true
+  keywords: ["Project Manager", "Delivery Manager", "Scrum Master"]
+  locations: ["European Union", "Worldwide"]   # Borjan may add "North Macedonia" (spec §10 q4)
+  remote_filter: "f_WT=2"
+  freshness: "f_TPR=r86400"
+
+tiers:
+  # 2.8.0 recompute state (2026-07-10, 5 logged sessions, Tracker conversion rate primary signal:
+  # Himalayas 25% (2/8), Workable 9% (1/11), Greenhouse 5% (1/19), Lever 5% (1/19),
+  # JustJoin.it 2% (1/43) despite highest volume; Tier 3 = 0% across all 9 (41 logged, 0 converted)).
+  # Tiers are DATA, not opinion. Next recompute after 5 more logged sessions (runs.json counter).
+  1: [JustJoin.it, Remotive, "Workable (ATS boards)", "Lever (ATS boards)", Himalayas]
+  2: ["Remote Rocketship (SM worldwide)", "Remote Rocketship (PM Europe)", NoDesk, "Greenhouse (ATS boards)"]
+  3: [We Work Remotely, Jobgether, Dynamite Jobs, Arc.dev, Working Nomads,
+      "Welcome to the Jungle", Landing.jobs, JustRemote, "Remote OK",
+      "Pinpoint HQ (ATS boards)", Deel, Crossover, EuropeRemotely, Otta]
+
+rejected_platforms:
+  # Do-NOT-re-add without new evidence (invariant #15; reasons verbatim from v2.10.0).
+  # New platforms earn tier placement via the same 5-session conversion-rate bar.
+  - { name: Rippling,             reason: "EMEA-title/US-employee bait-and-switch — confirmed via the company's own Himalayas listing tags (retested fully 2026-07-10)" }
+  - { name: Built In,             reason: "~90%+ US-dominated across 3 query passes; one EMEA-tagged role was UK-only bait-and-switch (retested fully 2026-07-10)" }
+  - { name: Remote.com,           reason: "real EMEA signal but its own Greenhouse links die on fetch (2/2 tested) — unreliable without a mirror-check discipline; revisit if a reliable mirror pattern emerges" }
+  - { name: Oyster,               reason: "zero PM/SM/DM openings found, any mirror" }
+  - { name: Multiplier,           reason: "zero search footprint for this role type" }
+  - { name: Velocity Global,      reason: "zero signal" }
+  - { name: Globalization Partners, reason: "only surfaced an already-logged India-tagged duplicate" }
+  - { name: Wellfound,            reason: "US-or-nearshore-only (same profile as Indeed/Glassdoor)" }
+  - { name: PowerToFly,           reason: "US-or-nearshore-only" }
+  - { name: Braintrust,           reason: "US-or-nearshore-only" }
+  - { name: Contra,               reason: "not a job board — freelancer-profile marketplace, no searchable PM postings" }
+  - { name: FlexJobs,             reason: "paywalled, high-volume-low-signal (but source of the EU-country-list filter insight)" }
+  - { name: Jobspresso,           reason: "sparse volume, restricted to US/Canada/UK/Germany hiring jurisdictions" }
+  - { name: Remote.co,            reason: "US/Poland-dominated; one Skopje listing found was dated 2024, not a standing signal" }
+
+keywords:
+  # With full enumeration (delta row 3) these are LOCAL TITLE-MATCH FILTERS, not search queries.
+  # Sets ported verbatim from v2.10.0 (1.8.0 core set; expanded tracked for promote/demote).
+  # Candidates record the title variant ON THE POSTING, not the keyword that matched.
+  # Substring matching applies: "project manager" catches Digital/Agile/Technical/IT variants.
+  core:
+    - project manager        # substring covers digital/agile/technical/IT/senior project manager
+    - scrum master
+    - delivery manager       # substring covers product/client/solutions/digital/technical delivery manager
+    - agile delivery lead
+    - program manager        # substring covers technical/IT program manager
+  expanded:                  # promote/demote dataset — Borjan-triggered review, never automated
+    - implementation manager
+    - release manager
+    - proxy product owner
+    - service delivery manager
+
+hard_filters:
+  # MACHINE FIRST-PASS ONLY. Regexes flag/drop the mechanical cases; Claude still does the
+  # judgment-layer read on every shortlist candidate (Spiralyze buried-hours lesson: scripts
+  # flag, Claude decides). Filters 11 (location-fluid copy) and 12 (LATAM payroll) plus the
+  # Cyclad EU-citizenship nuance are judgment-layer — listed here as flag-only patterns.
+  salary_floor:
+    eur_net_month: 2500
+    eur_gross_month: 3000
+    usd_year: 35000
+  auto_drop_patterns:      # confident drops — logged "Filtered Out" with matched pattern
+    us_only: '(?i)\b(US[- ]only|United States only|must (be located|reside) in the (US|United States)|authorized to work in the (US|U\.S\.)|E-?Verify|W-?2\b)'
+    clearance: '(?i)\b(security clearance|TS/SCI|secret clearance|public trust)\b'
+    travel: '(?i)\b(travel (up to |approximately |~)?\d{1,3}\s?%|\d{1,3}\s?% travel|occasional travel|willingness to travel|travel (is |will be )?(required|expected)|travel as needed)\b'
+    grind_culture: '(?i)\b(996|70[- ]hour|60\+? ?hours?/?week|work hard,? play hard|hustle culture)\b'
+  flag_patterns:           # NOT auto-drops — surfaced to the judgment layer with a flag
+    timezone: '(?i)\b(EST|EDT|PST|PDT|CST|CDT|MST|Eastern Time|Pacific Time|Mountain Time|Central Time|[0-9]{1,2}\s?(am|pm)\s?(ET|EST|PT|PST|CT|CST|MT))\b'
+    eu_citizenship: '(?i)\b(EU (citizenship|citizen|passport)|European Union citizenship|EU work permit required)\b'
+    tool_lockin: '(?i)\b(dynamics 365|(salesforce|servicenow|sap|workday|oracle|dynamics) (administrator|consultant|architect|certification|certified))\b'
+    latam_payroll: '(?i)\b(LATAM|Latin America)\b.{0,80}\b(payroll|contract|entity|salary in local currency)\b'
+    pure_ba: '(?i)\bbusiness analyst\b'
+  eu_country_list_detector:
+    # 2.10.0 filter #13: a CLOSED country list under a "Europe/EMEA remote" label that does not
+    # name North Macedonia/Skopje = hard drop, no further verification.
+    # Trigger: >=4 country names from the list below in one location block, no open-ended marker,
+    # no North Macedonia mention. Distinct from location-fluid copy and country clones.
+    countries: [Austria, Belgium, Bulgaria, Croatia, Cyprus, Czech, Denmark, Estonia, Finland,
+                France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg,
+                Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden,
+                Norway, Switzerland, Iceland, UK, "United Kingdom"]
+    open_ended_markers: ["and more", "worldwide", "among others", "not limited to", "etc"]
+    must_include: ["North Macedonia", "Macedonia", "Skopje"]
+
+caps:
+  linkedin_requests_per_run: 10
+  linkedin_min_delay_s: 3
+  max_full_reads_per_run: 60     # local parses, not context tokens; cap is politeness only
+                                 # (first post-migration runs carry a backlog; steady-state delta is small)
+  link_check_parallelism: 8
+  min_delay_same_host_s: 1
+  headless_parallelism: 3
+
+scan:
+  full_rotation_default: true    # r2: AM/PM half-split retired (token-cost workaround, obsolete)
+  freshness_window_h: 48         # where a platform supports date scoping
+  full_sweep_dow: "Mon"          # weekly unscoped sweep
+  timeout_s: 25
+
+notion:
+  tracker:
+    data_source_id: "560bd8e3-e45f-42c5-8c77-1e70a7e53c74"
+    parent_page_id: "6fed5421-39ae-4896-9046-d5554dff976d"
+    # NEVER a scan-write target (invariant #5). Interactive "I applied" flow only.
+  passed_seen:
+    data_source_id: "21ab771f-802a-402b-ba71-f92f94d911d9"
+    parent_page_id: "b4aaa7e8-bc50-40a4-accb-a052ca10c026"
+  pinned_pages:
+    job_scout_runs: "398054b0-88af-81b7-8670-fef8aad15254"
+    migration_delta: "398054b0-88af-8158-9cae-e1d7c44eb48b"
+  tracker_status_options: [Applied, Screening, Interview, Offer, Rejected, Withdrawn]
+  # Select options missing from BOTH DBs as of 2026-07-11 (verified live schemas):
+  # Pinpoint HQ, Deel, Crossover — notion_sync.py pre-checks and patches before first write.
+
+recompute:
+  due_at_sessions: 5

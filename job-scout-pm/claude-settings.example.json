@@ -1,0 +1,20 @@
+{
+  "//": "job-scout-pm v3 — zero-prompt permissions for unattended scans (spec §8.2).",
+  "//install": "On the machine that runs the scheduled scans: copy this file to .claude/settings.json inside the job-scout-pm working directory (mkdir -p .claude && cp claude-settings.example.json .claude/settings.json). Shipped as an example rather than live config so cloning the repo never silently grants permissions.",
+  "//scope": "Scoped to this repo: script execution, repo-local state/log writes, and the scripts' own outbound HTTP. No blanket skip-permissions flag; the cron fallback (claude -p) may additionally need --allowedTools set to the same list — a broader flag like --dangerously-skip-permissions trades safety for convenience and is NOT the default.",
+  "permissions": {
+    "allow": [
+      "Bash(python3 scripts/scan.py*)",
+      "Bash(python3 scripts/check_links.py*)",
+      "Bash(python3 scripts/notion_sync.py*)",
+      "Bash(python3 scripts/dedup.py*)",
+      "Bash(python3 scripts/fetch_boards.py*)",
+      "Bash(python3 scripts/linkedin_tripwire.py*)",
+      "Read(./**)",
+      "Edit(./state/**)",
+      "Write(./state/**)",
+      "Edit(./logs/**)",
+      "Write(./logs/**)"
+    ]
+  }
+}
