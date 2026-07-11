@@ -201,8 +201,12 @@ def append_digest(line: str, cfg: dict) -> str:
     kids = _req("GET", f"{API}/blocks/{page_id}/children?page_size=1")
     first = (kids.json().get("results") or [None])[0] if kids.status_code == 200 else None
     payload: dict = {"children": [block]}
-    if first and first["type"].startswith("heading"):
-        payload["after"] = first["id"]  # newest directly under the heading
+    if first:
+        # The REST API can only insert AFTER a block (no prepend). The page carries a
+        # heading anchor at the top ("Run digest — newest on top", added 2026-07-12);
+        # inserting after block 1 keeps newest-on-top. Works even if the anchor is
+        # replaced by a digest line — position 2 still beats the bottom of the page.
+        payload["after"] = first["id"]
     ar = _req("PATCH", f"{API}/blocks/{page_id}/children", json=payload)
     if ar.status_code != 200:
         raise RuntimeError(f"digest append failed {ar.status_code}: {ar.text[:200]}")
