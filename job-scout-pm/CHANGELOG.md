@@ -1,5 +1,24 @@
 # job-scout-pm — Changelog
 
+## 3.1.0 (2026-07-12) — Third lane: cloud Code sessions
+
+The skill now runs three ways, sharing one dedup history and one Notion inbox:
+**Code local** (laptop, state on disk — the 3.0.0 design), **Code cloud** (ephemeral
+Claude Code cloud sessions — new), and **chat-native** (Appendix A, unchanged).
+
+- `scripts/state_sync.py` — git round-trip for scan state. Cloud lane runs
+  `pull` as step 0 and `push` as step 8 (both mandatory there: the container is
+  wiped after the session). Conflict-safe: append-only `.jsonl` files union-merge,
+  `runs.json` deep-merges per day/label, push retries with re-pull. `jd_cache/`
+  excluded from git (bulky, regenerable — now .gitignored).
+- SKILL.md: three-lane environment detection; Cloud lane steps 0/8; cloud
+  scheduling section (Routines into fresh sessions; NOTION_TOKEN in environment
+  settings or Notion-MCP fallback — a cloud run may never end with unsynced rows).
+- Measured cloud-IP caveat documented: datacenter IPs draw more bot-blocking than
+  residential (Remote Rocketship fully blocked, WWR page fetches 403 / RSS fine);
+  the `sources down` ledger reports per-lane reality. Local + cloud schedules may
+  coexist — dedup absorbs overlap.
+
 ## 3.0.0 (2026-07-11) — Claude Code migration
 
 Converted the skill from a chat-native, tool-call-per-step workflow into a
