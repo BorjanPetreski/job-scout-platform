@@ -1,3 +1,5 @@
 scripts/__pycache__/
 *.pyc
 logs/*.html
+state/jd_cache/*
+!state/jd_cache/.gitkeep
