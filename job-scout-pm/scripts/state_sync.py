@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""state_sync.py — git round-trip for scan state (Cloud lane, v3.1.0).
+"""state_sync.py — git round-trip for scan state (both Code lanes, v3.1.1).
 
-Cloud Claude Code sessions run in ephemeral containers: local disk is wiped between
-sessions, so git is the state's home. Every cloud scan MUST:
+Every Code-lane scan — laptop and cloud — MUST:
     python3 scripts/state_sync.py pull     # FIRST action, before scan.py
     ... scan / score / log decisions ...
     python3 scripts/state_sync.py push     # LAST action, after notion_sync
 
-Laptop runs may also use it (optional but recommended once the cloud lane is active —
-it keeps both lanes' dedup history converged; dedup makes overlapping runs harmless).
+Cloud sessions run in ephemeral containers (disk wiped after the session), so git
+is the state's home there. Laptop runs need the round-trip too: pull brings in
+every unattended cloud run's state, push hands this run's decisions to the next
+scheduled cloud run. Dedup makes overlapping runs harmless.
 
 Conflict policy (two runs racing on push):
   *.jsonl  → union merge: both sides' lines kept, duplicates dropped, remote-first

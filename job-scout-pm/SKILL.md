@@ -10,10 +10,10 @@ description: >
   the user to re-specify these. Also use this skill for scheduled or unattended scan runs — prompts like
   "run the scheduled job scan", "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "3.1.0"
+  version: "3.1.1"
   created_by: Borjan
   organization: 2Coders Studio
-  last_updated: "2026-07-12"
+  last_updated: "2026-07-13"
 ---
 
 # Job Scout — Senior PM / Delivery Manager / Scrum Master
@@ -22,8 +22,8 @@ Borjan's automated job scouting workflow. Run end-to-end without re-confirming f
 
 ## Environment detection (do this FIRST, every invocation)
 
-- **Code lane, local** — `scripts/` exists next to this file, `python3 scripts/scan.py --help` runs, and this machine is persistent (Borjan's laptop): use the **Execution Protocol** below. State lives on local disk.
-- **Code lane, cloud** — same as above but running in an ephemeral Claude Code cloud/remote session (fresh container, repo cloned at session start): use the **Execution Protocol** below PLUS the two Cloud lane steps (0 and 8) — git is the state's home there, and skipping the push means the run's dedup history is lost when the container dies.
+- **Code lane, local** — `scripts/` exists next to this file, `python3 scripts/scan.py --help` runs, and this machine is persistent (Borjan's laptop): use the **Execution Protocol** below. State lives on local disk and converges through git (steps 0/8 — mandatory in both Code lanes since 3.1.1, because both lanes run on schedules).
+- **Code lane, cloud** — same as above but running in an ephemeral Claude Code cloud/remote session (fresh container, repo cloned at session start): use the **Execution Protocol** below. Steps 0 and 8 are existential here, not just convergence — git is the state's home, and skipping the push means the run's dedup history is lost when the container dies.
 - **Chat-native lane** — no scripts or no local network (claude.ai / Cowork): use **Appendix A**, the v2.10.0 chat-native flow, unchanged in meaning.
 
 All three lanes share one dedup history and one Notion inbox; dedup makes overlapping runs from different lanes harmless.
@@ -49,7 +49,7 @@ All three lanes share one dedup history and one Notion inbox; dedup makes overla
 
 Run these steps in order. Each step's trigger and action are literal — no step is optional, none is judged-from-memory.
 
-0. **Cloud lane only — pull state FIRST:** `python3 scripts/state_sync.py pull`. The container started with whatever state was last pushed to git; this fetches anything newer (a laptop run, another cloud run). Never scan against stale state.
+0. **Pull state FIRST (both Code lanes):** `python3 scripts/state_sync.py pull`. Cloud: the container started with whatever state was last pushed to git; this fetches anything newer. Laptop: this picks up every unattended cloud run's state (and any skill updates on the branch) since the last local run. Never scan against stale state.
 1. **Run the scan:** `python3 scripts/scan.py` (full active rotation — the AM/PM half-split is retired; `--half AM|PM` exists only for degraded/manual use, and the scheduler on Mondays runs `--full-sweep` to catch anything the freshness window missed). The script fetches every active platform (config.yaml is the single registry), applies the keyword title-filter, dedups against the FULL history in `state/seen.jsonl` (both-log backfill included), applies the machine-checkable hard-filter subset, fetches full JDs to `state/jd_cache/`, runs the liveness pass, and prints the coverage ledger. It does NOT score.
 2. **Read the results:** `state/last_run_candidates.json` + the per-candidate `jd_cache` files. Each candidate carries: title, company, loc, url, platform, posted_at, salary, `keyword_matched`, `flags[]` (regex first-pass hits), `link_status`, `jd_status`.
 3. **Judgment-layer filter pass (you, on EVERY candidate):** the regexes are a first pass only — read each JD against the full Hard Filters table below. The Spiralyze lesson (3pm-EST buried in the full posting) means scripts flag, you decide. A candidate with any `flags[]` entry needs that flag explicitly resolved (drop / clear / ❓ NEEDS BORJAN) in its role notes.
@@ -57,7 +57,7 @@ Run these steps in order. Each step's trigger and action are literal — no step
 5. **Log every decision immediately** (same-invocation discipline, invariant since 2.x): for each candidate, append to `state/seen.jsonl` via `scripts/dedup.py`'s `append()` — shortlisted (`status: shortlisted`, reason `New — Unreviewed`, fit, archetype, keyword_source = the title variant ON the posting, notes = role notes) or dropped (`status: dropped`, real reason: `Filtered Out` / `Stale/Expired` / `Duplicate Listing`). Never hold decisions for a later "logging pass". Never log roles still pending Borjan's own call.
 6. **Sync to Notion:** `python3 scripts/notion_sync.py --digest "[YYYY-MM-DD] [AM|PM] — N new · M dropped · K link-dead · sources down: [list or none]"`. Scan-driven rows go to the **Passed/Seen Log ONLY** — shortlists as `New — Unreviewed` with role notes in the page body — and the digest line lands on the pinned **Job Scout Runs** page. **The Applications Tracker is NEVER a scan-write target, in any mode** (2.7.0 violation: a scan wrote 3 shortlist rows to the Tracker, fabricating application history and poisoning the cross-check). The sync script cannot reach the Tracker from the scan path — Tracker writes exist only via the "I applied" flow below.
 7. **Present the delta output** (format below), then STOP. Interactive scans end with the Gemini offer; unattended scans end silently after the Notion sync.
-8. **Cloud lane only — push state LAST:** `python3 scripts/state_sync.py push "scan state: [date] [AM|PM]"`. This is NOT optional: an unpushed cloud run evaporates with the container, and every role it dropped gets re-fetched and re-judged next run. The script auto-merges if another run pushed in between (append-only logs union cleanly). If Notion sync ran tokenless (`NOTION_TOKEN` missing → `state/notion_pending.json` exported), push the pending rows via the Notion MCP connector before this step, mark them synced via dedup.update, and only then push state — a cloud run may NEVER end with unsynced shortlist rows and an unwritten digest.
+8. **Push state LAST (both Code lanes):** `python3 scripts/state_sync.py push "scan state: [date] [AM|PM]"`. This is NOT optional in either lane: an unpushed cloud run evaporates with the container, and an unpushed laptop run leaves the scheduled cloud runs scanning against stale history — re-fetching and re-judging every role this run already settled. The script auto-merges if another run pushed in between (append-only logs union cleanly). If Notion sync ran tokenless (`NOTION_TOKEN` missing → `state/notion_pending.json` exported), push the pending rows via the Notion MCP connector before this step, mark them synced via dedup.update, and only then push state — a cloud run may NEVER end with unsynced shortlist rows and an unwritten digest.
 
 **Liveness (2.7.0 definition, enforced in code):** only a direct fetch of the source URL returning actual JD content counts — never search snippets, aggregator mirrors, crawl caches, or list-view chips (JustJoin.it's own "New" badges contradicted its own expired offer pages, 2026-07-10; NoDesk's category page lists expired postings). Headless rendering of the source URL is a fetch method and counts. Mirror liveness ≠ source liveness (Superside: 3 live mirrors, source Lever URL 404) — `scan.py` resolves the source ATS URL when detectable and checks THAT. Mirror/search reconstruction recovers JD *content* for scoring only, zero liveness. `❓ unverified` in `link_status` is never upgraded to ✅ by anything but the scripts' own direct/rendered fetch. Evidence for every check persists in `state/fetch_evidence.jsonl` — no session-resume re-verification ritual exists anymore.
 
@@ -217,7 +217,7 @@ Assessment only by default: identify the core problem the role is solving, apply
 - `scripts/dedup.py` — seen-log read/write/match (URL-exact first, strict 3-part key fallback).
 - `scripts/linkedin_tripwire.py` — guest-endpoint discovery, rate-capped.
 - `scripts/notion_sync.py` — one-way push to Notion (typed, parent-asserted writes; `--applied` for the Tracker flow).
-- `scripts/state_sync.py` — git round-trip for scan state (Cloud lane steps 0/8; optional on the laptop, recommended once both lanes run — keeps one converged dedup history).
+- `scripts/state_sync.py` — git round-trip for scan state (steps 0/8, mandatory in both Code lanes since 3.1.1 — keeps one converged dedup history across laptop and cloud schedules).
 - `state/` — seen.jsonl (dedup source of truth), runs.json (ledger + recompute counter), fetch_evidence.jsonl, jd_cache/, last_run_candidates.json.
 - `references/pitching.md` — pitch/cover-letter tasks only (unchanged from 2.10.0).
 - `references/gemini-prompt.md` — Gemini cross-check offer accepted only (unchanged from 2.10.0).
@@ -251,4 +251,4 @@ Everything above (profile, hard filters, scoring, archetypes, country-clone, mul
 
 ## Changelog
 
-Current version: **3.1.0** (2026-07-12) — third lane: cloud Code sessions with git-hosted state. Full history: see `CHANGELOG.md`.
+Current version: **3.1.1** (2026-07-13) — state sync (steps 0/8) mandatory in both Code lanes. Full history: see `CHANGELOG.md`.

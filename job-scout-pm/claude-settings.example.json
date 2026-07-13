@@ -10,6 +10,7 @@
       "Bash(python3 scripts/dedup.py*)",
       "Bash(python3 scripts/fetch_boards.py*)",
       "Bash(python3 scripts/linkedin_tripwire.py*)",
+      "Bash(python3 scripts/state_sync.py*)",
       "Read(./**)",
       "Edit(./state/**)",
       "Write(./state/**)",
