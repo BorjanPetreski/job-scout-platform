@@ -23,3 +23,4 @@ guided setup, an application assistant, and eventually a laptop + mobile product
   - [ARCHITECTURE.md](docs/ARCHITECTURE.md) — engine/catalog/profile separation, pipeline, contracts
   - [PROFILE_CONFIG_SPEC.md](docs/PROFILE_CONFIG_SPEC.md) — profile schema, templates, option sets
   - [PROGRESS.md](docs/PROGRESS.md) — build log; **read first when resuming build sessions**
+  - [CUTOVER.md](docs/CUTOVER.md) — the ordered runbook for switching production to the `core/` engine
