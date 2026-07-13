@@ -1,5 +1,17 @@
 # job-scout-pm — Changelog
 
+## 3.1.2 (2026-07-13) — Allowlist covers the whole scan session
+
+First laptop run prompted for permission dozens of times: the example settings
+only allowed the six named scripts, but a real scan session also inspects
+results with read-only shell tools, runs git (status/log/diff/fetch/pull) around
+state_sync, and occasionally WebFetches a posting directly during the judgment
+pass. The allowlist now covers all of that — still scoped (no blanket
+skip-permissions): script execution generalized to `python3 scripts/*`,
+read-only shell + git, state/log writes, WebFetch/WebSearch. Direct
+`git commit`/`git push` still prompts by design — state_sync.py is the
+sanctioned write path. Re-copy to `.claude/settings.json` to take effect.
+
 ## 3.1.1 (2026-07-13) — State sync mandatory in both Code lanes
 
 Steps 0 (`state_sync.py pull`) and 8 (`state_sync.py push`) were Cloud-lane-only;
