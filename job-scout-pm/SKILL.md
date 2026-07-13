@@ -10,7 +10,7 @@ description: >
   the user to re-specify these. Also use this skill for scheduled or unattended scan runs — prompts like
   "run the scheduled job scan", "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "3.1.1"
+  version: "3.1.2"
   created_by: Borjan
   organization: 2Coders Studio
   last_updated: "2026-07-13"
@@ -251,4 +251,4 @@ Everything above (profile, hard filters, scoring, archetypes, country-clone, mul
 
 ## Changelog
 
-Current version: **3.1.1** (2026-07-13) — state sync (steps 0/8) mandatory in both Code lanes. Full history: see `CHANGELOG.md`.
+Current version: **3.1.2** (2026-07-13) — permission allowlist covers the whole scan session (first laptop run prompted constantly). Full history: see `CHANGELOG.md`.
