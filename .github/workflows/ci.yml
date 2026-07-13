@@ -10,7 +10,11 @@ jobs:
   validate-legacy:
     # job-scout-pm stays production until the Phase 1 cutover (step 1.12) —
     # keep its audit green until then; retire this job when it's frozen.
-    name: Validate job-scout-pm (legacy, pre-cutover)
+    # NAME MUST STAY "Validate job-scout-pm": it is the required status-check
+    # context in main's branch protection. Renaming it makes the required check
+    # go permanently "expected" and blocks every PR (2026-07-13). At cutover,
+    # update branch protection to require the new checks BEFORE retiring this job.
+    name: Validate job-scout-pm
     runs-on: ubuntu-latest
     defaults:
       run:
