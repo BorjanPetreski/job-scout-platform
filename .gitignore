@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+profiles/*/state/jd_cache/*
+!profiles/*/state/jd_cache/.gitkeep
+profiles/*/state/notion_pending.json

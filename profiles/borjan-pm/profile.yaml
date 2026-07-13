@@ -1,0 +1,86 @@
+# Profile: borjan-pm — the first production profile (migrated from job-scout-pm v3.1.2).
+# The ONLY file that knows who this user is and what they want. Everything platform- or
+# engine-generic lives in catalog/ and core/; PM-stream policy lives in the template.
+
+schema_version: 1
+id: borjan-pm
+template: project-management/delivery-manager
+
+candidate:
+  display_name: Borjan Petreski
+  location: { city: Skopje, country: North Macedonia, timezone: Europe/Skopje }
+  # Terms that count as "includes me" in closed location lists (drives the
+  # closed-location-list detector — North Macedonia is a Balkan non-EU country and is
+  # never in an EU/EEA enumeration):
+  location_match_terms: [North Macedonia, Macedonia, Skopje]
+  citizenship: [MK]
+  eligibility:
+    # B2B contractor (direct invoicing, no visa/sponsorship needed) AND full-time —
+    # both equally fine; never deprioritize or flag full-time as a concern.
+    employment_models: [b2b_contractor, full_time]
+    needs_visa_sponsorship: false
+  experience_years: 7
+  headline: "Senior IT Project Manager / Delivery Manager / Scrum Master / Proxy PO"
+  tools: [Jira, Confluence, Azure DevOps, Jira Admin, Agile/Scrum, Kanban]
+  certs: [PSM, PSPO, ECBA, "AZ-104 (expired)"]
+  domains: [Travel & Leisure, EdAI, Social Prospecting, IoT, Media/Streaming]
+
+search:
+  regions_acceptable: [worldwide, emea, europe]   # informative for scoring, not a hard filter
+
+compensation:
+  gross_net_ratio: 0.83     # net = gross x ratio (MK B2B approximation; user-tunable)
+
+# Profile-learned filter lessons the judgment layer reads on every scan (these are
+# BORJAN's lessons; a different profile earns its own):
+filter_notes: |
+  - EU-citizenship clauses drop even though B2B bypasses visa/payroll needs (Cyclad
+    lesson): an explicit EU-citizenship clause is an agency/legal restriction, common
+    on JustJoin.it. Drop even when everything else fits.
+  - CloudLinux Scrum Master is a known recurring stale across multiple mirrors — do
+    not resurface (it's in seen.jsonl).
+  - Requires work after 17:00 CET/EEST -> drop. Snippet-blindness caveat: working-hours
+    requirements routinely appear ONLY in the full posting (Spiralyze Skopje req, 3pm
+    EST) — the full JD must be read before shortlisting.
+
+platforms:
+  # Live tiers = 2.8.0 recompute state (2026-07-10, 5 logged sessions, Tracker
+  # conversion rate primary signal: Himalayas 25% (2/8), Workable 9% (1/11),
+  # Greenhouse 5% (1/19), Lever 5% (1/19), JustJoin.it 2% (1/43) despite highest
+  # volume; Tier 3 = 0% across all 9). Tiers are DATA, not opinion — next recompute
+  # after 5 more logged sessions (runs.json counter); never recomputed automatically.
+  tiers:
+    1: [justjoin-it, remotive, workable, lever, himalayas]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, greenhouse]
+    3: [wwr, jobgether, dynamite, arc, working-nomads, wttj, landing-jobs, justremote,
+        remote-ok, pinpoint, deel, crossover]
+  disabled: [europeremotely, otta]
+  ats_boards:            # per-company tokens, discovered + appended over time (profile data)
+    greenhouse: []
+    lever: []
+    workable: []
+    pinpoint: []
+  linkedin_tripwire:
+    locations: [European Union, Worldwide]   # third slot ("North Macedonia") left to Borjan
+
+sweep:
+  recheck_interval_h: 24
+
+output:
+  notion:
+    tracker:
+      data_source_id: "560bd8e3-e45f-42c5-8c77-1e70a7e53c74"
+      parent_page_id: "6fed5421-39ae-4896-9046-d5554dff976d"
+      # NEVER a scan-write target (invariant #5). Interactive "I applied" flow only.
+    passed_seen:
+      data_source_id: "21ab771f-802a-402b-ba71-f92f94d911d9"
+      parent_page_id: "b4aaa7e8-bc50-40a4-accb-a052ca10c026"
+    pinned_pages:
+      job_scout_runs: "398054b0-88af-81b7-8670-fef8aad15254"
+      migration_delta: "398054b0-88af-8158-9cae-e1d7c44eb48b"
+    tracker_status_options: [Applied, Screening, Interview, Offer, Rejected, Withdrawn]
+
+schedule:
+  runs: [{ at: "08:00", label: AM }, { at: "18:00", label: PM }]
+  full_sweep_dow: Mon
+  freshness_window_h: 48

@@ -1,0 +1,70 @@
+# Template: React Software Engineer (frontend subvariant)
+# Phase 1 status: DRY-RUN ONLY — the abstraction proof (PROJECT_PLAN.md Phase 1
+# acceptance). Keyword sets and category slugs marked verify_at_setup in the catalog
+# must be live-verified in Phase 2 before this template backs a scheduled profile.
+
+schema_version: 1
+template_id: software-engineering/frontend-react
+label: "React Software Engineer"
+suggest_also: [software-engineering/frontend, software-engineering/fullstack-js]
+
+defaults:
+  search:
+    stream: software-engineering
+    work_model: [remote]
+    keywords:
+      core:
+        - react developer
+        - react engineer
+        - frontend engineer
+        - frontend developer
+        - front-end developer
+        - front end developer
+      expanded:
+        - javascript engineer
+        - typescript engineer
+        - ui engineer
+        - web developer
+        - next.js developer
+    archetypes: [Frontend Engineer, Fullstack-leaning, UI Engineer]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []            # PM's ERP list doesn't apply; stream-appropriate list TBD in Phase 2
+    role_exclusion_terms: [wordpress, webflow]   # site-builder-only roles, not engineering
+    closed_location_list: drop_if_absent
+
+  compensation:
+    floor: { amount: 3000, currency: EUR, basis: gross, period: month }   # suggested band; always confirmed at setup
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [React Developer, Frontend Engineer]
+    rejected: []                    # earns its own evidence-based list per profile
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal always. Surface only >= threshold.
+  - 9.0-10.0 — Near-perfect: modern React (hooks, SSR/Next.js), TypeScript,
+    product-team ownership (not agency piecework); Worldwide or region-explicit and
+    open to the candidate; salary confirmed above threshold.
+  - 8.0-8.9 — Strong: senior frontend role, React primary, TS or strong JS; globally
+    open; salary likely clears; one minor gap OK (e.g. one unfamiliar tool in the stack).
+  - 7.0-7.9 — Worth reviewing: frontend/fullstack role where React is one of several
+    accepted frameworks; salary unconfirmed; minor flag or slight stack stretch.
+  - Below threshold — drop silently (log with the real reason).
+  Archetype tag before scoring: Frontend Engineer · Fullstack-leaning · UI Engineer.
+
+salary_estimation_heuristics: |
+  US/UK product company paying globally -> likely clears comfortably; agency/outsourcing
+  shop -> verify, wide variance; seniority in title (Senior/Staff/Lead) -> higher band.
+  Unpublished salary is NEVER an auto-drop.
+
+interview:
+  emphasize: [search.keywords, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

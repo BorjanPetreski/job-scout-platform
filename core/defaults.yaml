@@ -1,0 +1,91 @@
+# core/defaults.yaml — Layer 1 engine defaults. Profile-overridable ONLY where noted;
+# everything else is engine law (politeness caps, endpoint discipline).
+
+caps:
+  linkedin_requests_per_run: 10     # engine law — never profile-raised
+  linkedin_min_delay_s: 3           # engine law
+  max_full_reads_per_run: 60        # local parses; politeness cap only
+  link_check_parallelism: 8
+  min_delay_same_host_s: 1
+  headless_parallelism: 3
+
+scan:
+  full_rotation_default: true
+  freshness_window_h: 48            # profile-overridable (schedule.freshness_window_h)
+  full_sweep_dow: "Mon"             # profile-overridable (schedule.full_sweep_dow)
+  timeout_s: 25
+
+sweep:                              # shortlist liveness sweep (ARCHITECTURE.md §6)
+  recheck_interval_h: 24            # profile-overridable (sweep.recheck_interval_h)
+  escalate_after_unverifiable: 2    # consecutive unverifiable sweeps before manual-check flag
+
+recompute:
+  due_at_sessions: 5
+
+# ---------------------------------------------------------------------------
+# Filter library — regex machinery for the machine FIRST-PASS only. Values that
+# parameterize these (tool lists, location terms, timezone window) come from the
+# profile; core/profile_loader.py decides per profile WHICH entries apply
+# (e.g. us_only is skipped for a US-based candidate) and compiles the result into
+# the effective config's hard_filters. Claude's judgment layer still reads every
+# shortlist candidate — scripts flag, Claude decides (Spiralyze lesson).
+# Patterns ported byte-identical from job-scout-pm v3 config.yaml.
+filter_library:
+  auto_drop_patterns:
+    us_only: '(?i)\b(US[- ]only|United States only|must (be located|reside) in the (US|United States)|authorized to work in the (US|U\.S\.)|E-?Verify|W-?2\b)'
+    clearance: '(?i)\b(security clearance|TS/SCI|secret clearance|public trust)\b'
+    travel: '(?i)\b(travel (up to |approximately |~)?\d{1,3}\s?%|\d{1,3}\s?% travel|occasional travel|willingness to travel|travel (is |will be )?(required|expected)|travel as needed)\b'
+    grind_culture: '(?i)\b(996|70[- ]hour|60\+? ?hours?/?week|work hard,? play hard|hustle culture)\b'
+  flag_patterns:
+    timezone: '(?i)\b(EST|EDT|PST|PDT|CST|CDT|MST|Eastern Time|Pacific Time|Mountain Time|Central Time|[0-9]{1,2}\s?(am|pm)\s?(ET|EST|PT|PST|CT|CST|MT))\b'
+    eu_citizenship: '(?i)\b(EU (citizenship|citizen|passport)|European Union citizenship|EU work permit required)\b'
+    latam_payroll: '(?i)\b(LATAM|Latin America)\b.{0,80}\b(payroll|contract|entity|salary in local currency)\b'
+  # Built per profile: tool_lockin from hard_filters.tool_lockin_drop,
+  # role exclusions from hard_filters.role_exclusion_terms.
+  tool_lockin_template: '(?i)\b({tools_alt}|({tools_generic}) (administrator|consultant|architect|certification|certified))\b'
+  role_exclusion_template: '(?i)\b({terms})\b'
+  # Closed-location-list detector (v2.10.0 filter #13, generalized): a CLOSED country
+  # list under a "remote in <region>" label that does not name any of the profile's
+  # location_match_terms = hard drop. Trigger: >=4 of these country names in one
+  # location block, no open-ended marker, no profile location term.
+  closed_location_list:
+    countries: [Austria, Belgium, Bulgaria, Croatia, Cyprus, Czech, Denmark, Estonia, Finland,
+                France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg,
+                Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden,
+                Norway, Switzerland, Iceland, UK, "United Kingdom"]
+    open_ended_markers: ["and more", "worldwide", "among others", "not limited to", "etc"]
+
+# EU/EEA member states — used to decide whether the eu_citizenship flag applies to a
+# candidate (an EU citizen doesn't need it) — ISO 3166-1 alpha-2.
+eu_citizenships: [AT, BE, BG, HR, CY, CZ, DK, EE, FI, FR, DE, GR, HU, IE, IT, LV, LT, LU,
+                  MT, NL, PL, PT, RO, SK, SI, ES, SE, IS, LI, NO, CH]
+latam_countries: [Argentina, Bolivia, Brazil, Chile, Colombia, Costa Rica, Cuba,
+                  Dominican Republic, Ecuador, El Salvador, Guatemala, Honduras, Mexico,
+                  Nicaragua, Panama, Paraguay, Peru, Uruguay, Venezuela]
+
+# ---------------------------------------------------------------------------
+# Salary normalization (core/salary.py). Canonical comparison unit: floor-currency,
+# GROSS, per MONTH. Static FX table — refreshed manually; precision beyond "does it
+# clear the floor" is not a goal, and every normalization records the rate used.
+salary:
+  period_to_month_factor: { hour: 160, day: 20, month: 1, year: 0.08333 }
+  borderline_margin: 0.10            # within ±10% of floor -> "borderline — verify", never auto-drop
+  fx_to_eur:                         # 1 unit -> EUR (approx, 2026-07)
+    EUR: 1.0
+    USD: 0.92
+    GBP: 1.17
+    CHF: 1.05
+    PLN: 0.235
+    CZK: 0.041
+    SEK: 0.088
+    NOK: 0.086
+    DKK: 0.134
+    CAD: 0.67
+    AUD: 0.60
+    MXN: 0.050
+    BRL: 0.17
+
+# LinkedIn tripwire endpoint discipline (engine law; keywords/locations from profile)
+linkedin_tripwire:
+  remote_filter: "f_WT=2"
+  freshness: "f_TPR=r86400"

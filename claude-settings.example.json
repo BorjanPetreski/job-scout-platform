@@ -1,0 +1,31 @@
+{
+  "//": "job-scout platform v4.0.0 — zero-prompt permissions for unattended AND interactive scans (any profile).",
+  "//install": "On the machine that runs the scans: copy this file to .claude/settings.json at the REPO ROOT (mkdir -p .claude && cp claude-settings.example.json .claude/settings.json). Shipped as an example rather than live config so cloning the repo never silently grants permissions. Re-copy after engine updates. Your own 'Yes, don't ask again' clicks accumulate separately in .claude/settings.local.json and are preserved.",
+  "//scope": "Scoped to the scan workflow: core script execution (scripts do their own outbound HTTP), read-only shell inspection of results, git operations for state_sync, WebFetch/WebSearch for the judgment layer's occasional direct look at a posting, state writes under profiles/*/state only. No blanket skip-permissions flag; the cron fallback (claude -p) may additionally need --allowedTools set to the same list — a broader flag like --dangerously-skip-permissions trades safety for convenience and is NOT the default.",
+  "permissions": {
+    "allow": [
+      "Bash(python3 core/*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git fetch*)",
+      "Bash(git pull*)",
+      "Bash(git show*)",
+      "Bash(ls*)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(grep *)",
+      "Bash(jq *)",
+      "Bash(mkdir -p profiles/*)",
+      "Read(./**)",
+      "Grep",
+      "Glob",
+      "Edit(./profiles/**/state/**)",
+      "Write(./profiles/**/state/**)",
+      "WebFetch",
+      "WebSearch"
+    ]
+  }
+}
