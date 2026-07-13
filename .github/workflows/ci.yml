@@ -7,8 +7,10 @@ on:
     branches: [main]
 
 jobs:
-  validate:
-    name: Validate job-scout-pm
+  validate-legacy:
+    # job-scout-pm stays production until the Phase 1 cutover (step 1.12) —
+    # keep its audit green until then; retire this job when it's frozen.
+    name: Validate job-scout-pm (legacy, pre-cutover)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,3 +30,30 @@ jobs:
 
       - name: State-file integrity (seen.jsonl, runs.json, etc.)
         run: python3 scripts/validate_state.py
+
+  validate-platform:
+    name: Validate platform (core + catalog + templates + profiles)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pyyaml requests
+
+      - name: Platform validation (compilation, catalog, templates, profiles, state, skills)
+        run: python3 core/validate.py
+
+      - name: Parity — borjan-pm resolved config vs legacy config.yaml (until cutover)
+        run: python3 core/parity_diff.py
+
+      - name: Scan plans resolve for every profile (no network)
+        run: |
+          for p in profiles/*/; do
+            id=$(basename "$p")
+            echo "=== $id ==="
+            python3 core/scan.py --profile "$id" --plan
+          done

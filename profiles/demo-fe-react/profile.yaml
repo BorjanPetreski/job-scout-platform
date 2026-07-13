@@ -1,0 +1,41 @@
+# Profile: demo-fe-react — DRY-RUN demo profile, the Phase 1 abstraction proof.
+# A fictional React engineer in Lisbon: this profile must validate and produce a
+# coherent scan plan (python3 core/scan.py --profile demo-fe-react --plan) with ZERO
+# engine-code changes. It is NOT provisioned: no Notion targets, no schedule — the
+# engine refuses Notion writes and the setup interview (Phase 2) is what will turn
+# templates into real scheduled profiles.
+
+schema_version: 1
+id: demo-fe-react
+template: software-engineering/frontend-react
+dry_run: true
+
+candidate:
+  display_name: Demo Candidate
+  location: { city: Lisbon, country: Portugal, timezone: Europe/Lisbon }
+  location_match_terms: [Portugal, Lisbon]
+  citizenship: [PT]
+  eligibility:
+    employment_models: [full_time]
+    needs_visa_sponsorship: false
+  experience_years: 5
+
+compensation:
+  gross_net_ratio: 0.70    # PT approximation
+
+hard_filters:
+  timezone_window: { latest_end_local: "18:00" }
+
+platforms:
+  tiers:                   # seeded from catalog tier_default — no conversion data yet
+    1: [justjoin-it, lever, workable]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, himalayas, remotive, greenhouse]
+    3: [wwr, jobgether, dynamite, arc, working-nomads, wttj, landing-jobs, justremote,
+        remote-ok, pinpoint, deel, crossover]
+  disabled: [europeremotely, otta]
+  ats_boards: { greenhouse: [], lever: [], workable: [], pinpoint: [] }
+  linkedin_tripwire:
+    locations: [European Union, Worldwide]
+
+output:
+  notion: { dry_run: true }

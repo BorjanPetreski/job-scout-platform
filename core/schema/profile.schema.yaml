@@ -1,0 +1,93 @@
+# profile.schema.yaml — the NORMATIVE profile schema (PROFILE_CONFIG_SPEC.md §2).
+# core/profile_loader.py enforces this; keep the two in sync (the loader's validation
+# errors cite the paths below). Templates are partial profiles: any subset of the
+# `defaults`-eligible keys marked [T] plus template-only blocks (scoring_bands,
+# salary_estimation_heuristics, interview).
+#
+# Notation: type / required? / enum values. Unknown keys anywhere = validation error
+# (strict — silent skips come from tolerated config gaps, v2.7.1 lesson).
+
+schema_version: int, required, == 1
+id: str, required, kebab-case, must match the directory name
+template: str, optional, "<stream>/<name>" — must exist under templates/
+dry_run: bool, optional (default false) — demo/unprovisioned profile; Notion writes refused
+
+candidate:                              # required
+  display_name: str, required
+  location:                             # required
+    city: str, required
+    country: str, required
+    timezone: str, required (IANA name)
+  location_match_terms: [str], required, non-empty — terms that count as "includes me"
+  citizenship: [str], required — ISO 3166-1 alpha-2
+  eligibility:
+    employment_models: [str], required, subset of [b2b_contractor, full_time, part_time, freelance]
+    needs_visa_sponsorship: bool, required
+  experience_years: int, optional
+  headline: str, optional
+  tools: [str], optional
+  certs: [str], optional
+  domains: [str], optional
+
+search:                                 # [T] usually template-supplied
+  stream: str, required — a catalog categories key (e.g. project-management)
+  work_model: [str], required, subset of [remote, hybrid, on_site]
+  keywords:
+    core: [str], required, non-empty     # local TITLE-MATCH substrings, lowercase-insensitive
+    expanded: [str], required (may be []) # promote/demote dataset
+  archetypes: [str], required, non-empty
+  regions_acceptable: [str], optional — informative for scoring, not a hard filter
+  platform_slugs: {catalog-slug: str|[str]}, optional — per-platform category overrides
+                                          (beats the catalog's stream map; subvariant refinement)
+
+compensation:                           # [T] floor usually template-suggested, always confirmed
+  floor:
+    amount: number, required, > 0
+    currency: str, required — key of core/defaults.yaml salary.fx_to_eur
+    basis: str, required, one of [gross, net]
+    period: str, required, one of [hour, day, month, year]
+  gross_net_ratio: number, required, 0.3..1.0 — net = gross x ratio (country approximation)
+  published_equivalents: {str: number}, optional — hand-set judgment-layer equivalents, verbatim
+  assume_unstated: str, optional, one of [judgment] (default judgment)
+
+hard_filters:                           # [T] typed toggles; regex machinery is engine (defaults.yaml)
+  travel: str, optional, one of [none, occasional_ok, any] (default none)
+  clearance: str, optional, one of [drop, allow] (default drop)
+  grind_culture: str, optional, one of [drop, allow] (default drop)
+  tool_lockin_drop: [str], optional — primary-skill lock-in tools that disqualify
+  role_exclusion_terms: [str], optional — flagged (not auto-dropped); judgment decides
+  closed_location_list: str, optional, one of [drop_if_absent, off] (default drop_if_absent)
+  timezone_window:
+    latest_end_local: str, optional "HH:MM" — work required after this local time -> drop
+
+filter_notes: str, optional — profile-LEARNED lessons, read by the judgment layer verbatim
+
+scoring:                                # [T]
+  surface_threshold: number, required, 1.0..10.0
+
+platforms:
+  tiers: {1: [slug], 2: [slug], 3: [slug]}, required — every catalog-active platform
+         not in `disabled` MUST appear in exactly one tier (tierless = silent skip = error)
+  disabled: [slug], optional
+  ats_boards: {greenhouse: [], lever: [], workable: [], pinpoint: []}, optional — per-company
+              tokens, discovered over time (profile data: which companies matter is profile knowledge)
+  linkedin_tripwire:
+    enabled: bool [T] (default true)
+    keywords: [str] [T]
+    locations: [str], profile
+  rejected: [{name, reason}] [T] — do-not-re-add without new evidence
+
+sweep:
+  recheck_interval_h: int, optional (default from core/defaults.yaml)
+
+output:                                 # required
+  notion: either { dry_run: true } or ALL of:
+    tracker: { data_source_id: 32-hex-ish, parent_page_id }      # NEVER a scan-write target
+    passed_seen: { data_source_id, parent_page_id }              # the scanner's only write target
+    pinned_pages: { job_scout_runs, ... }
+    tracker_status_options: [str]
+
+schedule:                               # optional for dry_run profiles
+  runs: [{at: "HH:MM", label: str}]
+  full_sweep_dow: str (default Mon)
+  freshness_window_h: int (default 48)

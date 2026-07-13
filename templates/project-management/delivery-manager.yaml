@@ -1,0 +1,101 @@
+# Template: IT Project Manager / Delivery Manager / Scrum Master
+# The reference template — extracted from job-scout-pm v3.1.2 (SKILL.md + config.yaml),
+# battle-tested by construction. Templates are PARTIAL profiles (profile-agnostic keys
+# only) + stream-specific judgment text. Resolution: template defaults <- user profile,
+# deep-merged; the result must validate as a full profile.
+
+schema_version: 1
+template_id: project-management/delivery-manager
+label: "IT Project Manager / Delivery Manager / Scrum Master"
+suggest_also: []
+
+defaults:
+  search:
+    stream: project-management
+    work_model: [remote]
+    keywords:
+      # Local TITLE-MATCH FILTERS (substring), not search queries. Core set = 1.8.0
+      # invariant; expanded = promote/demote dataset (user-triggered review, never automated).
+      core:
+        - project manager        # substring covers digital/agile/technical/IT/senior variants
+        - scrum master
+        - delivery manager       # substring covers product/client/solutions/digital/technical variants
+        - agile delivery lead
+        - program manager        # substring covers technical/IT program manager
+      expanded:
+        - implementation manager
+        - release manager
+        - proxy product owner
+        - service delivery manager
+    archetypes: [Delivery Manager, Scrum Master, Technical PM, BA-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: [Dynamics 365, SAP, Salesforce, Workday, ServiceNow, Oracle]
+    role_exclusion_terms: [business analyst]   # pure-BA roles with no PM/delivery component
+    closed_location_list: drop_if_absent
+    timezone_window: { latest_end_local: "17:00" }
+
+  compensation:
+    floor: { amount: 2500, currency: EUR, basis: net, period: month }
+    # Hand-negotiated published equivalents carried verbatim for the judgment layer
+    # (v2.x wording: "~$35k/yr or ~€3,000/month gross published"):
+    published_equivalents: { eur_gross_month: 3000, usd_year: 35000 }
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Project Manager, Delivery Manager, Scrum Master]
+    rejected:
+      # Do-NOT-re-add without new evidence (invariant #15; PM-stream evidence, reasons
+      # verbatim from v2.10.0). New platforms earn tier placement via the same
+      # 5-session conversion-rate bar.
+      - { name: Rippling,             reason: "EMEA-title/US-employee bait-and-switch — confirmed via the company's own Himalayas listing tags (retested fully 2026-07-10)" }
+      - { name: Built In,             reason: "~90%+ US-dominated across 3 query passes; one EMEA-tagged role was UK-only bait-and-switch (retested fully 2026-07-10)" }
+      - { name: Remote.com,           reason: "real EMEA signal but its own Greenhouse links die on fetch (2/2 tested) — unreliable without a mirror-check discipline; revisit if a reliable mirror pattern emerges" }
+      - { name: Oyster,               reason: "zero PM/SM/DM openings found, any mirror" }
+      - { name: Multiplier,           reason: "zero search footprint for this role type" }
+      - { name: Velocity Global,      reason: "zero signal" }
+      - { name: Globalization Partners, reason: "only surfaced an already-logged India-tagged duplicate" }
+      - { name: Wellfound,            reason: "US-or-nearshore-only (same profile as Indeed/Glassdoor)" }
+      - { name: PowerToFly,           reason: "US-or-nearshore-only" }
+      - { name: Braintrust,           reason: "US-or-nearshore-only" }
+      - { name: Contra,               reason: "not a job board — freelancer-profile marketplace, no searchable PM postings" }
+      - { name: FlexJobs,             reason: "paywalled, high-volume-low-signal (but source of the EU-country-list filter insight)" }
+      - { name: Jobspresso,           reason: "sparse volume, restricted to US/Canada/UK/Germany hiring jurisdictions" }
+      - { name: Remote.co,            reason: "US/Poland-dominated; one Skopje listing found was dated 2024, not a standing signal" }
+
+# ---------------------------------------------------------------------------
+# Stream-specific judgment text — read by the run skill's scoring pass.
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal always (8.6, never 9). Anchor the band, then adjust by
+  tenths on how many band criteria are actually met. Surface only >= threshold.
+  - 9.0-10.0 — Near-perfect: full delivery lifecycle (pre-sales/A&D/dev/release);
+    Agile/Scrum/Kanban delivery management; Jira+Confluence; Worldwide or EMEA explicit;
+    no travel, no tool lock-in; salary confirmed above threshold.
+  - 8.0-8.9 — Strong: senior PM/SM delivery role; globally open/EMEA; agile required,
+    tools familiar; salary likely clears (company profile suggests it); one minor gap OK.
+    Domain note: a stated CS/data-ops/engineering-background PREFERENCE is not a
+    stretch — only dock if hands-on technical execution is a core daily duty.
+  - 7.0-7.9 — Worth reviewing: PM/SM/DM role; globally open but salary unconfirmed;
+    minor flag (e.g. staffing-agency placement); slight domain stretch.
+  - Below threshold — drop silently (but log to seen.jsonl with the real reason).
+  Archetype tag (assign BEFORE scoring, shown in table + notes): Delivery Manager ·
+  Scrum Master · Technical PM · BA-leaning (closest to the hard-filter boundary — flag
+  explicitly). Dual-tag genuine hybrids ("Delivery Manager / Scrum Master").
+
+salary_estimation_heuristics: |
+  When salary is unpublished: US/UK HQ paying globally -> likely $60k+; Senior/Lead ->
+  higher band; staffing agency with Fortune-500 end client -> "unconfirmed, likely
+  clears"; Eastern-European-focused company -> "likely below threshold, verify before
+  applying." Unpublished salary is NEVER an auto-drop.
+
+interview:
+  emphasize: [work_model, compensation.floor, candidate.location, schedule]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

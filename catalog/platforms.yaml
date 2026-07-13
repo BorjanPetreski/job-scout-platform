@@ -1,0 +1,456 @@
+# catalog/platforms.yaml — SHARED platform knowledge (Layer 2 of the config model).
+#
+# True for every profile that uses a given board: fetch strategy, quirks, expired
+# markers, URL/API patterns. NOTHING profile-specific lives here — search categories
+# are parameterized with {category} slots resolved per profile stream by
+# core/profile_loader.py. Live tiers are PROFILE data (conversion-driven);
+# tier_default only seeds NEW profiles.
+#
+# fetch_mode = FIRST-CHOICE strategy. Runtime fallback chain is always:
+#   api -> direct -> headless -> mirrors -> unverified_blocked
+#
+# categories: stream -> slug (string or list; a list expands to one URL per slug).
+#   A platform with no slug for a profile's stream is skipped-with-honesty in the
+#   ledger ("no category mapping"), never silently.
+# verify_at_setup: slugs marked true were NOT live-verified yet — the Phase 2 setup
+#   flow (or first interactive run) must confirm them before scheduling.
+#
+# Numeric ids preserved from job-scout-pm v3 config — they define rotation sort order.
+
+version: 1
+
+platforms:
+  - id: 1
+    slug: wwr
+    name: We Work Remotely
+    tier_default: 3
+    active: true
+    fetch_mode: direct
+    url_patterns:
+      - "https://weworkremotely.com/categories/remote-{category}-jobs"
+    rss_patterns:
+      - "https://weworkremotely.com/categories/remote-{category}-jobs.rss"
+    categories:
+      project-management: project-management
+      software-engineering: programming
+    mirrors: []
+    expired_markers: ["This job has been closed", "no longer accepting applications"]
+    quirks: >-
+      Cross-category pass required (roles appear outside their category) — the fetcher
+      uses the ALL-jobs RSS (category RSS 301s to nothing), which makes the
+      cross-category pass inherent. Title format 'Company: Role'.
+    notion_platform_name:
+      tracker: "WeWorkRemotely"
+      passed_seen: "We Work Remotely"
+
+  - id: 2
+    slug: jobgether
+    name: Jobgether
+    tier_default: 3
+    active: true
+    fetch_mode: direct
+    url_patterns:
+      - "https://jobgether.com/remote-jobs/emea/{category}"
+    categories:
+      project-management: [project-manager, scrum-master, agile-delivery-manager]
+      software-engineering: [software-engineer, frontend-developer]
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: ["This offer is no longer available"]
+    quirks: "Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no retry."
+    notion_platform_name: { tracker: "Jobgether", passed_seen: "Jobgether" }
+
+  - id: 3
+    slug: dynamite
+    name: Dynamite Jobs
+    tier_default: 3
+    active: true
+    fetch_mode: headless
+    url_patterns:
+      - "https://dynamitejobs.com/remote-jobs/{category}"
+    categories:
+      project-management: project-management
+      software-engineering: software-development
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: ["This job is no longer available"]
+    quirks: "Category pages JS-rendered (v2.10.0)."
+    notion_platform_name: { tracker: "Dynamite Jobs", passed_seen: "Dynamite Jobs" }
+
+  - id: 4
+    slug: arc
+    name: Arc.dev
+    tier_default: 3
+    active: true
+    fetch_mode: direct
+    url_patterns:
+      - "https://arc.dev/remote-jobs/{category}"
+    categories:
+      project-management: project-manager
+      software-engineering: [software-engineer, react-developer]
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: ["This job is no longer available"]
+    quirks: ""
+    notion_platform_name: { tracker: "Arc.dev", passed_seen: "Arc.dev" }
+
+  - id: 5
+    slug: remote-rocketship-worldwide
+    name: Remote Rocketship (worldwide)
+    tier_default: 2
+    active: true
+    fetch_mode: direct
+    url_patterns:
+      - "https://www.remoterocketship.com/jobs/anywhere-in-the-world/{category}/"
+    categories:
+      project-management: scrum-master
+      software-engineering: front-end-developer
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: ["This job is no longer accepting applications"]
+    quirks: >-
+      DEGRADED 2026-07-11: Cloudflare now 403s list pages AND sitemap, direct and headless
+      alike (was: per-job 403s only). Source reports down until RR loosens up; roles mostly
+      mirror in from teamtailor/ATS anyway. Candidate for tier demotion at next recompute.
+    per_job_fetch_mode: headless
+    notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
+
+  - id: 6
+    slug: remote-rocketship-europe
+    name: Remote Rocketship (Europe)
+    tier_default: 2
+    active: true
+    fetch_mode: direct
+    url_patterns:
+      - "https://www.remoterocketship.com/country/europe/jobs/{category}/"
+    categories:
+      project-management: project-management
+      software-engineering: software-engineering
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: ["This job is no longer accepting applications"]
+    quirks: "Same engine as remote-rocketship-worldwide — same 2026-07-11 Cloudflare degradation."
+    per_job_fetch_mode: headless
+    notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
+
+  - id: 7
+    slug: working-nomads
+    name: Working Nomads
+    tier_default: 3
+    active: true
+    fetch_mode: api
+    api_patterns:
+      - "https://www.workingnomads.com/api/exposed_jobs/"
+    url_patterns:
+      - "https://www.workingnomads.com/remote-{category}-jobs-europe"
+    categories:
+      project-management: project-management
+      software-engineering: development
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: []
+    quirks: "Category HTML now JS-rendered (2.10.0 regression) — API only, skip HTML. Verified live 2026-07-11. API is an all-category sample; keyword filter does the scoping."
+    notion_platform_name: { tracker: "Working Nomads", passed_seen: "Working Nomads" }
+
+  - id: 8
+    slug: himalayas
+    name: Himalayas
+    tier_default: 2
+    active: true
+    fetch_mode: direct
+    url_patterns:
+      - "https://himalayas.app/jobs/remote/{category}"
+    categories:
+      project-management: project-management
+      software-engineering: software-development
+    categories_verify_at_setup: [software-engineering]
+    # Fetcher pre-filter phrases per stream (jobs/api returns ALL categories; this keeps
+    # a Tier-1-volume platform from flooding the pipeline — the real keyword filter
+    # still runs in scan.py):
+    prefilter_phrases:
+      project-management: ["project management"]
+      software-engineering: ["software development", "engineering", "developer"]
+    mirrors: []
+    expired_markers: ["This job posting is no longer available"]
+    quirks: >-
+      Company-URL bounce (redirect to company page) is a platform quirk, NOT staleness —
+      special-cased in check_links. HTML listing 403s on direct fetch — public /jobs/api
+      endpoint replaces it (offset/limit, newest-first).
+    notion_platform_name: { tracker: "Himalayas", passed_seen: "Himalayas" }
+
+  - id: 9
+    slug: europeremotely
+    name: EuropeRemotely
+    tier_default: 3
+    active: false
+    recheck_after: "2026-10-01"
+    fetch_mode: direct
+    url_patterns:
+      - "https://europeremotely.com/"
+    categories: {}
+    mirrors: []
+    expired_markers: []
+    quirks: "Demoted to quarterly recheck (2.x) — low volume/stale inventory."
+    notion_platform_name: { tracker: "EuropeRemotely", passed_seen: "EuropeRemotely" }
+
+  - id: 10
+    slug: remotive
+    name: Remotive
+    tier_default: 2
+    active: true
+    fetch_mode: api
+    api_patterns:
+      - "https://remotive.com/api/remote-jobs?category={category}"
+    url_patterns:
+      - "https://remotive.com/remote-jobs/{category}"
+    categories:
+      project-management: project-management
+      software-engineering: software-dev
+    mirrors: []
+    expired_markers: ["This job listing has expired"]
+    quirks: >-
+      REGRESSED 2026-07-11 (post-delta): API now a 41-job stub (params ignored, 0 PM);
+      anonymous category HTML masks companies AND carries no per-job links, rendered or not.
+      Fetcher returns the stub; platform effectively degraded for enumeration. Per-job pages
+      remain public (liveness checks fine). ❓ NEEDS USER at next recompute.
+    notion_platform_name: { tracker: "Remotive", passed_seen: "Remotive" }
+
+  - id: 11
+    slug: wttj
+    name: Welcome to the Jungle
+    tier_default: 3
+    active: true
+    fetch_mode: direct
+    url_patterns:
+      - "https://www.welcometothejungle.com/en/jobs?query={category}&refinementList%5Boffices.country_code%5D%5B%5D=remote"
+    categories:
+      project-management: "project%20manager"
+      software-engineering: "software%20engineer"
+    mirrors: []
+    expired_markers: ["This job is no longer available"]
+    quirks: >-
+      Search pages robots-blocked (row 9); rendered search results are Algolia/consent-gated
+      (verified 2026-07-11) — no anonymous enumeration channel. WttJ roles reach us via
+      mirrors (Remotive/app.wttj links in history). France-skew. Absorbed Otta.
+    notion_platform_name: { tracker: "Welcome to the Jungle", passed_seen: "Welcome to the Jungle" }
+
+  - id: 12
+    slug: landing-jobs
+    name: Landing.jobs
+    tier_default: 3
+    active: true
+    fetch_mode: headless
+    url_patterns:
+      - "https://landing.jobs/jobs?q={category}"
+    categories:
+      project-management: "project+manager"
+      software-engineering: "software+engineer"
+    mirrors: []
+    expired_markers: ["This job is closed"]
+    quirks: "robots.txt hard block on direct fetch (delta row 9)."
+    notion_platform_name: { tracker: "Landing.jobs", passed_seen: "Landing.jobs" }
+
+  - id: 13
+    slug: justremote
+    name: JustRemote
+    tier_default: 3
+    active: true
+    fetch_mode: headless
+    url_patterns:
+      - "https://justremote.co/remote-{category}-jobs"
+    categories:
+      project-management: project-management
+      software-engineering: developer
+    mirrors: []
+    expired_markers: ["This position is no longer available"]
+    quirks: >-
+      DEGRADED 2026-07-11: listings lazy-load on scroll — headless snapshot carries zero
+      postings; no API/page-data channel found. Reports source_down until they change engines.
+    notion_platform_name: { tracker: "JustRemote", passed_seen: "JustRemote" }
+
+  - id: 14
+    slug: nodesk
+    name: NoDesk
+    tier_default: 2
+    active: true
+    fetch_mode: headless
+    url_patterns:
+      - "https://nodesk.co/remote-jobs/{category}/"
+    categories:
+      project-management: project-management
+      software-engineering: engineering
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: ["Job Expired", "career opportunity is no longer available"]
+    quirks: >-
+      JS-rendered; undated listings unverified-by-default (v2.10.0). Category page KEEPS
+      expired postings listed (2026-07-11: 15/16 harvested PM links were "Job Expired" on
+      their own pages) — liveness comes from the posting page only, never the listing.
+    notion_platform_name: { tracker: "NoDesk", passed_seen: "NoDesk" }
+
+  - id: 15
+    slug: remote-ok
+    name: Remote OK
+    tier_default: 3
+    active: true
+    fetch_mode: api
+    api_patterns:
+      - "https://remoteok.com/api"
+    url_patterns:
+      - "https://remoteok.com/remote-{category}-jobs"
+    categories:
+      project-management: project-manager
+      software-engineering: engineer
+    mirrors: []
+    expired_markers: []
+    quirks: "HTML is JS-rendered; public JSON API exists (all categories; first element is a legal notice)."
+    notion_platform_name: { tracker: "Remote OK", passed_seen: "Remote OK" }
+
+  - id: 16
+    slug: otta
+    name: Otta
+    tier_default: 3
+    active: false
+    fetch_mode: direct
+    url_patterns: []
+    categories: {}
+    mirrors: []
+    expired_markers: []
+    quirks: "Merged into Welcome to the Jungle — do not fetch."
+    notion_platform_name: { tracker: "Otta", passed_seen: "Otta" }
+
+  - id: 17
+    slug: justjoin-it
+    name: JustJoin.it
+    tier_default: 1
+    active: true
+    fetch_mode: api
+    # by-cursor endpoint (verified 2026-07-11): pagination param is `from` (the
+    # meta.next.cursor VALUE); perPage caps at 20. The fetcher builds pagination itself.
+    api_patterns:
+      - "https://api.justjoin.it/v2/user-panel/offers/by-cursor?categories[]={category_id}&perPage=20"
+    url_patterns:
+      - "https://justjoin.it/job-offers/all-locations/{category}"
+    categories:
+      project-management: pm
+      software-engineering: javascript
+    # Numeric category ids for the offers API. PM=15 verified live 2026-07-11 (831 offers).
+    category_ids:
+      project-management: "15"
+      software-engineering: "1"
+    categories_verify_at_setup: [software-engineering]
+    mirrors: []
+    expired_markers: ["Offer expired"]
+    quirks: >-
+      LIST CHIPS LIE (2026-07-10: "New" badge + day-counters on expired offers) — liveness
+      ONLY from the offer page/offer JSON expired marker, never list-view data. High density of
+      EU-citizenship / Poland-residency requirements — filter layer must read carefully.
+      Posting age 2+ months = soft-stale. B2B salary transparency is why it stays Tier 1 despite 2% conversion.
+    notion_platform_name: { tracker: "JustJoin.it", passed_seen: "JustJoin.it" }
+
+  - id: 18
+    slug: greenhouse
+    name: Greenhouse (ATS boards)
+    tier_default: 2
+    active: true
+    fetch_mode: api
+    api_board_pattern: "https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true"
+    categories: {}   # ATS boards are company-scoped, not category-scoped; boards come from profile state
+    mirrors: []
+    expired_markers: []
+    quirks: "Public JSON board API — enumerate per known board; site: sampling retired. Board tokens are PROFILE data (which companies matter is profile knowledge)."
+    notion_platform_name: { tracker: "Greenhouse", passed_seen: "Greenhouse" }
+
+  - id: 19
+    slug: lever
+    name: Lever (ATS boards)
+    tier_default: 1
+    active: true
+    fetch_mode: api
+    api_board_pattern: "https://api.lever.co/v0/postings/{board}?mode=json"
+    categories: {}
+    mirrors: []
+    expired_markers: []
+    quirks: >-
+      Public JSON postings API per company. Per-company bot-detection on HTML pages is
+      inconsistent (Mistral 2026-07-09, Zuri Group 2026-07-10) — not a fixed list; the JSON API
+      usually bypasses it, else headless retry then mirrors (delta row 9).
+    notion_platform_name: { tracker: "Lever", passed_seen: "Lever" }
+
+  - id: 20
+    slug: workable
+    name: Workable (ATS boards)
+    tier_default: 1
+    active: true
+    fetch_mode: api
+    api_board_pattern: "https://apply.workable.com/api/v3/accounts/{board}/jobs"
+    categories: {}
+    mirrors: []
+    expired_markers: []
+    quirks: "apply.workable.com HTML is JS-rendered — job-board JSON endpoint only (POST, paginated)."
+    notion_platform_name: { tracker: "Workable", passed_seen: "Workable" }
+
+  - id: 21
+    slug: pinpoint
+    name: Pinpoint HQ (ATS boards)
+    tier_default: 3
+    active: true
+    fetch_mode: api
+    api_board_pattern: "https://{board}.pinpointhq.com/postings.json"
+    categories: {}
+    mirrors: []
+    expired_markers: []
+    quirks: >-
+      JS-rendered HTML; postings.json endpoint verified — else headless.
+      2.7.1 lesson: this platform previously had NO tier and was silently skipped — config
+      validation makes tierless active platforms an error.
+    notion_platform_name: { tracker: "Pinpoint HQ", passed_seen: "Pinpoint HQ" }
+
+  - id: 22
+    slug: deel
+    name: Deel
+    tier_default: 3
+    active: true
+    fetch_mode: api
+    api_patterns:
+      - "https://api.ashbyhq.com/posting-api/job-board/deel?includeCompensation=true"
+    url_patterns:
+      - "https://www.deel.com/careers/"
+    categories:
+      project-management: all
+      software-engineering: all   # company board carries every function; keyword filter scopes
+    mirrors:
+      - builtin.com
+      - colorwavecareers.com
+      - euremotejobs.com
+    expired_markers: []
+    quirks: "Ashby-hosted (JS chrome on HTML) — Deel DISABLED the Ashby public API; jobs parsed from careers-page embedded Strapi JSON (delta row 7). EOR: roles skew finance/ops-adjacent as often as classic IT — score domain fit carefully."
+    notion_platform_name: { tracker: "Deel", passed_seen: "Deel" }
+
+  - id: 23
+    slug: crossover
+    name: Crossover
+    tier_default: 3
+    active: true
+    fetch_mode: headless
+    url_patterns:
+      - "https://www.crossover.com/jobs"
+    categories:
+      project-management: all
+      software-engineering: all
+    mirrors:
+      - linkedin-snippets
+    expired_markers: []
+    quirks: >-
+      JS-rendered SPA; mirrors = LinkedIn snippets as last resort. Grind-culture flags
+      common — judgment layer reads every JD. EOR: genuinely worldwide-open,
+      independent-contractor structured, but also runs USA/nearshore-restricted reqs —
+      verify per-role, never trust the brand.
+    notion_platform_name: { tracker: "Crossover", passed_seen: "Crossover" }
+
+# LinkedIn is NOT a platform entry: it is a discovery tripwire only
+# (core/linkedin_tripwire.py). No login, no cookies, guest endpoint only.
+# Keywords/locations come from the profile; caps and endpoint discipline are engine law.
+linkedin_tripwire:
+  remote_filter: "f_WT=2"
+  freshness: "f_TPR=r86400"

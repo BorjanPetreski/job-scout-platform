@@ -16,8 +16,8 @@ Do not break it before the Phase 1 cutover step.**
 
 | Phase | Deliverable | Status |
 |-------|-------------|--------|
-| 0 | Documentation set (plan, architecture, config spec, this log) | 🟡 in review — this PR |
-| 1 | Core engine extraction + borjan-pm parity + shortlist liveness sweep | ⬜ not started |
+| 0 | Documentation set (plan, architecture, config spec, this log) | ✅ merged (PR #8) |
+| 1 | Core engine extraction + borjan-pm parity + shortlist liveness sweep | 🟡 built — in review; cutover (1.12) pending Borjan |
 | 2 | Template library + setup interview + Notion provisioning | ⬜ not started |
 | 3 | Application Assistant (Claude Projects package) | ⬜ not started |
 | 4 | Setup/companion FE app (Agent SDK) | ⬜ not started |
@@ -30,7 +30,7 @@ Do not break it before the Phase 1 cutover step.**
 | 0.2 | ARCHITECTURE.md — layers, repo layout, pipeline, Notion contract, sweep design | ✅ 2026-07-13 | |
 | 0.3 | PROFILE_CONFIG_SPEC.md — schema draft, option sets, salary model, template format | ✅ 2026-07-13 | Schema is illustrative; normative schema ships in Phase 1 |
 | 0.4 | This log seeded with the Phase 1 checklist | ✅ 2026-07-13 | |
-| 0.5 | Borjan reviews docs + answers open questions | ⬜ | Blocks Phase 1 kickoff decisions; defaults adopted in plan §5 apply if unanswered |
+| 0.5 | Borjan reviews docs + answers open questions | ✅ 2026-07-13 | Docs merged (PR #8); "lets go" = defaults adopted per plan §5 |
 
 ## Phase 1 — Core engine extraction (build checklist)
 
@@ -39,18 +39,18 @@ ARCHITECTURE.md throughout.
 
 | # | Step | Status | Notes |
 |---|------|--------|-------|
-| 1.1 | `core/schema/profile.schema.yaml` + `profile_loader.py` + `validate.py` (validator in core) | ⬜ | Schema per PROFILE_CONFIG_SPEC.md §2; strict validation |
-| 1.2 | `catalog/platforms.yaml` — extract platform registry, parameterize URLs with `{category}` slots + slug maps | ⬜ | Mechanical extraction from job-scout-pm/config.yaml; keep every quirk verbatim |
-| 1.3 | `templates/project-management/delivery-manager.yaml` — PM template extracted from SKILL.md + config | ⬜ | First template, battle-tested by construction |
-| 1.4 | `profiles/borjan-pm/profile.yaml` — Borjan's values; resolved-config diff vs today's effective config passes | ⬜ | Comparison script, not eyeballing (spec §8) |
-| 1.5 | Move scripts → `core/`, thread `--profile` through; state paths profile-namespaced | ⬜ | No behavior change; salary.py added per spec §5 |
-| 1.6 | `core/sweep.py` — shortlist liveness sweep + Notion `Stale/Expired` flip | ⬜ | ARCHITECTURE.md §6; seeded-stale acceptance test |
-| 1.7 | `skills/job-scout-run/SKILL.md` — generic run skill (engine policy + judgment layer reads profile) | ⬜ | Three-lane detection and Appendix-A fallback preserved |
-| 1.8 | Migrate `job-scout-pm/state/` → `profiles/borjan-pm/state/` verbatim | ⬜ | History is the asset; never regenerate |
-| 1.9 | Parity runs: full rotation on new engine vs old (coverage ledger, dedup decisions, Notion writes) | ⬜ | Old path untouched until this passes |
-| 1.10 | Demo second profile (dry-run, e.g. fe-react) validates + plans with zero engine changes | ⬜ | The abstraction proof |
-| 1.11 | CI: audit `core/` + catalog + all profiles (replace job-scout-pm target) | ⬜ | Keep old audit green until 1.12 |
-| 1.12 | CUTOVER: re-point laptop + cloud schedules; freeze `job-scout-pm/` as archive | ⬜ | Deliberate, reversible; needs Borjan for the laptop schedule |
+| 1.1 | `core/schema/profile.schema.yaml` + `profile_loader.py` + `validate.py` (validator in core) | ✅ 2026-07-13 | Strict validation; loader resolves catalog+template+profile → effective config shaped like v3 config.yaml (the parity-friendly design decision) |
+| 1.2 | `catalog/platforms.yaml` — extract platform registry, parameterize URLs with `{category}` slots + slug maps | ✅ 2026-07-13 | 23 entries, quirks verbatim; slug-keyed; SE-stream slugs marked `categories_verify_at_setup` (live-verify in Phase 2) |
+| 1.3 | `templates/project-management/delivery-manager.yaml` — PM template extracted from SKILL.md + config | ✅ 2026-07-13 | + `software-engineering/frontend-react.yaml` (dry-run only) |
+| 1.4 | `profiles/borjan-pm/profile.yaml` — Borjan's values; resolved-config diff vs today's effective config passes | ✅ 2026-07-13 | `core/parity_diff.py` PASSES: key-for-key identical, 16 documented accepted deltas (A1–A7 in the script header) |
+| 1.5 | Move scripts → `core/`, thread `--profile` through; state paths profile-namespaced | ✅ 2026-07-13 | + `core/paths.py`, `core/salary.py` (additive `salary_assessment` metadata — never a machine drop) |
+| 1.6 | `core/sweep.py` — shortlist liveness sweep + Notion `Stale/Expired` flip | ✅ 2026-07-13 | Seeded-stale acceptance PASSED (retired w/ queued in-place Notion update); 24h deferral verified; live-tested on the 18 real New—Unreviewed rows (all still live, sweep.json committed) |
+| 1.7 | `skills/job-scout-run/SKILL.md` — generic run skill (engine policy + judgment layer reads profile) | ✅ 2026-07-13 | v4.0.0, status pre-cutover; three lanes + Appendix A preserved, profile-parameterized |
+| 1.8 | Migrate `job-scout-pm/state/` → `profiles/borjan-pm/state/` verbatim | ✅ 2026-07-13 | `core/migrate_state.py`, idempotent union-merge; 765 records/471 URLs migrated. RE-RUN AT CUTOVER — legacy keeps producing state until then |
+| 1.9 | Parity runs: full rotation on new engine vs old (coverage ledger, dedup decisions, Notion writes) | ✅ 2026-07-13 | Back-to-back live runs (`--no-headless`): identical covered(14)/down(8) ledgers; all 56 non-LinkedIn candidates IDENTICAL; only diff = LinkedIn tripwire sampling (nondeterministic endpoint). Legacy state git-restored after; Notion writes not exercised (no token) — structural guarantee unchanged + MCP-pending path preserved |
+| 1.10 | Demo second profile (dry-run, e.g. fe-react) validates + plans with zero engine changes | ✅ 2026-07-13 | `profiles/demo-fe-react` — `scan.py --plan` produces a coherent React-stream rotation, zero engine changes |
+| 1.11 | CI: audit `core/` + catalog + all profiles (replace job-scout-pm target) | ✅ 2026-07-13 | New `validate-platform` job (validate.py + parity_diff.py + per-profile `--plan`); legacy audit KEPT green until 1.12 |
+| 1.12 | CUTOVER: re-point laptop + cloud schedules; freeze `job-scout-pm/` as archive | ⬜ NEXT | Needs Borjan (laptop schedule + NOTION_TOKEN in cloud env). Checklist: (a) merge this PR, (b) re-run `core/migrate_state.py` + commit, (c) copy `job-scout-pm/references/` → `profiles/borjan-pm/references/`, (d) re-point both schedules to `core/scan.py --profile borjan-pm` prompts per skills/job-scout-run, (e) freeze `job-scout-pm/` (README note + retire its CI job + parity_diff step), (f) first supervised run |
 
 ## Phase 2 / 3 / 4
 
@@ -61,4 +61,5 @@ pre-plan details here — plans go stale; the plan of record is PROJECT_PLAN.md.
 
 | Date | Session | Work done |
 |------|---------|-----------|
-| 2026-07-13 | Phase 0 (cloud, branch `claude/job-scout-engine-abstraction-2g5b0o`) | Wrote the four-doc planning set; seeded Phase 1 checklist; PR opened for review |
+| 2026-07-13 | Phase 0 (cloud, branch `claude/job-scout-engine-abstraction-2g5b0o`) | Wrote the four-doc planning set; seeded Phase 1 checklist; PR #8 merged |
+| 2026-07-13 | Phase 1 build (same session/branch, restarted from main) | Built steps 1.1–1.11 end-to-end: catalog, templates (PM + fe-react), profiles (borjan-pm + demo), loader+validator, core extraction, sweep, generic skill, state migration, parity (config diff + live back-to-back runs), CI. Cutover (1.12) deliberately left for Borjan. Env notes: selectolax pip-installed; playwright not needed (`--no-headless` runs); `REQUESTS_CA_BUNDLE=/root/.ccr/ca-bundle.crt` required for live fetches in cloud sessions |
