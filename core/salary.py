@@ -64,11 +64,30 @@ def parse(text: str) -> dict | None:
             continue
         window = text[max(0, m.start() - 60): m.end() + 60].lower()
         basis = "net" if re.search(r"\b(net|netto)\b", window) else "gross"
-        if period is None:  # infer: yearly figures are big, monthly mid, daily small
-            period = "year" if hi >= 20000 else ("month" if hi >= 900 else "day")
+        # period stays None when the text doesn't state it — currency-neutral inference
+        # happens in assess() on the EUR-normalized magnitude (a raw-magnitude guess is
+        # wrong for non-USD: 24998 PLN/month tripped a ">=20000 → annual" rule and read
+        # 12x too low, 2026-07-13 cutover run).
         return {"amount_min": lo, "amount_max": hi, "currency": cur or "USD",
-                "period": period, "basis": basis}
+                "period": period, "period_stated": period is not None, "basis": basis}
     return None
+
+
+def _infer_period(amount: float, currency: str, defaults: dict) -> str | None:
+    """Infer pay period from the EUR-normalized magnitude of a single figure —
+    currency-neutral, so a monthly PLN salary in the tens of thousands is not mistaken
+    for an annual one. None if the currency isn't in the FX table."""
+    fx = defaults.get("salary", {}).get("fx_to_eur", {})
+    if currency not in fx:
+        return None
+    eur = amount * fx[currency]
+    if eur >= 30000:
+        return "year"
+    if eur >= 1200:
+        return "month"
+    if eur >= 150:
+        return "day"
+    return "hour"
 
 
 def to_canonical(amount: float, currency: str, period: str, basis: str,
@@ -105,7 +124,10 @@ def assess(text: str | None, floor_norm: dict, defaults: dict) -> dict:
     parsed = parse(text or "")
     if not parsed or not floor_norm.get("canonical_gross_month"):
         return {"status": "unparseable", "detail": "no parseable salary; apply estimation heuristics"}
-    canon = to_canonical(parsed["amount_max"], parsed["currency"], parsed["period"],
+    period = parsed["period"] or _infer_period(parsed["amount_max"], parsed["currency"], defaults)
+    if period is None:
+        return {"status": "unparseable", "detail": f"unknown currency {parsed['currency']}"}
+    canon = to_canonical(parsed["amount_max"], parsed["currency"], period,
                          parsed["basis"], floor_norm["currency"],
                          floor_norm["gross_net_ratio"], defaults)
     if canon is None:
@@ -113,9 +135,10 @@ def assess(text: str | None, floor_norm: dict, defaults: dict) -> dict:
     floor = floor_norm["canonical_gross_month"]
     margin = float(defaults.get("salary", {}).get("borderline_margin", 0.10))
     ratio = canon / floor
+    stated = "" if parsed.get("period_stated") else " [period inferred]"
     detail = (f"range max ≈ {canon:,.0f} {floor_norm['currency']} gross/month vs floor "
               f"{floor:,.0f} (parsed {parsed['amount_max']:,.0f} {parsed['currency']} "
-              f"{parsed['basis']}/{parsed['period']})")
+              f"{parsed['basis']}/{period}{stated})")
     if ratio >= 1 + margin:
         return {"status": "clears", "detail": detail}
     if ratio <= 1 - margin:
