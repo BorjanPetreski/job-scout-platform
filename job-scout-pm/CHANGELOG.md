@@ -1,5 +1,16 @@
 # job-scout-pm — Changelog
 
+## 3.1.1 (2026-07-13) — State sync mandatory in both Code lanes
+
+Steps 0 (`state_sync.py pull`) and 8 (`state_sync.py push`) were Cloud-lane-only;
+now both Code lanes run them on every scan. Rationale: with laptop and cloud
+schedules both live, an unpushed laptop run left cloud runs re-fetching and
+re-judging roles already settled locally, and an unpulled laptop run scanned
+blind to everything the unattended runs had logged. `state_sync.py pull` is a
+full `git pull --rebase`, so laptop runs also pick up skill/config updates.
+`claude-settings.example.json` gains the `state_sync.py` permission so
+unattended laptop runs don't stall on a prompt.
+
 ## 3.1.0 (2026-07-12) — Third lane: cloud Code sessions
 
 The skill now runs three ways, sharing one dedup history and one Notion inbox:
