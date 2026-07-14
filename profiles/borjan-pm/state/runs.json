@@ -1,7 +1,7 @@
 {
  "recompute": {
   "last": "2026-07-10",
-  "sessions_since": 4,
+  "sessions_since": 6,
   "due_at_sessions": 5
  },
  "2026-07-11": {
@@ -112,13 +112,15 @@
    "full_sweep": false
   },
   "PM": {
-   "ran_at": "2026-07-13T21:26:14+00:00",
+   "ran_at": "2026-07-13T21:59:27+00:00",
    "platforms_covered": [
     "Himalayas",
     "Remotive",
     "JustJoin.it",
     "Lever (ATS boards)",
     "Workable (ATS boards)",
+    "Remote Rocketship (worldwide)",
+    "Remote Rocketship (Europe)",
     "NoDesk",
     "Greenhouse (ATS boards)",
     "We Work Remotely",
@@ -134,18 +136,61 @@
     "LinkedIn (tripwire)"
    ],
    "sources_down": [
-    "Remote Rocketship (worldwide)",
-    "Remote Rocketship (Europe)",
     "Welcome to the Jungle",
     "JustRemote"
    ],
-   "new": 116,
-   "dropped": 0,
+   "new": 26,
+   "dropped": 2,
    "link_dead": 0,
    "sweep": {
-    "scope": 18,
-    "checked": 0,
+    "scope": 23,
+    "checked": 5,
     "deferred": 18,
+    "stale": 0,
+    "live": 5,
+    "unverifiable": 0,
+    "escalated": 0
+   },
+   "half": null,
+   "full_sweep": false
+  }
+ },
+ "2026-07-14": {
+  "AM": {
+   "ran_at": "2026-07-14T05:19:40+00:00",
+   "platforms_covered": [
+    "Himalayas",
+    "Remotive",
+    "JustJoin.it",
+    "Lever (ATS boards)",
+    "Workable (ATS boards)",
+    "Remote Rocketship (worldwide)",
+    "Remote Rocketship (Europe)",
+    "NoDesk",
+    "Greenhouse (ATS boards)",
+    "We Work Remotely",
+    "Jobgether",
+    "Dynamite Jobs",
+    "Arc.dev",
+    "Working Nomads",
+    "Landing.jobs",
+    "Remote OK",
+    "Pinpoint HQ (ATS boards)",
+    "Deel",
+    "Crossover",
+    "LinkedIn (tripwire)"
+   ],
+   "sources_down": [
+    "Welcome to the Jungle",
+    "JustRemote"
+   ],
+   "new": 41,
+   "dropped": 0,
+   "link_dead": 1,
+   "sweep": {
+    "scope": 23,
+    "checked": 0,
+    "deferred": 23,
     "stale": 0,
     "live": 0,
     "unverifiable": 0,
