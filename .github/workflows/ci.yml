@@ -7,34 +7,9 @@ on:
     branches: [main]
 
 jobs:
-  validate-legacy:
-    # job-scout-pm stays production until the Phase 1 cutover (step 1.12) —
-    # keep its audit green until then; retire this job when it's frozen.
-    # NAME MUST STAY "Validate job-scout-pm": it is the required status-check
-    # context in main's branch protection. Renaming it makes the required check
-    # go permanently "expected" and blocks every PR (2026-07-13). At cutover,
-    # update branch protection to require the new checks BEFORE retiring this job.
-    name: Validate job-scout-pm
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: job-scout-pm
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: pip install pyyaml
-
-      - name: Skill audit (frontmatter, script compilation, config validity)
-        run: python3 scripts/audit_skill.py
-
-      - name: State-file integrity (seen.jsonl, runs.json, etc.)
-        run: python3 scripts/validate_state.py
-
+  # `validate-legacy` (name: "Validate job-scout-pm") was retired 2026-07-14, after
+  # main's ruleset swapped its required check to "Validate platform (…)". job-scout-pm/
+  # is a frozen v3 archive (see job-scout-pm/README.md) and is no longer audited in CI.
   validate-platform:
     name: Validate platform (core + catalog + templates + profiles)
     runs-on: ubuntu-latest
@@ -51,8 +26,11 @@ jobs:
       - name: Platform validation (compilation, catalog, templates, profiles, state, skills)
         run: python3 core/validate.py
 
-      - name: Parity — borjan-pm resolved config vs legacy config.yaml (until cutover)
-        run: python3 core/parity_diff.py
+      # Parity (borjan-pm resolved config == legacy config.yaml) was the Phase-1
+      # acceptance gate; it is retired at cutover (CUTOVER.md 5b). It now diverges BY
+      # DESIGN: tiers are living per-profile data and the first post-cutover recompute
+      # (2026-07-14: Greenhouse->T1, NoDesk + Remote Rocketship->T3) moved them off the
+      # frozen legacy config. core/parity_diff.py is kept as the historical record.
 
       - name: Scan plans resolve for every profile (no network)
         run: |

@@ -81,6 +81,69 @@ def _fresh(posted_at, cutoff: datetime) -> bool:
         return True
 
 
+# --- Predominantly-non-English JD detector (4.1, lesson: JustJoin.it PM offers with
+# Polish-only JDs/ATS forms despite international tags — not caught by any keyword or
+# location filter, discovered only at apply time). Conservative: fires only on
+# substantial text carrying almost no distinctive English function words, so an English
+# JD sprinkled with foreign words never trips it (false negatives are the safe side).
+_EN_SIGNAL = frozenset(
+    "the and for with you are our will this that have from your about who what would "
+    "should must team work experience they their been were which while when has".split())
+_PL_MARKERS = frozenset(
+    "się jest oraz dla lub jako że praca doświadczenie umiejętności zespół wymagania "
+    "stanowisko obowiązki mile widziane znajomość firmy poszukujemy".split())
+_PL_DIACRITICS = frozenset("ąćęłńóśźż")
+
+
+def language_flag(text: str) -> tuple[str | None, str]:
+    """Return ('non_english_jd', note) when JD text reads as predominantly non-English."""
+    words = re.findall(r"[^\W\d_]+", (text or "").lower(), flags=re.UNICODE)
+    if len(words) < 50:
+        return None, ""  # too little text to judge
+    if sum(1 for w in words if w in _EN_SIGNAL) / len(words) >= 0.025:
+        return None, ""  # reads as English
+    if sum(1 for w in words if w in _PL_MARKERS) >= 3 or any(ch in _PL_DIACRITICS for ch in text):
+        return "non_english_jd", "JD appears predominantly Polish (Polish-only JD/ATS form)"
+    return "non_english_jd", "JD appears predominantly non-English"
+
+
+# --- Stated-start-date-in-the-past detector (4.1, Cyclad lesson: posted months ago,
+# the JD's own start/target date already gone, the platform still shows it live). Only
+# dates in an explicit start/kick-off context count — never a stray date in the body.
+_MONTHS = {m: i for i, m in enumerate(
+    "jan feb mar apr may jun jul aug sep oct nov dec".split(), 1)}
+_START_CTX = re.compile(
+    r"(start(?:ing|s)?|kick[- ]?off|target start|expected start|planned start|"
+    r"project start|earliest start|commencement|commenc\w*)", re.I)
+_DATE_PATS = [
+    (re.compile(r"(\d{1,2})[./](\d{4})"), "num"),                                  # 06.2026
+    (re.compile(r"(\d{4})-(\d{2})"), "iso"),                                       # 2026-06
+    (re.compile(r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{4})", re.I), "mon"),
+]
+
+
+def start_date_passed(text: str, today: date) -> tuple[bool, str]:
+    """(True, 'YYYY-MM') if the JD states a start/target month already before this month."""
+    for cm in _START_CTX.finditer(text or ""):
+        window = text[cm.end():cm.end() + 45]
+        for pat, kind in _DATE_PATS:
+            m = pat.search(window)
+            if not m:
+                continue
+            try:
+                if kind == "num":
+                    mo, yr = int(m.group(1)), int(m.group(2))
+                elif kind == "iso":
+                    yr, mo = int(m.group(1)), int(m.group(2))
+                else:
+                    mo, yr = _MONTHS[m.group(1).lower()[:3]], int(m.group(2))
+            except (ValueError, KeyError):
+                continue
+            if 1 <= mo <= 12 and 2000 <= yr <= 2100 and (yr, mo) < (today.year, today.month):
+                return True, f"{yr:04d}-{mo:02d}"
+    return False, ""
+
+
 def hard_filter(cand: dict, hf: dict) -> tuple[str | None, list[str]]:
     """Returns (drop_reason, flags). Drop only on the machine-certain patterns."""
     hay = " ".join(str(cand.get(k) or "") for k in ("title", "loc", "salary", "jd_text"))
@@ -255,6 +318,39 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         text = " ".join(str(c.get(k) or "") for k in ("salary", "jd_text"))
         c["salary_assessment"] = salary.assess(text, floor_norm, defaults)
 
+    # ---- candidate-quality + prior-history annotations (4.1 judgment-layer inputs;
+    # ADDITIVE flags/notes only — never a machine drop, the judgment layer decides).
+    # Runs on FULL jd_text, before it is truncated for the cache below.
+    comp_idx = dedup.company_index()
+    for c in survivors:
+        flags = set(c.get("flags") or [])
+        if not dedup.norm_company(c.get("company", "")):
+            flags.add("missing_company")            # scan-side data-quality note (lesson 6)
+        jd = c.get("jd_text") or ""
+        lang_flag, lang_note = language_flag(jd)     # Polish-only JD/ATS (lesson 1)
+        if lang_flag:
+            flags.add(lang_flag)
+            c["language_note"] = lang_note
+        passed, when = start_date_passed(jd, date.today())  # stated start gone (lesson 4)
+        if passed:
+            flags.add("start_date_passed")
+            c["start_date_note"] = f"stated start {when} is already past (posting may be stale)"
+        # Prior reqs from the same company — surface so the judgment layer never has to
+        # re-ask "did I already apply to a variant of this?" (lessons 2 + 3).
+        prior = [r for r in comp_idx.get(dedup.norm_company(c.get("company", "")), [])
+                 if dedup.norm_url(r.get("url", "")) != dedup.norm_url(c["url"])]
+        if prior:
+            c["company_prior"] = [
+                {"role": r.get("role", ""), "locdom": r.get("locdom", ""),
+                 "status": r.get("status", ""), "reason": r.get("reason", "")}
+                for r in prior[:8]]
+            fam = dedup.role_family(c["title"])
+            applied_variants = [r for r in prior if r.get("status") == "applied"
+                                and dedup.role_family(r.get("role", "")) == fam]
+            if len(applied_variants) >= 2:  # location-agnostic country-clone saturation
+                flags.add("applied_variant_saturation")
+        c["flags"] = sorted(flags)
+
     # ---- shortlist liveness sweep (4.0, step 8 — ARCHITECTURE.md §6)
     sweep_counts = {"scope": 0, "checked": 0, "stale": 0, "unverifiable": 0,
                     "escalated": 0, "live": 0, "deferred": 0}
@@ -316,6 +412,12 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
           f"{sweep_counts['checked']} rechecked, {sweep_counts['stale']} went stale, "
           f"{sweep_counts['unverifiable']} unverifiable"
           + (f" ({sweep_counts['escalated']} escalated — check manually)" if sweep_counts["escalated"] else ""))
+    dq = {f: sum(1 for c in survivors if f in (c.get("flags") or []))
+          for f in ("non_english_jd", "start_date_passed", "missing_company",
+                    "applied_variant_saturation")}
+    dq = {k: v for k, v in dq.items() if v}
+    if dq:
+        print("  candidate flags: " + ", ".join(f"{k}×{v}" for k, v in dq.items()))
     rc = runs["recompute"]
     if rc["sessions_since"] >= rc.get("due_at_sessions", 5):
         print(f"⚠ tier recompute due: {rc['sessions_since']} sessions since {rc['last']} "

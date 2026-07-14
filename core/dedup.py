@@ -64,6 +64,16 @@ def make_key(company: str, role: str, locdom: str) -> str:
     return f"{norm_company(company)}|{_norm(role)}|{_norm(locdom)}"
 
 
+def role_family(role: str) -> str:
+    """Role title with a trailing location/scope qualifier stripped, e.g.
+    'Delivery Manager - Belgrade' / 'Delivery Manager (Poland)' -> 'delivery manager'.
+    Used for the location-agnostic country-clone cross-check: two applied reqs that
+    share a company + role_family but differ only in location are the same opportunity
+    (Andersen Belgrade/Skopje/Warszawa lesson — dedup on the 3-part key treats every
+    country tag as distinct BY DESIGN, which is the wrong call once 2+ have converted)."""
+    return re.split(r"\s[-–—|(/]|,", _norm(role), maxsplit=1)[0].strip()
+
+
 def load_seen(path: Path | None = None) -> dict:
     """Return {'by_url': {norm_url: rec}, 'by_key': {key: rec}} — last record wins."""
     path = path or paths.seen_path()
@@ -150,6 +160,23 @@ def current_records(path: Path | None = None) -> list[dict]:
 def unsynced(path: Path | None = None) -> list[dict]:
     """Current (last-wins) records not yet pushed to Notion."""
     return [r for r in current_records(path) if not r.get("synced_to_notion")]
+
+
+def company_index(path: Path | None = None) -> dict[str, list[dict]]:
+    """norm_company -> list of current (last-wins) records for that company.
+
+    One pass so scan.py can, per survivor, surface prior reqs from the same company
+    ("Andersen also has: DM-Skopje [Applied], DM-Warszawa [Applied]") without asking
+    the user each time, and detect applied-variant saturation (the location-agnostic
+    country-clone check). Company-less rows are skipped — they'd bucket together
+    meaninglessly.
+    """
+    idx: dict[str, list[dict]] = {}
+    for rec in current_records(path):
+        c = norm_company(rec.get("company", ""))
+        if c:
+            idx.setdefault(c, []).append(rec)
+    return idx
 
 
 if __name__ == "__main__":

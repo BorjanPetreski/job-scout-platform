@@ -352,6 +352,10 @@ platforms:
       LIST CHIPS LIE (2026-07-10: "New" badge + day-counters on expired offers) — liveness
       ONLY from the offer page/offer JSON expired marker, never list-view data. High density of
       EU-citizenship / Poland-residency requirements — filter layer must read carefully.
+      POLISH-ONLY JD/ATS: ~1/3 of PM-tagged offers ship a Polish-only JD (and Polish ATS
+      application form) despite an international/PM tag (2026-07-14) — no keyword or location
+      filter catches it; the scan's non_english_jd flag (computed at full-fetch) is a hard-drop
+      signal, so it is caught before apply-time rather than on manual discovery.
       Posting age 2+ months = soft-stale. B2B salary transparency is why it stays Tier 1 despite 2% conversion.
     notion_platform_name: { tracker: "JustJoin.it", passed_seen: "JustJoin.it" }
 

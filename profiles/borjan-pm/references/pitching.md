@@ -54,6 +54,8 @@ Two-step task when Borjan provides a JD and asks for a hiring-manager email pitc
 
 Any submittable application text (cover letters, email pitches, form answers, follow-up screening answers) goes inside a plain markdown code block (triple backticks, no language tag) — one-tap copyable on mobile, delivered on the first response without a second request. Commentary and analysis stay as normal chat prose outside the block.
 
+**This extends to every ad-hoc ask during or after a JD review** — a profile link (GitHub/LinkedIn), a short intro/blurb, a one-line availability note, a reworded answer, anything Borjan asks to hand off. Deliver it inside a copy-block on the first response so he never has to manually select and copy — **even for a single URL** (a bare clickable link still forces a manual select; the block does not). Commentary stays outside the block.
+
 ---
 
 ## Job hunt strategy & tone constraints (canonical)
@@ -71,3 +73,38 @@ Many employers (Human Made confirmed) follow the cover letter with a Q&A form. D
 - **Specialisms / tools / experience levels** → structured list, with years and a level (expert/advanced/intermediate) per item, not prose.
 - **Dislikes / weaker areas** → honest, constructive, grounded in real past examples (Scrumfall, dispersed stakeholders, time-tracking imposed on engineers, authority-building with senior teams).
 - **Preferred engagement length** → upfront that most experience is long-form engagements, but note the discrete shorter-scope deliverables within them (audits, A&D phases); state flexibility toward the platform's actual model.
+
+---
+
+## Screening-question & gap-honesty procedure (any Q&A answer, incl. domain-fit questions)
+
+Applies to every drafted application answer, screening question, and "do you have experience with X" prompt (ESG/regulatory, SAP/ERP, e-learning, etc. all came up):
+
+1. **Read the source docs first** — CV, Quarterly Review, Job Requirements, Struggles and Challenges, past answers — before writing a word. Don't answer from assumption.
+2. **If genuine adjacent experience exists:** draft the closest HONEST answer grounded in it — name the real project/domain and the transferable part, don't overclaim it as direct experience.
+3. **If it does not:** say so plainly ("I haven't worked directly in <domain>") and, only if real, add the nearest adjacent exposure. "Insufficient data" / an honest gap beats a fabricated match.
+4. **Flag the gap to Borjan explicitly** in chat commentary (outside the copy-block) so he decides how to handle it — never silently paper it over inside the answer.
+
+This is the same discipline as the "No invented experience" rule above, made into a step because it recurs on almost every form.
+
+---
+
+## Salary expectation / "max yearly ask" heuristic
+
+When asked for a number (yearly expectation, max, desired range), default rule:
+
+- **Posted range present:** anchor the ask near the TOP of the posted range if the seniority genuinely supports it (7 yrs, Senior PM/DM). The floor from the profile is the safety check — never ask below it.
+- **No posted range:** market-comparable for the role/region + 10–15%, still floored at the profile's salary floor.
+- **B2B vs full-time:** state the number in the basis the listing uses; if B2B, the figure is gross day/month rate the sole-proprietor model quotes, not a net salary.
+- Give ONE number or a tight range, confidently, with a one-line justification — not a menu of options.
+
+---
+
+## Profile links (paste verbatim, always in a copy-block)
+
+Fixed references Borjan hands off repeatedly during applications — deliver each inside a copy-block per the delivery-format rule above:
+
+- **GitHub:** https://github.com/BorjanPetreski
+- **LinkedIn:** https://www.linkedin.com/in/borjanpetreski/
+
+No pre-canned intro is stored — when a short intro/blurb is asked for, draft it fresh in his voice for that request (source docs + the voice guide above) and deliver it in a copy-block.
