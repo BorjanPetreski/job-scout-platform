@@ -3,6 +3,13 @@
 borjan-pm effective config reproduces job-scout-pm v3's effective configuration
 key-for-key. A comparison script, not eyeballing. Exit 0 = parity holds.
 
+HISTORICAL ARTIFACT (retired from CI at cutover, CUTOVER.md 5b): this proved the
+extraction was faithful at the moment of cutover and PASSED then. It now diverges BY
+DESIGN — tiers are living per-profile conversion data, and the first post-cutover
+recompute (2026-07-14) moved several platforms off the frozen legacy config.yaml tiers.
+Kept for the record and re-runnable, but a tier mismatch here is expected, not a
+regression; everything OUTSIDE the tiers block should still hold.
+
 ACCEPTED deltas (each printed, none silent):
   A1  Remote Rocketship display names are stream-neutral now
       ("(SM worldwide)" -> "(worldwide)", "(PM Europe)" -> "(Europe)"). Cosmetic:

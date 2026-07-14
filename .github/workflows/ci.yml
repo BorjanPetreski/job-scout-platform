@@ -51,8 +51,11 @@ jobs:
       - name: Platform validation (compilation, catalog, templates, profiles, state, skills)
         run: python3 core/validate.py
 
-      - name: Parity — borjan-pm resolved config vs legacy config.yaml (until cutover)
-        run: python3 core/parity_diff.py
+      # Parity (borjan-pm resolved config == legacy config.yaml) was the Phase-1
+      # acceptance gate; it is retired at cutover (CUTOVER.md 5b). It now diverges BY
+      # DESIGN: tiers are living per-profile data and the first post-cutover recompute
+      # (2026-07-14: Greenhouse->T1, NoDesk + Remote Rocketship->T3) moved them off the
+      # frozen legacy config. core/parity_diff.py is kept as the historical record.
 
       - name: Scan plans resolve for every profile (no network)
         run: |

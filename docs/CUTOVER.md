@@ -40,13 +40,15 @@ platform` required check added 2026-07-13). Ready to run when Borjan is.
    Passed/Seen Log, digest on the SAME Runs page, sweep line present, dedup suppresses
    already-seen roles.
 5. **Freeze the legacy skill.** In this order to avoid the required-check trap:
-   a. Update `main` ruleset: **remove `Validate job-scout-pm`** from required checks
-      (the `Validate platform` check added in preconditions is the stable replacement).
-   b. In `.github/workflows/ci.yml`: delete the `validate-legacy` job and the
-      `parity_diff` step (parity is a pre-cutover concept; the legacy config is now
-      historical).
-   c. Add a `job-scout-pm/README.md` note: "Frozen v3.1.2 archive — superseded by the
-      `core/` engine + `profiles/borjan-pm/` on 2026-07-DD. Do not run; kept for history."
+   a. [ ] **ADMIN, PENDING** — Update `main` ruleset: **remove `Validate job-scout-pm`**
+      from required checks (the `Validate platform` check added in preconditions is the
+      stable replacement). Borjan-only (GitHub admin). Nothing in code can do this, and
+      it MUST land before 5b.
+   b. In `.github/workflows/ci.yml`: [x] parity step removed 2026-07-14 (parity diverges
+      by design post-tier-recompute; `core/parity_diff.py` kept as historical). [ ] the
+      `validate-legacy` job is **still present on purpose** — it is the current required
+      check, so deleting it before 5a re-triggers the block. Retire it right after 5a.
+   c. [x] Done 2026-07-14 — `job-scout-pm/README.md` archive note added.
    d. Do NOT delete `job-scout-pm/` — it's the reference archive and the parity anchor.
 6. **Rollback (if the new engine misbehaves in the first days):** un-freeze is trivial —
    re-point the schedules back to the v3 prompt; legacy code and state history are

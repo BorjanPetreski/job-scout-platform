@@ -71,3 +71,44 @@ Many employers (Human Made confirmed) follow the cover letter with a Q&A form. D
 - **Specialisms / tools / experience levels** → structured list, with years and a level (expert/advanced/intermediate) per item, not prose.
 - **Dislikes / weaker areas** → honest, constructive, grounded in real past examples (Scrumfall, dispersed stakeholders, time-tracking imposed on engineers, authority-building with senior teams).
 - **Preferred engagement length** → upfront that most experience is long-form engagements, but note the discrete shorter-scope deliverables within them (audits, A&D phases); state flexibility toward the platform's actual model.
+
+---
+
+## Screening-question & gap-honesty procedure (any Q&A answer, incl. domain-fit questions)
+
+Applies to every drafted application answer, screening question, and "do you have experience with X" prompt (ESG/regulatory, SAP/ERP, e-learning, etc. all came up):
+
+1. **Read the source docs first** — CV, Quarterly Review, Job Requirements, Struggles and Challenges, past answers — before writing a word. Don't answer from assumption.
+2. **If genuine adjacent experience exists:** draft the closest HONEST answer grounded in it — name the real project/domain and the transferable part, don't overclaim it as direct experience.
+3. **If it does not:** say so plainly ("I haven't worked directly in <domain>") and, only if real, add the nearest adjacent exposure. "Insufficient data" / an honest gap beats a fabricated match.
+4. **Flag the gap to Borjan explicitly** in chat commentary (outside the copy-block) so he decides how to handle it — never silently paper it over inside the answer.
+
+This is the same discipline as the "No invented experience" rule above, made into a step because it recurs on almost every form.
+
+---
+
+## Salary expectation / "max yearly ask" heuristic
+
+When asked for a number (yearly expectation, max, desired range), default rule:
+
+- **Posted range present:** anchor the ask near the TOP of the posted range if the seniority genuinely supports it (7 yrs, Senior PM/DM). The floor from the profile is the safety check — never ask below it.
+- **No posted range:** market-comparable for the role/region + 10–15%, still floored at the profile's salary floor.
+- **B2B vs full-time:** state the number in the basis the listing uses; if B2B, the figure is gross day/month rate the sole-proprietor model quotes, not a net salary.
+- Give ONE number or a tight range, confidently, with a one-line justification — not a menu of options.
+
+---
+
+## Ready-to-paste blocks (save round trips)
+
+Borjan repeatedly asks for the same intro / profile links mid-application. Keep them here so they're one-tap, not re-derived each time.
+
+> ⚠️ **Borjan to confirm/fill:** the links below are placeholders and the intro is a draft from the profile headline — replace with the real values so this block is genuinely canned. Until then, treat as a template, not verified copy.
+
+- **LinkedIn:** `<add LinkedIn URL>`
+- **GitHub:** `<add GitHub URL — or note "not used for PM roles" if N/A>`
+
+**Short intro (peer-to-peer, ~3 sentences, his voice):**
+
+```
+I'm a senior IT project / delivery manager with 7 years running agile delivery across travel, EdAI, IoT and media/streaming products. I've worked as Delivery Manager, Scrum Master and Proxy PO, mostly on long-form engagements, and I'm comfortable owning delivery end to end — planning, RAID, stakeholder alignment and reporting. I work B2B as a sole proprietor, so there's no visa or payroll overhead on your side, and I'm equally open to full-time.
+```

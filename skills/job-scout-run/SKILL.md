@@ -10,11 +10,11 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.0.0"
-  status: pre-cutover — job-scout-pm/SKILL.md v3.1.2 remains production until Phase 1 step 1.12
+  version: "4.1.0"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Remaining coordinated steps — schedule re-point + ruleset/CI retirement of the legacy required check."
   created_by: Borjan
   organization: 2Coders Studio
-  last_updated: "2026-07-13"
+  last_updated: "2026-07-14"
 ---
 
 # Job Scout — generic run skill (one engine, N profiles)
@@ -54,7 +54,11 @@ overlapping runs from different lanes harmless. Profiles never share state.
 - **Scan / shortlist / assessment** → this file + the profile. Nothing else.
 - **Pitch / cover letter / application answers** → read
   `profiles/<id>/references/pitching.md` if present (the user's voice pack); if absent,
-  say the profile has no pitch pack yet and offer plain drafting.
+  say the profile has no pitch pack yet and offer plain drafting. **Honesty-check before
+  drafting any answer** (screening questions included): read the profile's reference
+  docs first; draft the closest HONEST adjacent-experience answer if one exists; say
+  "insufficient data" and flag the domain gap explicitly if none does — never invent
+  experience to smooth over a gap. The pitching pack carries the full procedure.
 - **Gemini cross-check prompt** → `profiles/<id>/references/gemini-prompt.md`, only
   after the user says yes to the post-scan offer.
 
@@ -78,9 +82,20 @@ optional, none is judged-from-memory. `<id>` = the active profile.
    — see the sweep section), and prints the coverage ledger. It does NOT score.
 2. **Read the results:** `profiles/<id>/state/last_run_candidates.json` + the
    per-candidate JD cache files. Each candidate carries: title, company, loc, url,
-   platform, posted_at, salary, `keyword_matched`, `flags[]` (regex first-pass hits),
-   `salary_assessment` (clears / below_floor / borderline / unparseable — metadata,
-   never a machine drop), `link_status`, `jd_status`.
+   platform, posted_at, salary, `keyword_matched`, `flags[]` (regex first-pass hits +
+   the computed flags below), `salary_assessment` (clears / below_floor / borderline /
+   unparseable — metadata, never a machine drop), `link_status`, `jd_status`. Computed
+   annotations added at scan time (4.1 — all ADDITIVE, all "scripts flag, you decide"):
+   - `non_english_jd` flag (+ `language_note`): the full JD reads as predominantly
+     non-English (JustJoin.it Polish-only JD/ATS lesson). On JustJoin.it this is a
+     hard-drop signal per the profile's filter_notes; elsewhere, judge it.
+   - `start_date_passed` flag (+ `start_date_note`): the JD's own stated start/target
+     month is already past — the soft posting-age signal escalated to explicit ⚠️
+     (Cyclad "still listed live, start already gone"). Verify freshness before shortlisting.
+   - `missing_company` flag: the source gave no Company (data-quality note; reference it
+     by role+platform and try to recover the company from the JD).
+   - `company_prior` list + `applied_variant_saturation` flag: prior seen/applied reqs
+     from the SAME company — see the Country-Clone section.
 3. **Judgment-layer filter pass (you, on EVERY candidate):** the regexes are a first
    pass only — read each JD against the profile's full filter set (Hard Filters
    section below) plus the profile's `filter_notes`. The Spiralyze lesson (3pm-EST
@@ -181,6 +196,7 @@ the PROFILE's values. In unattended mode, an ambiguous case resolves conservativ
 | **"Location-fluid" marketing copy** | "Work from anywhere" culture copy ≠ open worldwide. If 2+ live reqs are each tagged to specific countries that exclude the candidate, the company is country-set-restricted regardless of marketing (Moro Tech lesson). |
 | **Regional-payroll mismatch** | Benefits/payroll currency signals a target region that excludes the candidate despite a "worldwide" label (Rapido Solutions lesson: MXN benefits under a worldwide tag). |
 | **Closed location list** | A closed country list under a "remote in <region>" label that does not name any of the profile's `location_match_terms` — drop without further verification (enforced first-pass by the detector). |
+| **Non-English JD / ATS** | `non_english_jd` flag: the JD (and usually the application form) is not in a language the candidate can apply in — a local-hire signal the keyword/location filters miss. On boards where the profile marks it a hard drop (JustJoin.it Polish-only, in borjan-pm's filter_notes), drop; otherwise verify the applicant can actually complete the application. |
 
 ## Scoring
 
@@ -190,7 +206,10 @@ that pass hard filters; surface only ≥ `scoring.surface_threshold`; below-thre
 drops are logged with the real reason. Salary estimation for unpublished postings uses
 the template's `salary_estimation_heuristics`. **Posting-age heuristic:**
 live-but-2+-months-old is a soft staleness signal — combined with any other flag, note
-the age explicitly.
+the age explicitly. **Stated-start-date escalation:** when the scan sets
+`start_date_passed` (the JD's own start/target month is already gone), that soft signal
+is now an explicit ⚠️ — re-verify the posting is genuinely current and note it in the
+role notes even if the link still checks live (Cyclad: listed live, start already past).
 
 ## Country-Clone Posting Pattern
 
@@ -205,6 +224,19 @@ lesson — the candidate-city variant surfaced only via a targeted company+city 
   being shortlisted. **Multi-req caveat:** one company can run multiple concurrent
   reqs for the same function — check for a newer or differently-scoped posting from
   the same company before shortlisting.
+- **Cross-check against already-applied variants (location-agnostic):** the 3-part
+  dedup key treats every country tag as distinct BY DESIGN, so a Belgrade variant of a
+  role you already applied to in Skopje/Warszawa is NOT auto-suppressed. Each candidate
+  carries `company_prior` (prior reqs from the same company, with status) — when 2+ of
+  them are `applied` and share the candidate's role-family, the scan sets
+  `applied_variant_saturation`. Treat that as a strong dedup-drop signal (the user
+  already pursued this role at other locations), but confirm the JD is genuinely the
+  same opportunity first — a same-company role that is genuinely different scope still
+  stands (the Krakow-PM case: different role, correctly kept).
+- **Surface prior history, don't re-ask:** whenever a candidate has `company_prior`,
+  prepend a one-line note to its role notes listing the other reqs and their status
+  (e.g. "Andersen also has: DM-Skopje [Applied], DM-Warszawa [Applied], DM-Belgrade
+  [Declined]") so the user never has to ask "is this a variant of one I applied to?".
 
 ## Platform knowledge
 
@@ -356,7 +388,11 @@ when the snippet plausibly clears hard filters AND could score ≥ the threshold
 (3) Cheap liveness rechecks (~400-token reads). (4) Batch same-turn Notion writes;
 ~30s between rapid Notion queries. (5) Minimal narration. (6) Bulk dedup pre-fetch at
 scan start — query the profile's Passed/Seen Log AND Applications Tracker ONCE each
-(recent-first, LIMIT 100), hold both in context. (7) Scans never read Project files.
+(recent-first, LIMIT 100), hold both in context, **and cache each row's page ID/URL
+from that one pull.** A later status flip (stale, applied, declined) is then a single
+`update` on the cached page ID — never re-query Job-URL→page-ID per decision (that
+query→flip-per-row pattern draws repeated 429s even at ~30s spacing). (7) Scans never
+read Project files.
 
 **Mandatory Execution Log:** before presenting any shortlist or "no results", output
 the literal per-platform checklist (✅ searched directly / 🔁 mirror-incidental only —
@@ -394,8 +430,11 @@ create blank stubs — 27-row incident). Post-write spot-check at least one crea
 page per batch. Platform select pre-check before first write of a new platform name.
 Real-time dedup logging: drops logged the same turn they're confirmed. Shortlist rows
 land in the Passed/Seen Log BEFORE the chat table is presented. The profile's
-`output.notion` block carries all IDs — go straight to them; on failure search by
-title; create only if both miss and report the new ID. Never create-by-title.
+`output.notion` block carries all IDs — **read them from the profile every run; never
+trust an ID cached in memory across sessions** (a one-character-stale data-source ID
+caused a 404 — memory IDs drift, the profile is the source of truth). Go straight to the
+profile's IDs; on a 404/failure re-read the profile then search by title; create only if
+both miss and report the new ID. Never create-by-title.
 
 **Unattended (chat-native):** per-DAY completeness across the tier split; digest line
 per run on the profile's Runs page (newest on top); LinkedIn incidental snippet pass,
@@ -404,6 +443,15 @@ best-effort; isolated blocked fetches are expected and are NOT source-down.
 ---
 
 ## Changelog
+
+**4.1.0** (2026-07-14) — post-cutover lessons fed back from the first attended run on the
+new engine. Engine: computed candidate annotations (`non_english_jd` Polish-only-JD
+detector, `start_date_passed` stated-start-in-past detector, `missing_company`
+data-quality flag, `company_prior` prior-reqs surface + `applied_variant_saturation`
+location-agnostic country-clone check). Skill: non-English-JD hard filter, prior-history
+surfacing instead of re-asking, Notion page-ID caching to kill the query→flip 429s,
+memory-ID re-verification rule, honesty-check step in the pitch router. Legacy
+`job-scout-pm/` frozen as the v3 archive; parity CI gate retired (tiers now living data).
 
 **4.0.0** (2026-07-13) — Phase 1 extraction: one engine, N profiles. Everything
 user/stream-specific moved to catalog + templates + profiles; shortlist liveness
