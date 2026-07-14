@@ -247,7 +247,12 @@ platforms:
       software-engineering: "software+engineer"
     mirrors: []
     expired_markers: ["This job is closed"]
-    quirks: "robots.txt hard block on direct fetch (delta row 9)."
+    quirks: >-
+      robots.txt hard block on direct fetch (delta row 9); the headless fallback
+      bypasses this fine (confirmed live 2026-07-14: 2 postings harvested). Zero
+      logged candidates through 2026-07-14 is a keyword/volume signal (nothing
+      harvested has matched a PM/SM/DM title yet), not a fetch-health problem —
+      fetch-health audit, no source_down.
     notion_platform_name: { tracker: "Landing.jobs", passed_seen: "Landing.jobs" }
 
   - id: 13
@@ -266,6 +271,8 @@ platforms:
     quirks: >-
       DEGRADED 2026-07-11: listings lazy-load on scroll — headless snapshot carries zero
       postings; no API/page-data channel found. Reports source_down until they change engines.
+      Re-verified still degraded 2026-07-14 (fetch-health audit): headless render again
+      returned 0 candidates. No fix available from this side; re-check next quarter.
     notion_platform_name: { tracker: "JustRemote", passed_seen: "JustRemote" }
 
   - id: 14
@@ -403,7 +410,11 @@ platforms:
     quirks: >-
       JS-rendered HTML; postings.json endpoint verified — else headless.
       2.7.1 lesson: this platform previously had NO tier and was silently skipped — config
-      validation makes tierless active platforms an error.
+      validation makes tierless active platforms an error. Fetch-health audit 2026-07-14:
+      zero candidates ever logged is a CONFIG gap, not a fetch problem — borjan-pm's
+      platforms.ats_boards.pinpoint is empty, so fetch_pinpoint has zero boards to query
+      (structurally 0 results by design until company board tokens are discovered/added).
+      Same story for greenhouse/lever/workable ats_boards.
     notion_platform_name: { tracker: "Pinpoint HQ", passed_seen: "Pinpoint HQ" }
 
   - id: 22
@@ -445,7 +456,10 @@ platforms:
       JS-rendered SPA; mirrors = LinkedIn snippets as last resort. Grind-culture flags
       common — judgment layer reads every JD. EOR: genuinely worldwide-open,
       independent-contractor structured, but also runs USA/nearshore-restricted reqs —
-      verify per-role, never trust the brand.
+      verify per-role, never trust the brand. Fetch-health audit 2026-07-14: headless
+      render confirmed healthy (1 live posting harvested). Zero PM/SM/DM candidates
+      logged to date is a keyword/volume signal, not a fetch problem — low overall
+      posting count on this SPA at any given snapshot.
     notion_platform_name: { tracker: "Crossover", passed_seen: "Crossover" }
 
 # LinkedIn is NOT a platform entry: it is a discovery tripwire only
