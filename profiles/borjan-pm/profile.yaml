@@ -44,16 +44,22 @@ filter_notes: |
     EST) — the full JD must be read before shortlisting.
 
 platforms:
-  # Live tiers = 2.8.0 recompute state (2026-07-10, 5 logged sessions, Tracker
-  # conversion rate primary signal: Himalayas 25% (2/8), Workable 9% (1/11),
-  # Greenhouse 5% (1/19), Lever 5% (1/19), JustJoin.it 2% (1/43) despite highest
-  # volume; Tier 3 = 0% across all 9). Tiers are DATA, not opinion — next recompute
-  # after 5 more logged sessions (runs.json counter); never recomputed automatically.
+  # Live tiers = 2026-07-14 recompute state (all-time Tracker conversion rate,
+  # Source = Claude Skill Scan: Workable 7.7% (1/13), Greenhouse 7.7% (2/26),
+  # Himalayas 7.1% (2/28), Remotive 4.5% (1/22), Lever 4.3% (1/23), JustJoin.it
+  # 0.4% (1/225, stays Tier 1 on volume + B2B salary-transparency value per the
+  # 2.8.0 exception); Remote Rocketship 0% (0/39) and NoDesk 0% (0/18) demoted —
+  # zero conversion on samples larger than most Tier 3 members. Tiers are DATA,
+  # not opinion — next recompute after 5 more logged sessions (runs.json
+  # counter); never recomputed automatically. Pinpoint HQ/Crossover/Landing.jobs/
+  # JustRemote have logged ZERO candidates ever (no conversion data either way —
+  # a fetch-health question, not a tier one).
   tiers:
-    1: [justjoin-it, remotive, workable, lever, himalayas]
-    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, greenhouse]
+    1: [justjoin-it, remotive, workable, lever, himalayas, greenhouse]
+    2: []
     3: [wwr, jobgether, dynamite, arc, working-nomads, wttj, landing-jobs, justremote,
-        remote-ok, pinpoint, deel, crossover]
+        remote-ok, pinpoint, deel, crossover, nodesk, remote-rocketship-worldwide,
+        remote-rocketship-europe]
   disabled: [europeremotely, otta]
   ats_boards:            # per-company tokens, discovered + appended over time (profile data)
     greenhouse: []
