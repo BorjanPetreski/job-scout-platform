@@ -54,6 +54,8 @@ Two-step task when Borjan provides a JD and asks for a hiring-manager email pitc
 
 Any submittable application text (cover letters, email pitches, form answers, follow-up screening answers) goes inside a plain markdown code block (triple backticks, no language tag) — one-tap copyable on mobile, delivered on the first response without a second request. Commentary and analysis stay as normal chat prose outside the block.
 
+**This extends to every ad-hoc ask during or after a JD review** — a profile link (GitHub/LinkedIn), a short intro/blurb, a one-line availability note, a reworded answer, anything Borjan asks to hand off. Deliver it inside a copy-block on the first response so he never has to manually select and copy — **even for a single URL** (a bare clickable link still forces a manual select; the block does not). Commentary stays outside the block.
+
 ---
 
 ## Job hunt strategy & tone constraints (canonical)
@@ -98,17 +100,11 @@ When asked for a number (yearly expectation, max, desired range), default rule:
 
 ---
 
-## Ready-to-paste blocks (save round trips)
+## Profile links (paste verbatim, always in a copy-block)
 
-Borjan repeatedly asks for the same intro / profile links mid-application. Keep them here so they're one-tap, not re-derived each time.
+Fixed references Borjan hands off repeatedly during applications — deliver each inside a copy-block per the delivery-format rule above:
 
-> ⚠️ **Borjan to confirm/fill:** the links below are placeholders and the intro is a draft from the profile headline — replace with the real values so this block is genuinely canned. Until then, treat as a template, not verified copy.
+- **GitHub:** https://github.com/BorjanPetreski
+- **LinkedIn:** https://www.linkedin.com/in/borjanpetreski/
 
-- **LinkedIn:** `<add LinkedIn URL>`
-- **GitHub:** `<add GitHub URL — or note "not used for PM roles" if N/A>`
-
-**Short intro (peer-to-peer, ~3 sentences, his voice):**
-
-```
-I'm a senior IT project / delivery manager with 7 years running agile delivery across travel, EdAI, IoT and media/streaming products. I've worked as Delivery Manager, Scrum Master and Proxy PO, mostly on long-form engagements, and I'm comfortable owning delivery end to end — planning, RAID, stakeholder alignment and reporting. I work B2B as a sole proprietor, so there's no visa or payroll overhead on your side, and I'm equally open to full-time.
-```
+No pre-canned intro is stored — when a short intro/blurb is asked for, draft it fresh in his voice for that request (source docs + the voice guide above) and deliver it in a copy-block.
