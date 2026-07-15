@@ -325,14 +325,23 @@ complex artifact), and the cost-efficient model on the high-volume execution.
 
 Before any build step, run **one scoped adversarial review of this plan** on Claude Fable 5. Purpose:
 catch structural gaps before they propagate into 12 templates + the setup skill + provisioning. Scope
-it tightly — the review hunts for blocking risks, not restyling or new scope. Review prompt:
+it tightly — **read the Phase 1 contracts for grounding, but critique `PHASE_2_PLAN.md` only.** The
+Phase 0/1 docs are settled, merged, and battle-tested (Phase 1 ran live); do not audit them for their
+own sake. Reading them matters because Phase 2's biggest risks are at the *seams* with Phase 1 (schema
+additivity, template-format/loader fit, per-stream catalog tiers, the prime directive that `borjan-pm`
+must not regress) — the review can't judge those from `PHASE_2_PLAN.md` in isolation. Review prompt:
 
-> Read `docs/PROGRESS.md`, then `docs/PHASE_2_PLAN.md` in full. Act as a pre-build reviewer of
-> `PHASE_2_PLAN.md`. Hunt ONLY for **structural gaps, contradictions, unstated assumptions, and
-> checklist-sequencing risks** that would cause the Phase 2 build to fail or require rework. Do NOT
-> re-litigate the locked decisions D1–D23, and do NOT propose new scope/streams. Output a short
-> prioritized list of genuine risks, each with a one-line suggested fix — or "no blocking issues
-> found." Do not change any files — this is review only.
+> Read `docs/PROGRESS.md` and `docs/PHASE_2_PLAN.md` in full, plus `docs/PROFILE_CONFIG_SPEC.md` and
+> `docs/ARCHITECTURE.md` as the Phase 1 contracts Phase 2 extends. Spot-check
+> `core/schema/profile.schema.yaml`, `catalog/platforms.yaml`, and
+> `templates/project-management/delivery-manager.yaml` to verify Phase 2's proposed schema/template/
+> catalog changes are genuinely additive. Then act as a pre-build reviewer of **`PHASE_2_PLAN.md`
+> only** — do not critique the Phase 0/1 docs, they're settled. Hunt ONLY for **structural gaps,
+> contradictions, unstated assumptions, seam risks with the Phase 1 contracts (especially the prime
+> directive that `borjan-pm` must not regress), and checklist-sequencing problems** that would cause
+> the Phase 2 build to fail or require rework. Do NOT re-litigate the locked decisions D1–D23, and do
+> NOT propose new scope or new streams. Output a short prioritized list of genuine risks, each with a
+> one-line suggested fix — or "no blocking issues found." Do not change any files — this is review only.
 
 Effort: **xhigh** (bounded one-shot, high leverage — worth the depth; `high` is the acceptable floor).
 Address any *blocking* findings by amending the plan (keeping D1–D23 intact) before starting 2.1;
