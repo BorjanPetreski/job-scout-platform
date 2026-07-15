@@ -277,6 +277,7 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 
 | # | Step | Notes |
 |---|------|-------|
+| 2.0 | **Pre-build review gate (Fable 5)** — one scoped adversarial review of this plan; amend for any blocking findings (D1–D23 intact) before 2.1 | §12.1 |
 | 2.1 | **Schema extensions** — add `target_seniority`, `employment_type`, `subvariant_secondary`, `compensation.fte_fraction`, `run.effort(+by_run_type)` to `profile.schema.yaml` + validator + loader; update PROFILE_CONFIG_SPEC §2/§3. `borjan-pm` still validates. | §3.1, D14–D22 |
 | 2.2 | **Template format v2** — `platform_tiers` + `salary_estimation_heuristics` (text, no numbers) + `seniority_titles` + inheritance/loader; add `core/data/seniority_lexicon.yaml`; update spec §6. | §3.3, D20–D22 |
 | 2.3 | **Catalog expansion** — per-stream slug maps for existing platforms; add new stream-appropriate boards as **full `status: unverified` entries**; per-stream tiers move to templates. | §3.2 |
@@ -313,3 +314,39 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 - Coverage honesty: a platform with no slug for a stream is **skipped-with-honesty in the ledger**,
   never silently.
 - CV/PII never enters the repo (D4) or write-back suggestions (D6).
+
+## 12. Execution handoff — models, effort, and the pre-build review gate
+
+Recommended pipeline: **plan (done) → Claude Fable 5 pre-build review → Claude Opus 4.8 build.**
+Put the most-capable model where judgment on the finished spec pays off (adversarial review of a
+complex artifact), and the cost-efficient model on the high-volume execution.
+
+### 12.1 Pre-build review gate (step 2.0) — Claude Fable 5
+
+Before any build step, run **one scoped adversarial review of this plan** on Claude Fable 5. Purpose:
+catch structural gaps before they propagate into 12 templates + the setup skill + provisioning. Scope
+it tightly — the review hunts for blocking risks, not restyling or new scope. Review prompt:
+
+> Read `docs/PROGRESS.md`, then `docs/PHASE_2_PLAN.md` in full. Act as a pre-build reviewer of
+> `PHASE_2_PLAN.md`. Hunt ONLY for **structural gaps, contradictions, unstated assumptions, and
+> checklist-sequencing risks** that would cause the Phase 2 build to fail or require rework. Do NOT
+> re-litigate the locked decisions D1–D23, and do NOT propose new scope/streams. Output a short
+> prioritized list of genuine risks, each with a one-line suggested fix — or "no blocking issues
+> found." Do not change any files — this is review only.
+
+Effort: **xhigh** (bounded one-shot, high leverage — worth the depth; `high` is the acceptable floor).
+Address any *blocking* findings by amending the plan (keeping D1–D23 intact) before starting 2.1;
+non-blocking suggestions are optional.
+
+### 12.2 Build model + per-step effort — Claude Opus 4.8
+
+Build on `claude-opus-4-8`. A well-specified checklist is execution, not open-ended reasoning —
+Fable 5's edge doesn't pay off here and draws ~1.5–2× the usage. Default effort **`high`**; tier it:
+
+| Steps | Effort | Why |
+|-------|--------|-----|
+| 2.4 (bulk template YAML), 2.10–2.11 (CI, docs) | `medium` | mechanical, well-patterned |
+| 2.1–2.3 (schema/catalog/format), 2.7–2.8 (write-back, effort-tier) | `high` | real design surface, bounded by spec |
+| 2.5–2.6 (provisioning, CV templater skill), 2.9 (live test) | `xhigh` | trickiest logic + the end-to-end test |
+
+Escalate a single step to Fable 5 only if it turns out genuinely hard/ambiguous mid-build.
