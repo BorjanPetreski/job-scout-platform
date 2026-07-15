@@ -11,8 +11,11 @@ Plan of record: [PROJECT_PLAN.md](PROJECT_PLAN.md) · [ARCHITECTURE.md](ARCHITEC
 > The design contract + ordered build checklist live in **[PHASE_2_PLAN.md](PHASE_2_PLAN.md)**.
 > Start there and execute steps 2.1→2.11; do not re-open the settled decisions (D1–D13).
 
-**Standing production constraint: `job-scout-pm/` runs live schedules against `main`.
-Do not break it before the Phase 1 cutover step.**
+**Standing production constraint (prime directive): the `borjan-pm` profile is Borjan's live,
+daily job search and is sacred. Phase 2+ is purely additive — never regress its behavior, state,
+history, or Notion; Borjan keeps using the engine throughout the build; he is account #1 carried in
+verbatim when the app ships. See [PHASE_2_PLAN.md §0a](PHASE_2_PLAN.md). (The frozen `job-scout-pm/`
+archive also stays intact as the reference/parity anchor.)**
 
 ---
 

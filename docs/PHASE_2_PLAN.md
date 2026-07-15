@@ -23,6 +23,27 @@ entries), and platform **tiers rotate per stream**. First real test: onboard a *
 backend engineer** (post-break, targeting **mid/medior part-time**) under Borjan's Notion as a
 supervised trial.
 
+## 0a. Prime directive — `borjan-pm` is production and sacred (do not regress)
+
+**Phase 1's engine works and Borjan uses it daily to find his own jobs. That must keep working,
+unchanged in behavior, the entire way through Phase 2 and beyond.** This is the top constraint —
+it outranks any Phase 2 convenience.
+
+- **Purely additive.** Phase 2 *extends*; it never obfuscates, rewrites, or removes what already
+  serves `borjan-pm`. Every schema field is additive with a default that preserves current behavior;
+  every catalog/template change is backward-compatible; `borjan-pm` validates and scans identically
+  before and after each step.
+- **Continuous dogfooding.** Borjan keeps running the scanner for himself *while* we build — we do not
+  pause his job search to build the platform. Running it in anger is how we learn (it's how v3 got good).
+  No Phase 2 step may require taking `borjan-pm` offline.
+- **State/history is untouchable.** `profiles/borjan-pm/state/` (seen.jsonl, runs, evidence, JD cache)
+  is the most valuable asset — never regenerated, migrated destructively, or reset by any Phase 2 work.
+- **Borjan is user #1, forever.** When the app arrives (Phase 4/5), Borjan is **account #1** and
+  everything already built for him — profile, state/history, Notion, config — is **carried in verbatim**,
+  not re-created. Nothing in Phases 2–4 may assume a "fresh start" that would strand his existing setup.
+
+If any Phase 2 change would force a regression here, the change is wrong — find the additive path instead.
+
 ## 1. Decisions locked in the brainstorm (the design contract)
 
 These are settled. Do not re-litigate; implement.
@@ -51,6 +72,7 @@ These are settled. Do not re-litigate; implement.
 | D20 | **No shipped salary numbers (option c).** Templates carry **`salary_estimation_heuristics` text only** — no hardcoded per-seniority band numbers (they'd be stale/country-wrong). Floor is **user-provided or unset**; when unset the judgment layer estimates from the posting per the template's heuristics. |
 | D21 | **Seniority vocabulary = core base lexicon + template extensions.** `core` ships a base title→band lexicon (junior/mid/senior/staff/principal/lead…); templates extend it with stream/region-specific titles ("medior", "SDE II", "staff"). |
 | D22 | **Part-time comp = pro-rate the floor to FTE fraction.** When a floor is set and the target/role is part-time, pro-rate the floor by an `fte_fraction` (default 0.5, user-tunable) before the salary comparison; day/hourly rates normalize via the existing `salary.py` period model. |
+| D23 | **`borjan-pm` is production and sacred — see §0a (prime directive).** Phase 2 is **purely additive**; Borjan **keeps using the engine for his own job search throughout the build** (continuous dogfooding); his profile/state/history/Notion are never regressed, reset, or destructively migrated; and when the app ships he is **account #1** with everything carried in verbatim. This constraint outranks any Phase 2 convenience. |
 
 ## 2. Stream / subvariant taxonomy (the groundwork deliverable)
 
@@ -282,7 +304,9 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 
 ## 11. Guardrails carried from Phase 1 (do not regress)
 
-- `borjan-pm` stays production; nothing in Phase 2 may break its scans, state, or Notion writes.
+- **`borjan-pm` stays production and sacred — the prime directive (§0a / D23).** Nothing in Phase 2
+  may break its scans, state, history, or Notion writes; Borjan keeps using it for his own search
+  throughout; additive-only, no destructive migration, account #1 carried in verbatim at app time.
 - Scanner **never** writes the Applications Tracker (invariant); Passed/Seen Log is the scanner's only
   write target; the sweep owns staleness.
 - Strict validation: invalid profile/template/catalog = **refuse the run with a named error**.
