@@ -108,6 +108,11 @@ stays a per-profile ratio, see PROFILE_CONFIG_SPEC.md §5).
 
 ### Phase 2 — Template library + setup interview
 
+> **Detailed execution plan (plan of record for the build): [PHASE_2_PLAN.md](PHASE_2_PLAN.md).**
+> Brainstormed + expanded 2026-07-15 — the scope below is the original sketch; where PHASE_2_PLAN
+> refines it (broad ~12-stream taxonomy, CV-driven templater, per-stream tier rotation, seniority/
+> employment-type/effort schema fields, opt-in write-back, deferred scheduling), that document wins.
+
 **Goal:** a new user (or Borjan trying a new stream) goes from nothing to a running,
 scheduled profile in one guided session.
 
