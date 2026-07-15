@@ -42,6 +42,15 @@ These are settled. Do not re-litigate; implement.
 | D11 | **Provisioning takes token + parent-page as parameters, never hardcoded.** Borjan's workspace for the supervised trial; **per-user Notion is the end goal.** Token-paste + parent-page pick is a **discrete promptable step** (Phase 4 renders it as a field). Modes: **provision** or **adopt existing**. |
 | D12 | **Scheduling stays deferred.** The interview **writes schedule config into `profile.yaml`** but does **not** wire the laptop task / cloud Routine (same manual gap as today). |
 | D13 | **First test = backend-java, supervised, real scan, config-only schedule.** Acceptance: provision real Notion DBs under Borjan's workspace + **one manual live scan completes with an honest coverage ledger**; schedule written as config, cron not wired. |
+| D14 | **Interview interaction posture is user-chosen.** At the start of the confirm phase the templater offers, with a friendly explanation, a choice between **(a) progressive** (confirm only high-impact/ambiguous fields, accept template defaults for the rest) and **(b) full field-by-field**. Not hardcoded. |
+| D15 | **A profile may target a primary + optional secondary subvariant.** Keyword/archetype sets are **unioned** across the two; the **primary drives** the comp band and stream tier ordering. (A fullstack dev, or the Java case also taking broader JVM/backend roles.) A second distinct target = a second profile. |
+| D16 | **CV strongly preferred but not required.** No-CV path = guided Q&A build (less auto-tailoring, same schema output). |
+| D17 | **Notion access is instruct → verify-by-probe.** The integration-token creation + "share the parent page with the integration" click live in the Notion UI and cannot be scripted; the interview instructs the user, then verifies by a probe write and reports if access is missing. Honest, not pretend-headless. |
+| D18 | **Secrets: capture once, store encrypted-at-rest per user, never in the repo.** Phase 2 designs the seam (profile references a secret; the value is captured once and stored encrypted, env fallback for the trial). End goal = the app manages accounts/login/configs/Claude-API + Notion connectors as a **full one-time setup** — Phase 2 must not preclude it. |
+| D19 | **Provisioning is idempotent via a marker.** Re-running detects existing DBs (provisioning marker / title) and **adopts** them; never duplicates. |
+| D20 | **No shipped salary numbers (option c).** Templates carry **`salary_estimation_heuristics` text only** — no hardcoded per-seniority band numbers (they'd be stale/country-wrong). Floor is **user-provided or unset**; when unset the judgment layer estimates from the posting per the template's heuristics. |
+| D21 | **Seniority vocabulary = core base lexicon + template extensions.** `core` ships a base title→band lexicon (junior/mid/senior/staff/principal/lead…); templates extend it with stream/region-specific titles ("medior", "SDE II", "staff"). |
+| D22 | **Part-time comp = pro-rate the floor to FTE fraction.** When a floor is set and the target/role is part-time, pro-rate the floor by an `fte_fraction` (default 0.5, user-tunable) before the salary comparison; day/hourly rates normalize via the existing `salary.py` period model. |
 
 ## 2. Stream / subvariant taxonomy (the groundwork deliverable)
 
@@ -84,6 +93,9 @@ Additive and **non-breaking** — `borjan-pm` must still validate (fields defaul
 
 ```yaml
 search:
+  stream: software-engineering         # existing
+  subvariant: backend-java             # existing (primary)
+  subvariant_secondary: null           # NEW (D15): optional; keyword/archetype sets unioned, primary drives comp+tiers
   work_model: [remote]                 # existing; enum remote|hybrid|on_site (already present)
   target_seniority:                    # NEW (D7)
     bands: [mid, medior]               # enum: intern|junior|mid|medior|senior|staff|principal|lead|manager
@@ -91,6 +103,9 @@ search:
   employment_type:                     # NEW (D8)
     accept: [part_time, contract]      # enum: full_time|part_time|contract|b2b|freelance|internship|any
                                        #   'any' present in list = filter disabled
+compensation:
+  floor: null                          # NEW default (D20): user-provided or unset; no template numbers shipped
+  fte_fraction: 0.5                    # NEW (D22): pro-rates the floor for part-time targets; default 0.5, tunable
 run:
   effort: mid                          # NEW (D9/D10): fast|mid|high  -> model tier; entitlement-shaped
   effort_by_run_type:                  # NEW, optional: per-run-type override (design target b)
@@ -120,12 +135,19 @@ run:
 
 Extend the existing format with:
 - `platform_tiers:` per-stream tier ordering (seeds `profile.platforms.tiers`) — **new, per D3**.
-- `seniority_comp_bands:` a best-effort `seniority → suggested floor {amount,currency,basis,period}`
-  table (confirm-at-setup) — **new, per decision C in the brainstorm**. The templater picks the row
-  matching `target_seniority`, pro-rates a note for part-time, sets currency from candidate location.
+- `salary_estimation_heuristics:` stream-specific **text only** — **no hardcoded band numbers** (D20).
+  The floor is user-provided or unset; when unset the judgment layer estimates from the posting using
+  this text. (Replaces the earlier numeric `seniority_comp_bands` idea, which would ship stale/
+  country-wrong numbers.)
+- `seniority_titles:` template extensions to the core seniority lexicon (D21) — stream/region-specific
+  titles ("medior", "SDE II", "staff engineer") mapped to the base bands.
 - `interview:` hints block already specified (emphasize / skip_if_defaulted) — use it.
 - Inheritance chain unchanged: `stream defaults → subvariant → variant → user answers`, deep-merged,
   result must validate as a full profile.
+
+**New core artifact:** `core/data/seniority_lexicon.yaml` — the base title→band lexicon (D21),
+extended per-stream by templates' `seniority_titles`. Consumed by the judgment layer to map a
+posting's stated level to a band for `target_seniority` scoring/filtering.
 
 ## 4. The setup interview / templater (`skills/job-scout-setup/SKILL.md`)
 
@@ -133,19 +155,25 @@ Conversational flow in Claude Code. Every step is **scriptable/promptable** (Pha
 no step exists only as human-readable prose.
 
 1. **Kickoff** — request CV (PDF or pasted text) + optional target-role note / hard constraints
-   (location, must-be-part-time, salary floor if known).
-2. **Extract** — read CV → structured extract: titles, years, tech/skills, domains, seniority
-   signals, location, languages. **CV read, never written to the repo** (D4).
-3. **Classify** — extract → stream + subvariant. Clear match → confirm. Ambiguous/multi → present
-   top candidates (use templates' `suggest_also`), user picks. No-match → nearest stream + generic
-   subvariant, **log a template-gap** (feeds library growth).
+   (location, must-be-part-time, salary floor if known). **CV preferred, not required** (D16): if none,
+   fall back to a guided Q&A build (same schema output, less auto-tailoring).
+2. **Extract** — read CV (or run the Q&A) → structured extract: titles, years, tech/skills, domains,
+   seniority signals, location, languages. **CV read, never written to the repo** (D4).
+3. **Classify** — extract → stream + **primary subvariant**, and optionally a **secondary subvariant**
+   (D15) if the CV/goal spans two (e.g. broader JVM/backend). Clear match → confirm. Ambiguous/multi →
+   present top candidates (use templates' `suggest_also`), user picks primary (+ optional secondary).
+   No-match → nearest stream + generic subvariant, **log a template-gap** (feeds library growth).
 4. **Consent gate** — ask permission to stage anonymized write-back learnings (D6). Record the answer.
-5. **Tailor** — deep-merge template defaults; apply CV enrichments within guardrails (D5): reweight/
-   select keyword+archetype sets, add CV-obvious concrete tech terms; set `target_seniority`
-   (actual vs target), `employment_type`, `work_model`; pick comp band from `seniority_comp_bands`.
-6. **Confirm interview** — present **every** profile field with its template default + CV-derived
-   value; user overrides; surface `target_seniority.strict` and the `employment_type: any` escape.
-   Never ask what a template default already answers (spec §1 rule 2).
+5. **Tailor** — deep-merge template defaults (primary; **union** primary+secondary keyword/archetype
+   sets per D15); apply CV enrichments within guardrails (D5): reweight/select keyword+archetype sets,
+   add CV-obvious concrete tech terms; set `target_seniority` (actual vs target), `employment_type`,
+   `work_model`. **Comp: do not fabricate a floor** (D20) — take it from the user if stated, else leave
+   unset for judgment-time estimation via the template's `salary_estimation_heuristics`; set
+   `fte_fraction` for part-time targets (D22).
+6. **Confirm interview** — first offer the user a choice, with a friendly explanation, between
+   **(a) progressive** (confirm only high-impact/ambiguous fields, template defaults for the rest) and
+   **(b) full field-by-field** (D14). Then run the chosen posture; surface `target_seniority.strict` and
+   the `employment_type: any` escape. Never ask what a template default already answers (spec §1 rule 2).
 7. **Provision → persist → validate** — run `provision_notion` (§5) → write `profiles/<id>/profile.yaml`
    → `validate.py` (refuse to proceed on any error) → write `schedule:` config (cron **not** wired, D12).
 8. **First run** — offer `core/scan.py --profile <id> --plan` (dry-run) then one live scan; review the
@@ -160,6 +188,10 @@ heavy) — this is separate from the profile's scan-time `run.effort`.
 
 - Inputs: `--token` (or `NOTION_TOKEN` env) and `--parent-page-id`, **explicit params, never hardcoded**
   (D11). For the trial these are Borjan's; the design assumes each user brings their own later.
+- **Access is instruct → verify-by-probe (D17):** the token creation + the Notion-UI "share the parent
+  page with the integration" click cannot be scripted. The interview **instructs** the user through
+  those steps, then **probes** (a test write / metadata read) and reports clearly if the integration
+  lacks access — no pretending it's fully headless.
 - **provision mode:** create **Applications Tracker** (status select w/ the six canonical options,
   Source, Date Applied, Fit Score, Keyword Source, Notes), **Passed/Seen Log** (Status incl.
   `New — Unreviewed` / `Stale/Expired`, Reason Passed, Platform select, Job URL, Fit, Archetype),
@@ -168,8 +200,16 @@ heavy) — this is separate from the profile's scan-time `run.effort`.
   `profile.output.notion`.
 - **adopt mode:** point at existing `data_source_id`/`page_id`s, **verify schema compatibility, report
   gaps**, do not mutate beyond additive select options.
-- Idempotent / safe to re-run. This is the only component needing Notion **write** scope. The
-  token-paste + parent-page pick is exposed as a **discrete promptable step** (D11).
+- **Idempotent via a marker (D19):** re-running detects existing provisioned DBs (a provisioning
+  marker / known titles under the parent) and **adopts** them — never creates duplicates.
+- This is the only component needing Notion **write** scope.
+
+**Secret-storage seam (D18):** the Notion token (and later the Claude API key + other connectors) is
+**captured once and stored encrypted-at-rest, keyed to the user/profile — never committed to the repo.**
+The profile stores a *reference* to the secret, not the value. Phase 2 builds the minimal seam (encrypt
++ store + resolve at runtime, with `NOTION_TOKEN` env as the trial fallback); the full account/login/
+config/connector management is the app layer (Phase 4/5), and this seam must not preclude a **one-time
+setup** there.
 
 ## 6. Write-back learning loop (opt-in, staged, human-reviewed)
 
@@ -197,16 +237,17 @@ heavy) — this is separate from the profile's scan-time `run.effort`.
 
 - Persona: senior Java backend engineer, post-break, targeting **mid/medior part-time** to survey the
   market. Real CV provided by Borjan.
-- Run the **full interview** end-to-end → `backend-java` template classification → tailoring (Java/Spring/
-  Kafka concrete terms, `target_seniority: {bands: [mid, medior], strict: false}`,
-  `employment_type: {accept: [part_time, contract]}`) → provision under **Borjan's Notion** (supervised)
-  → validate → **one manual live scan** with an honest coverage ledger → schedule config written, cron
-  not wired.
+- Run the **full interview** end-to-end → `backend-java` classification (optional secondary subvariant
+  if he'd take broader JVM/backend, D15) → tailoring (Java/Spring/Kafka concrete terms,
+  `target_seniority: {bands: [mid, medior], strict: false}`, `employment_type: {accept: [part_time,
+  contract]}`, `fte_fraction: 0.5`, **floor left unset unless he states one**, D20/D22) → provision under
+  **Borjan's Notion** (supervised, instruct→verify-by-probe) → validate → **one manual live scan** with
+  an honest coverage ledger → schedule config written, cron not wired.
 - **Acceptance:** valid non-PM profile produced by the interview; provisioning creates real DBs;
   one live scan completes with a sane ledger and correct catalog URLs/keywords/filters for the stream;
   seniority/employment-type semantics behave (mid roles surface, senior deprioritized-with-note, part-
-  time honored per D8). Capture lessons into the profile / skill / catalog per the friction-logging
-  culture.
+  time honored per D8, floor pro-rated by FTE if he set one per D22). Capture lessons into the profile /
+  skill / catalog per the friction-logging culture.
 
 ## 9. Ordered build checklist (seed into PROGRESS.md Phase 2 table)
 
@@ -214,12 +255,12 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 
 | # | Step | Notes |
 |---|------|-------|
-| 2.1 | **Schema extensions** — add `target_seniority`, `employment_type`, `run.effort(+by_run_type)` to `profile.schema.yaml` + validator + loader; update PROFILE_CONFIG_SPEC §2/§3. `borjan-pm` still validates. | §3.1 |
-| 2.2 | **Template format v2** — `platform_tiers` + `seniority_comp_bands` + inheritance/loader support; update spec §6. | §3.3 |
+| 2.1 | **Schema extensions** — add `target_seniority`, `employment_type`, `subvariant_secondary`, `compensation.fte_fraction`, `run.effort(+by_run_type)` to `profile.schema.yaml` + validator + loader; update PROFILE_CONFIG_SPEC §2/§3. `borjan-pm` still validates. | §3.1, D14–D22 |
+| 2.2 | **Template format v2** — `platform_tiers` + `salary_estimation_heuristics` (text, no numbers) + `seniority_titles` + inheritance/loader; add `core/data/seniority_lexicon.yaml`; update spec §6. | §3.3, D20–D22 |
 | 2.3 | **Catalog expansion** — per-stream slug maps for existing platforms; add new stream-appropriate boards as **full `status: unverified` entries**; per-stream tiers move to templates. | §3.2 |
 | 2.4 | **Template library** — build the §2 taxonomy: ⭐ tech-core deepest + battle-tested (incl **backend-java**), business/support/content as groundwork marked coverage-pending. | §2 |
-| 2.5 | **`core/provision_notion.py`** — provision + adopt modes, token/parent params, idempotent, lazy select patch, discrete promptable step. | §5 |
-| 2.6 | **`skills/job-scout-setup/`** — the templater/interview skill, full step sequence. | §4 |
+| 2.5 | **`core/provision_notion.py`** — provision + adopt modes, token/parent params, instruct→verify-by-probe, idempotent-via-marker, lazy select patch; **secret-storage seam** (encrypt/store/resolve, env fallback). | §5, D17–D19 |
+| 2.6 | **`skills/job-scout-setup/`** — the templater/interview skill: CV-or-Q&A, primary+secondary subvariant, user-chosen posture, full step sequence. | §4, D14–D16 |
 | 2.7 | **Write-back loop** — consent gate, generic-only extraction, staged suggestions, curator merge path. | §6 |
 | 2.8 | **Effort/model tier** — schema field + documented mapping + two-stage design (wiring deferred). | §7 |
 | 2.9 | **First real test** — backend-java onboarding end-to-end; supervised live scan; capture lessons. | §8 |
@@ -233,6 +274,9 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 - Billing/subscription enforcement — the `effort` enum is only *shaped* for it (D9).
 - Per-user Notion multi-tenancy beyond token/parent-page parameterization — trial runs under Borjan's
   workspace (D11).
+- The **full account/login/config/connector management** (Claude API + Notion connectors, one-time
+  setup) — Phase 2 builds only the encrypted secret-storage *seam* (D18); the account system is the
+  Phase 4/5 app layer.
 - Auto-merge of write-back suggestions — human-reviewed only for now (D6).
 - The Phase 3 Application Assistant and Phase 4 FE app.
 
