@@ -47,7 +47,11 @@ _EMPLOYMENT_TO_ELIGIBILITY = {"full_time": "full_time", "part_time": "part_time"
                               "b2b": "b2b_contractor", "freelance": "freelance",
                               "contract": None, "internship": None}
 _TEMPLATE_KEYS = {"schema_version", "template_id", "label", "suggest_also", "extends",
-                  "defaults", "scoring_bands", "salary_estimation_heuristics", "interview"}
+                  "defaults", "scoring_bands", "salary_estimation_heuristics", "interview",
+                  # Phase 2 v2 template-only blocks (§3.3):
+                  "platform_tiers",     # per-stream tier ordering — seeds profile.platforms.tiers
+                                        #   at INTERVIEW time (2.6); NEVER loader-merged (see note below)
+                  "seniority_titles"}   # title->band extensions to the base seniority_lexicon (D21)
 _US_NAMES = {"united states", "usa", "us", "united states of america"}
 
 
@@ -92,9 +96,19 @@ def load_template(template_id: str) -> dict:
     if tpl.get("extends"):
         base = load_template(tpl["extends"])
         tpl["defaults"] = _merge(base.get("defaults", {}), tpl.get("defaults", {}))
-        for k in ("scoring_bands", "salary_estimation_heuristics", "interview"):
+        for k in ("scoring_bands", "salary_estimation_heuristics", "interview", "platform_tiers"):
             tpl.setdefault(k, base.get(k))
+        # seniority_titles deep-merge along the chain (child titles win on overlap)
+        tpl["seniority_titles"] = _merge(base.get("seniority_titles") or {},
+                                         tpl.get("seniority_titles") or {})
     return tpl
+
+
+def load_seniority_lexicon() -> dict:
+    """Base title->band lexicon (D21), lowercased keys. Templates extend it via
+    `seniority_titles`; load() deep-merges the two into cfg['seniority_lexicon']."""
+    data = _load_yaml(paths.SENIORITY_LEXICON_PATH)
+    return {str(k).lower(): v for k, v in (data.get("titles") or {}).items()}
 
 
 def _merge(base, override):
@@ -501,6 +515,11 @@ def load(profile_id: str | None = None) -> dict:
     if merged.get("dry_run"):
         notion["dry_run"] = True
 
+    # Resolved seniority lexicon (D21): base + this template's seniority_titles extensions.
+    # Consumed by the judgment layer + scan.py's seniority_detected annotation.
+    seniority_lexicon = load_seniority_lexicon()
+    seniority_lexicon.update({str(k).lower(): v for k, v in (tpl.get("seniority_titles") or {}).items()})
+
     return {
         "version": ENGINE_VERSION,
         "profile_id": pid,
@@ -523,6 +542,7 @@ def load(profile_id: str | None = None) -> dict:
             "salary_estimation_heuristics": tpl.get("salary_estimation_heuristics", ""),
         },
         "filter_notes": merged.get("filter_notes", ""),
+        "seniority_lexicon": seniority_lexicon,
         "defaults": defaults,
     }
 

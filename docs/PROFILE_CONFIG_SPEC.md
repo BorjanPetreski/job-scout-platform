@@ -216,8 +216,15 @@ defaults:                                    # any subset of profile keys from �
 scoring_bands: |                             # stream-specific band criteria text (the 9/8/7 rubric)
   9.0–10.0: modern React (hooks, SSR/Next), TS, product-team ownership, worldwide/EMEA, salary confirmed…
   …
-salary_estimation_heuristics: |
+salary_estimation_heuristics: |              # TEXT ONLY — no hardcoded per-seniority numbers (D20)
   …
+platform_tiers:                              # v2 (Phase 2, D3/§3.3) — per-stream starting tier order
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel]
+seniority_titles:                            # v2 (Phase 2, D21) — extends core/data/seniority_lexicon.yaml
+  sde ii: mid                                #   stream/region-specific title → base band
+  staff engineer: staff
 interview:                                   # Phase 2 hints
   emphasize: [work_model, compensation.floor, candidate.location]
   skip_if_defaulted: [hard_filters.grind_culture, sweep]
@@ -228,6 +235,21 @@ order; the resolved result must validate as a full profile. The current PM setup
 `templates/project-management/delivery-manager.yaml` — extracted from, and verified
 against, today's `config.yaml` + `SKILL.md` so the first template is battle-tested by
 construction.
+
+**Template v2 blocks (Phase 2).** Beyond `scoring_bands` / `salary_estimation_heuristics`
+/ `interview`, a v2 template may carry:
+- `platform_tiers` (D3/§3.3) — the per-stream tier ordering that **seeds** a new profile's
+  `platforms.tiers`. It is **template-only and never loader-merged**: seeded once at
+  interview time, after which the profile's tiers are per-profile conversion DATA (a later
+  template edit never retiers an existing profile — `borjan-pm`'s live tiers stay put by
+  construction). At seed time, active platforms the block doesn't list are placed
+  deterministically — catalog `tier_default` if they carry a slug for the stream, else
+  `disabled` (recorded, not silent).
+- `seniority_titles` (D21) — stream/region-specific title→band entries that extend the base
+  `core/data/seniority_lexicon.yaml`, deep-merged along the `extends` chain and into the
+  resolved `cfg["seniority_lexicon"]` the judgment layer reads for `target_seniority`.
+- `salary_estimation_heuristics` is **text only** — no shipped per-seniority band numbers
+  (D20); the floor is user-provided or unset (judgment-time estimation from this text).
 
 ## 7. Notion provisioning (Phase 2, `core/provision_notion.py`)
 

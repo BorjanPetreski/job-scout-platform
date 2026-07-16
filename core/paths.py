@@ -16,8 +16,10 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CORE_DIR = REPO_ROOT / "core"
+DATA_DIR = CORE_DIR / "data"
 CATALOG_PATH = REPO_ROOT / "catalog" / "platforms.yaml"
 DEFAULTS_PATH = CORE_DIR / "defaults.yaml"
+SENIORITY_LEXICON_PATH = DATA_DIR / "seniority_lexicon.yaml"
 TEMPLATES_DIR = REPO_ROOT / "templates"
 PROFILES_DIR = REPO_ROOT / "profiles"
 
