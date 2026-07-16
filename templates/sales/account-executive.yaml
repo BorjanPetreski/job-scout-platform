@@ -1,0 +1,77 @@
+# Template: Account Executive — sales stream GROUNDWORK (catalog coverage pending dogfood).
+# No salary numbers (D20).
+schema_version: 1
+template_id: sales/account-executive
+label: "Account Executive"
+suggest_also: [sales/sdr-bdr, sales/customer-success]
+
+defaults:
+  search:
+    stream: sales
+    subvariant: account-executive
+    work_model: [remote]
+    keywords:
+      core:
+        - account executive
+        - sales executive
+        - enterprise account executive
+        - saas sales
+        - b2b sales
+      expanded:
+        - sales manager
+        - business development manager
+        - account manager
+        - sales representative
+        - commercial manager
+    archetypes: [Account Executive, SDR/BDR, Account Manager, Sales Engineer, Customer Success]
+
+  hard_filters:
+    travel: occasional_ok             # sales roles routinely involve some travel
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [door to door, retail floor]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Account Executive, SaaS Sales, Business Development]
+    rejected: []
+
+platform_tiers:
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
+  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  sales representative: junior
+  account executive: mid
+  senior account executive: senior
+  enterprise account executive: senior
+  sales lead: lead
+  head of sales: manager
+  sales director: manager
+  vp of sales: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold. GROUNDWORK bands.
+  - 9.0-10.0 — Full-cycle B2B/SaaS AE (prospecting -> close), quota history, remote-friendly
+    territory open to the candidate, salary (base + OTE) confirmed above the floor.
+  - 8.0-8.9 — Strong AE role, clear ICP/segment fit; territory open; OTE likely clears.
+  - 7.0-7.9 — Adjacent sales role (AM/BDR with AE scope); OTE unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Account Executive · SDR/BDR · Account Manager · Sales Engineer ·
+  Customer Success. NOTE base vs OTE explicitly (a "salary" that is mostly commission is a flag).
+
+salary_estimation_heuristics: |
+  Sales comp is base + OTE — always distinguish. US/UK SaaS paying globally -> competitive OTE;
+  early startup -> variable, verify base floor. A high OTE with a low base is a risk flag, not a
+  clear. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model, hard_filters.travel]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

@@ -1,0 +1,74 @@
+# Template: Recruiter / Talent Acquisition — people-hr stream GROUNDWORK (catalog coverage
+# pending dogfood). No salary numbers (D20).
+schema_version: 1
+template_id: people-hr/recruiter-talent
+label: "Recruiter / Talent Acquisition"
+suggest_also: [people-hr/people-ops, people-hr/hr-business-partner]
+
+defaults:
+  search:
+    stream: people-hr
+    subvariant: recruiter-talent
+    work_model: [remote]
+    keywords:
+      core:
+        - recruiter
+        - technical recruiter
+        - talent acquisition
+        - talent partner
+        - talent acquisition specialist
+      expanded:
+        - talent acquisition manager
+        - sourcer
+        - recruitment consultant
+        - people partner
+        - talent sourcer
+    archetypes: [Technical Recruiter, TA Partner, Sourcer, People Ops-leaning, Agency-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [sales recruiter commission only]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Technical Recruiter, Talent Acquisition, Recruiter]
+    rejected: []
+
+platform_tiers:
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
+  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  recruiter: mid
+  senior recruiter: senior
+  talent acquisition manager: manager
+  head of talent: manager
+  head of people: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold. GROUNDWORK bands.
+  - 9.0-10.0 — Full-cycle in-house TA (sourcing -> offer), tech hiring depth, remote-first,
+    salary confirmed above the floor.
+  - 8.0-8.9 — Strong recruiter/TA role, clear function fit; salary likely clears.
+  - 7.0-7.9 — Adjacent role (sourcer or people-ops with TA scope); salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Technical Recruiter · TA Partner · Sourcer · People Ops-leaning ·
+  Agency-leaning (flag agency/commission roles vs in-house).
+
+salary_estimation_heuristics: |
+  In-house tech TA at a funded product company pays a solid mid/senior band; agency recruiting
+  is commission-weighted (verify base). US/UK paying globally -> likely clears. Unpublished
+  salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

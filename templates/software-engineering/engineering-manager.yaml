@@ -1,0 +1,79 @@
+# Template: Engineering Manager (leadership subvariant — distinct keywords/archetypes from IC
+# roles, D7 note: leadership is its own SUBVARIANT, not just a seniority band). No salary
+# numbers (D20).
+schema_version: 1
+template_id: software-engineering/engineering-manager
+label: "Engineering Manager"
+suggest_also: [software-engineering/tech-lead, product-management/delivery-manager]
+
+defaults:
+  search:
+    stream: software-engineering
+    subvariant: engineering-manager
+    work_model: [remote]
+    keywords:
+      core:
+        - engineering manager
+        - software engineering manager
+        - development manager
+        - head of engineering
+        - director of engineering
+      expanded:
+        - team lead
+        - tech lead manager
+        - vp of engineering
+        - engineering lead
+        - head of software
+    archetypes: [Engineering Manager, Director-leaning, Tech Lead Manager, Head of Engineering, Delivery-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [pure project manager, non-technical manager]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Engineering Manager, Head of Engineering, Director of Engineering]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:
+  engineering manager: manager
+  senior engineering manager: manager
+  director of engineering: manager
+  head of engineering: manager
+  vp of engineering: manager
+  tech lead: lead
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — People-leadership of an engineering team (hiring, 1:1s, delivery), retained
+    technical depth, product org; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong EM role, clear team/scope; globally open; salary likely clears. A hands-on
+    component is fine; flag if the role is IC-with-a-manager-title.
+  - 7.0-7.9 — EM-adjacent (tech lead / delivery lead with people scope); salary unconfirmed;
+    minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Engineering Manager · Director-leaning · Tech Lead Manager ·
+  Head of Engineering · Delivery-leaning (flag pure-PM/delivery roles with no people-management).
+
+salary_estimation_heuristics: |
+  EM comp at a funded product company sits above senior-IC bands; the reporting line (how many
+  reports, org level) drives the band. US/UK product paying globally -> likely clears. Unpublished
+  salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

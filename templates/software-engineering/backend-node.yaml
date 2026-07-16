@@ -1,0 +1,77 @@
+# Template: Node.js Backend Engineer (backend subvariant). No salary numbers (D20).
+schema_version: 1
+template_id: software-engineering/backend-node
+label: "Node.js Backend Engineer"
+suggest_also: [software-engineering/backend-java, software-engineering/fullstack-js, software-engineering/backend-python]
+
+defaults:
+  search:
+    stream: software-engineering
+    subvariant: backend-node
+    work_model: [remote]
+    keywords:
+      core:
+        - node developer
+        - node.js developer
+        - backend engineer
+        - backend developer
+        - node engineer
+      expanded:
+        - typescript engineer
+        - nestjs developer
+        - javascript engineer
+        - software engineer
+        - api developer
+        - platform engineer
+    archetypes: [Backend Engineer, Node/TS Specialist, Microservices Engineer, API/Platform Engineer, Fullstack-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [pure frontend, wordpress]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Node.js Developer, Backend Engineer, TypeScript]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:
+  sde ii: mid
+  sde iii: senior
+  staff engineer: staff
+  principal engineer: principal
+  engineering lead: lead
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Core Node/TS backend (Express/Nest, REST/GraphQL, SQL/NoSQL, Docker/cloud),
+    product ownership; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong Node backend role, TS strong, one minor gap OK; globally open; salary likely
+    clears. Fullstack lean is fine unless frontend is the core daily duty.
+  - 7.0-7.9 — Backend/fullstack role where Node is one of several accepted stacks; salary
+    unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Backend Engineer · Node/TS Specialist · Microservices Engineer ·
+  API/Platform Engineer · Fullstack-leaning.
+
+salary_estimation_heuristics: |
+  US/UK/EU product company paying globally -> likely clears a senior-backend floor; agency ->
+  verify. Seniority (Senior/Staff/Lead) -> higher band. Unpublished salary is NEVER an
+  auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

@@ -1,0 +1,78 @@
+# Template: Data Engineer — ⭐ data stream. No shipped salary numbers (D20).
+schema_version: 1
+template_id: data/data-engineer
+label: "Data Engineer"
+suggest_also: [data/analytics-engineer, ai-ml/ml-engineer, software-engineering/backend-python]
+
+defaults:
+  search:
+    stream: data
+    subvariant: data-engineer
+    work_model: [remote]
+    keywords:
+      core:
+        - data engineer
+        - analytics engineer
+        - data platform engineer
+        - etl developer
+        - big data engineer
+      expanded:
+        - data infrastructure engineer
+        - dataops engineer
+        - data pipeline engineer
+        - spark engineer
+        - snowflake engineer
+    archetypes: [Data Engineer, Analytics Engineer, Data Platform, DataOps, BI-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [pure data analyst, dashboards only]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Data Engineer, Analytics Engineer, Data Platform]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  data engineer i: junior
+  data engineer ii: mid
+  senior data engineer: senior
+  staff data engineer: staff
+  data engineering lead: lead
+  head of data: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Near-perfect: pipeline/platform ownership (batch + streaming), a warehouse
+    (Snowflake/BigQuery/Redshift), orchestration (Airflow/dbt), a real language (Python/
+    Scala/SQL-heavy), cloud; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong: data-engineering-primary role, modern stack, one minor gap OK; globally
+    open; salary likely clears. Analytics-engineering overlap is fine unless the role is BI/
+    dashboards-primary with no pipeline ownership.
+  - 7.0-7.9 — Worth reviewing: data role blending analytics + engineering; salary unconfirmed;
+    minor flag or stack stretch.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Data Engineer · Analytics Engineer · Data Platform · DataOps ·
+  BI-leaning (flag when the role is dashboards/reporting-primary).
+
+salary_estimation_heuristics: |
+  Data engineering pays near backend-SWE bands; pure BI/analyst sits lower. US/UK product or
+  fintech paying globally -> likely clears; consultancy/agency -> verify. Cloud + streaming +
+  seniority -> higher band. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

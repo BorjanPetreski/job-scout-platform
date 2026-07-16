@@ -1,0 +1,75 @@
+# Template: Data Analyst — data stream (analyst-leaning, distinct from data-engineer). No
+# salary numbers (D20).
+schema_version: 1
+template_id: data/data-analyst
+label: "Data Analyst"
+suggest_also: [data/analytics-engineer, data/bi, data/data-scientist]
+
+defaults:
+  search:
+    stream: data
+    subvariant: data-analyst
+    work_model: [remote]
+    keywords:
+      core:
+        - data analyst
+        - business analyst data
+        - analytics analyst
+        - bi analyst
+        - product analyst
+      expanded:
+        - business intelligence analyst
+        - reporting analyst
+        - marketing analyst
+        - analytics engineer
+        - insights analyst
+    archetypes: [Data Analyst, BI Analyst, Product Analyst, Analytics Engineer-leaning, Marketing Analyst]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [pure data entry, non-analytical reporting]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Data Analyst, BI Analyst, Product Analyst]
+    rejected: []
+
+platform_tiers:
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
+  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  data analyst i: junior
+  data analyst ii: mid
+  senior data analyst: senior
+  analytics lead: lead
+  head of analytics: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Strong SQL + a BI tool (Looker/Tableau/PowerBI) + stakeholder-facing insight
+    ownership, some Python/stats; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Solid analyst role, SQL + BI depth, one minor gap OK; globally open; salary likely
+    clears.
+  - 7.0-7.9 — Reporting-leaning analyst role; salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Data Analyst · BI Analyst · Product Analyst · Analytics
+  Engineer-leaning · Marketing Analyst.
+
+salary_estimation_heuristics: |
+  Analyst comp sits below data/ML engineering; product-analyst at a funded SaaS pays a fair
+  mid band. US/UK product paying globally -> likely clears a mid floor. Unpublished salary is
+  NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

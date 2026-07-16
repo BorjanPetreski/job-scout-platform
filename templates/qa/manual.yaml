@@ -1,0 +1,75 @@
+# Template: Manual QA Engineer — qa stream (manual-leaning, distinct from automation-sdet).
+# No salary numbers (D20).
+schema_version: 1
+template_id: qa/manual
+label: "Manual QA Engineer"
+suggest_also: [qa/automation-sdet, qa/performance]
+
+defaults:
+  search:
+    stream: qa
+    subvariant: manual
+    work_model: [remote]
+    keywords:
+      core:
+        - qa engineer
+        - manual qa engineer
+        - quality assurance engineer
+        - qa analyst
+        - software tester
+      expanded:
+        - test engineer
+        - quality analyst
+        - qa specialist
+        - functional tester
+        - qa tester
+    archetypes: [Manual QA, QA Analyst, Functional Tester, Automation-leaning, Domain QA]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [automation only, sdet only]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [QA Engineer, Manual QA, Software Tester]
+    rejected: []
+
+platform_tiers:
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
+  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  qa engineer i: junior
+  qa engineer ii: mid
+  senior qa engineer: senior
+  qa lead: lead
+  qa manager: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold. GROUNDWORK bands.
+  - 9.0-10.0 — Strong functional/manual QA with test-design rigour (cases, exploratory, bug
+    advocacy), some automation exposure, product/domain depth; globally open; salary confirmed
+    above the floor.
+  - 8.0-8.9 — Solid manual QA role, clear domain; globally open; salary likely clears.
+  - 7.0-7.9 — Entry/adjacent QA role; salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Manual QA · QA Analyst · Functional Tester · Automation-leaning ·
+  Domain QA.
+
+salary_estimation_heuristics: |
+  Manual QA sits below SDET/automation bands. US/UK product paying globally -> likely clears a
+  mid floor; testing-services shop -> often lower, verify. Unpublished salary is NEVER an
+  auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

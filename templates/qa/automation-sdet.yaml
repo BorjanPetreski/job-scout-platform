@@ -1,0 +1,79 @@
+# Template: QA Automation / SDET — ⭐ qa stream. No shipped salary numbers (D20).
+schema_version: 1
+template_id: qa/automation-sdet
+label: "QA Automation Engineer / SDET"
+suggest_also: [qa/manual, software-engineering/backend-java]
+
+defaults:
+  search:
+    stream: qa
+    subvariant: automation-sdet
+    work_model: [remote]
+    keywords:
+      core:
+        - qa automation engineer
+        - sdet
+        - test automation engineer
+        - automation engineer
+        - software engineer in test
+      expanded:
+        - qa engineer
+        - quality engineer
+        - test engineer
+        - playwright engineer
+        - cypress engineer
+        - selenium engineer
+    archetypes: [SDET, Automation Engineer, QA Platform, Performance QA, Manual-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [manual only, no automation]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [SDET, QA Automation, Test Automation]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  sdet i: junior
+  sdet ii: mid
+  senior sdet: senior
+  qa lead: lead
+  test lead: lead
+  qa manager: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Near-perfect: framework-owning SDET (build/maintain automation frameworks,
+    CI integration, API + UI + maybe perf), a real programming language (Java/Python/JS/TS),
+    product-team embedded; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong: automation-primary QA role, one strong framework + language; globally
+    open; salary likely clears; one minor gap OK. A manual component is fine unless the role
+    is manual-primary with automation as a "nice to have."
+  - 7.0-7.9 — Worth reviewing: hybrid manual/automation role; salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: SDET · Automation Engineer · QA Platform · Performance QA ·
+  Manual-leaning (flag when automation is <~40% of the role).
+
+salary_estimation_heuristics: |
+  SDET/automation pays near backend-SWE bands where the role is genuinely engineering;
+  manual-heavy QA sits lower. US/UK product company paying globally -> likely clears;
+  outsourcing/testing-services shop -> verify, often below a Western floor. Seniority +
+  framework ownership -> higher band. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

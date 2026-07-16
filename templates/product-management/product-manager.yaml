@@ -1,0 +1,79 @@
+# Template: Product Manager — product-management stream (product-leaning, distinct from the
+# delivery/agile subvariants). No salary numbers (D20).
+schema_version: 1
+template_id: product-management/product-manager
+label: "Product Manager"
+suggest_also: [product-management/product-owner, product-management/technical-pm]
+
+defaults:
+  search:
+    stream: project-management
+    subvariant: product-manager
+    work_model: [remote]
+    keywords:
+      core:
+        - product manager
+        - senior product manager
+        - technical product manager
+        - product owner
+        - group product manager
+      expanded:
+        - digital product manager
+        - platform product manager
+        - growth product manager
+        - product lead
+        - principal product manager
+    archetypes: [Product Manager, Technical PM, Product Owner, Growth PM, Platform PM]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [project manager only, delivery only]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Product Manager, Technical Product Manager, Product Owner]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, remotive, workable, lever, himalayas, greenhouse]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk]
+  3: [wwr, jobgether, dynamite, arc, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:
+  associate product manager: junior
+  product manager: mid
+  senior product manager: senior
+  principal product manager: principal
+  group product manager: lead
+  head of product: manager
+  director of product: manager
+  cpo: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — End-to-end product ownership (discovery -> delivery -> outcomes), data-informed,
+    stakeholder leadership, domain fit; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong PM role, clear product/segment fit; globally open; salary likely clears.
+    A technical bent is a plus for technical-PM archetypes.
+  - 7.0-7.9 — PM-adjacent (PO or delivery-leaning with product scope); salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Product Manager · Technical PM · Product Owner · Growth PM ·
+  Platform PM. A "Product Manager" that is really a project/delivery manager is a scope flag.
+
+salary_estimation_heuristics: |
+  PM comp at a funded product company sits at or above senior-IC-eng bands at senior levels; the
+  org level / scope drives it. US/UK product paying globally -> likely clears. Unpublished salary
+  is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

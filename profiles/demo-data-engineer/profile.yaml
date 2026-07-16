@@ -1,0 +1,34 @@
+# Profile: demo-data-engineer — DRY-RUN fixture for the data-engineer ⭐ template.
+schema_version: 1
+id: demo-data-engineer
+template: data/data-engineer
+dry_run: true
+
+candidate:
+  display_name: Demo Data Engineer
+  location: { city: Warsaw, country: Poland, timezone: Europe/Warsaw }
+  location_match_terms: [Poland, Warsaw, EU, European Union]
+  citizenship: [PL]
+  eligibility:
+    employment_models: [b2b_contractor, full_time]
+    needs_visa_sponsorship: false
+  experience_years: 7
+
+search:
+  subvariant: data-engineer
+  target_seniority: { bands: [senior], strict: false }
+  employment_type: { accept: [full_time, b2b] }
+
+platforms:
+  tiers:
+    1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+    3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+        remote-ok, pinpoint, deel, crossover]
+  disabled: [europeremotely, otta]
+  ats_boards: { greenhouse: [], lever: [], workable: [], pinpoint: [] }
+  linkedin_tripwire:
+    locations: [European Union, Worldwide]
+
+output:
+  notion: { dry_run: true }
