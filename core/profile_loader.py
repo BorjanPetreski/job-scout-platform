@@ -71,6 +71,9 @@ def load_defaults() -> dict:
     return _load_yaml(paths.DEFAULTS_PATH)
 
 
+_CATALOG_STATUS = {"verified", "unverified"}
+
+
 def load_catalog() -> dict:
     cat = _load_yaml(paths.CATALOG_PATH)
     errors = []
@@ -82,6 +85,21 @@ def load_catalog() -> dict:
         seen_slugs.add(slug)
         if p.get("active") and p.get("tier_default") not in (1, 2, 3):
             errors.append(f"catalog platform {slug!r} is active but has no valid tier_default")
+        # Phase 2 §3.2 — `status` is the whole-entry researched-but-unverified marker for
+        # NEW boards. Its one consistency rule keeps new entries OUT of tier-coverage
+        # (invariant #14) until a live smoke test: unverified ⇒ active MUST be false, so a
+        # new board can never fail every existing profile's tier-coverage validation. The
+        # smoke test flips `status: verified` + `active: true` together; only then does the
+        # platform enter tier-coverage. (`categories_verify_at_setup` is unchanged — the
+        # per-SLUG marker on already-active boards; `status` is the whole-entry marker.)
+        status = p.get("status")
+        if status is not None and status not in _CATALOG_STATUS:
+            errors.append(f"catalog platform {slug!r} has invalid status {status!r} "
+                          f"(one of {sorted(_CATALOG_STATUS)})")
+        if status == "unverified" and p.get("active"):
+            errors.append(f"catalog platform {slug!r} is status: unverified but active: true — "
+                          "unverified entries must ship active: false (§3.2); the live smoke "
+                          "test flips status: verified + active: true together")
     if errors:
         raise SystemExit("[profile_loader] catalog validation FAILED:\n  " + "\n  ".join(errors))
     return cat
