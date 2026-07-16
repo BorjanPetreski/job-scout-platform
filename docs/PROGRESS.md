@@ -77,7 +77,7 @@ engineer (post-break, targeting mid/medior part-time) under Borjan's Notion, sup
 | 2.5 | `core/provision_notion.py`: provision + adopt modes, token/parent params, idempotent; probe view-creation API first (instruct→verify fallback) | ⬜ | Plan §5 |
 | 2.6 | `skills/job-scout-setup/`: the CV-driven templater/interview skill | ⬜ | Plan §4 |
 | 2.7 | Write-back loop: opt-in consent, generic-only, staged suggestions in `suggestions/` (outside `templates/`), curator merge | ⬜ | Plan §6 |
-| 2.8 | Effort/model tier: schema + documented mapping + two-stage design (wiring deferred) | ⬜ | Plan §7 |
+| 2.8 | Effort/model tier: schema + documented mapping + two-stage design (wiring deferred) | ✅ 2026-07-16 | Schema field landed in 2.1; 2.8 documents the mapping (fast→Haiku, mid→Sonnet, high→Opus), the two-stage judgment design (cheap triage → capable shortlist read via subagent), and the entitlement shape. Run skill v4.3.0 + ARCHITECTURE §7a. Design-and-defer (D10) — recorded/documented only, no model wiring; borjan-pm behavior unchanged. Plan §7 |
 | 2.9 | First real test: backend-java onboarding end-to-end; supervised live scan; capture lessons | ⬜ | Plan §8, acceptance D13 |
 | 2.10 | CI: extend `validate-platform` to new schema/templates/catalog + per-⭐-template `--plan` smoke via the 2.4 fixture profiles + `suggestions/` staging check | ⬜ | — |
 | 2.11 | Docs: update ARCHITECTURE + PROFILE_CONFIG_SPEC + PROGRESS | ⬜ | — |

@@ -10,8 +10,8 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.2.0"
-  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 2 additive: seniority/employment/floorless judgment wiring (borjan-pm behavior unchanged)."
+  version: "4.3.0"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 2 additive: seniority/employment/floorless judgment wiring + run.effort design-and-defer (borjan-pm behavior unchanged)."
   created_by: Borjan
   organization: 2Coders Studio
   last_updated: "2026-07-16"
@@ -319,6 +319,27 @@ schedules may coexist; dedup absorbs the overlap.
 
 ---
 
+## Run effort / model tier (design-and-defer — NOT wired yet, D9/D10)
+
+The profile may carry `run.effort` (`fast`|`mid`|`high`) and an optional
+`run.effort_by_run_type` (e.g. `{daily: fast, weekly_deep: high}`). These are **recorded
+and documented in Phase 2 but NOT yet wired to actual model selection** — today every run
+uses whatever model the session/scheduler launched with. Do not change your behavior based
+on `run.effort`; it is forward-declared config.
+
+- **Mapping (design target):** `fast → Haiku`, `mid → Sonnet`, `high → Opus`. Entitlement-
+  shaped: free tier = `fast` + unscheduled; paid tiers unlock `mid`/`high` + a weekly deep
+  sweep + scheduling.
+- **Two-stage judgment (design target):** the capable path splits the judgment pass into a
+  cheap-model **triage** of the raw candidate list (obvious drops / clear-keeps) and a
+  capable-model **deep read** of the shortlist survivors, via subagent delegation at the
+  chosen model. `effort_by_run_type` lets a frequent cheap daily sweep coexist with a
+  capable weekly deep sweep.
+- **Why deferred:** model-at-launch belongs with the scheduler (also deferred, D12) — the
+  scheduler picks the launch model per run type, and/or the judgment step spawns a subagent
+  at the chosen model. Phase 2 ships the schema + this design only; the wiring lands with
+  scheduling. See PHASE_2_PLAN §7 / ARCHITECTURE "Effort / model tier".
+
 ## Application Tracking — the ONLY Tracker write path
 
 When the user says they applied ("applied here", "just applied") in a chat session:
@@ -453,6 +474,12 @@ best-effort; isolated blocked fetches are expected and are NOT source-down.
 ---
 
 ## Changelog
+
+**4.3.0** (2026-07-16) — Phase 2 step 2.8: documented the `run.effort` / model-tier mapping
+(fast→Haiku, mid→Sonnet, high→Opus), the two-stage judgment design (cheap triage → capable
+shortlist read via subagent), and the entitlement shape. Design-and-defer (D10): recorded +
+documented only, NOT wired to model selection — that lands with the deferred scheduler. No
+runtime behavior change.
 
 **4.2.0** (2026-07-16) — Phase 2 judgment-layer wiring (step 2.2), additive. New profile
 fields become behavior: `target_seniority` (soft scoring / `strict` hard drop via the

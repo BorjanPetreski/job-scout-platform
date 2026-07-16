@@ -184,6 +184,18 @@ never share dedup history (the same URL can legitimately be a candidate for two 
 The `borjan-pm` migration moves `job-scout-pm/state/` → `profiles/borjan-pm/state/`
 verbatim — history is the most valuable asset and is never regenerated.
 
+## 7a. Effort / model tier (Phase 2 design-and-defer, D9/D10)
+
+The profile's `run.effort` (`fast`|`mid`|`high`) and optional `run.effort_by_run_type` map
+to a compute/model tier: **fast→Haiku, mid→Sonnet, high→Opus**, shaped as a future
+billing/entitlement axis (free = `fast` + unscheduled; paid = `mid`/`high` + weekly-deep +
+scheduling). The intended runtime is a **two-stage judgment**: a cheap-model triage of the
+raw candidate list, then a capable-model deep read of the shortlist survivors via subagent
+delegation, with `effort_by_run_type` letting a frequent cheap daily sweep coexist with a
+capable weekly deep sweep. **Phase 2 ships the schema field + this design only** — actual
+model-at-launch selection belongs with the scheduler (also deferred, §8/D12), so no model
+wiring exists yet; `run.effort` is recorded and validated but does not change run behavior.
+
 ## 8. What deliberately does NOT change
 
 - The three-lane model (Code local / Code cloud / chat-native Appendix-A fallback) and
