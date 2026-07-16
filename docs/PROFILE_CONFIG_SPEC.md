@@ -147,6 +147,7 @@ These enums are the "screens". Each field: options, default source, and who rend
 | Platforms | catalog list with template's relevance marks; tiers seeded from `tier_default` | catalog+template |
 | Schedule | 1×/2× daily times, weekly full-sweep day | 08:00+18:00, Mon |
 | Notion | provision new databases (default) or point at existing IDs | provision |
+| Write-back consent | opt in / out of staging generic (non-PII) template enrichments for curator review (D6, `writeback.consent`) | out (opt-in) |
 
 ## 4. Keyword & category model
 

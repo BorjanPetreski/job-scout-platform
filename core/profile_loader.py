@@ -36,7 +36,7 @@ ENGINE_VERSION = "4.0.0"
 
 _TOP_KEYS = {"schema_version", "id", "template", "dry_run", "candidate", "search",
              "compensation", "hard_filters", "filter_notes", "scoring", "platforms",
-             "sweep", "output", "schedule", "run"}
+             "sweep", "output", "schedule", "run", "writeback"}
 # Phase 2 enums (§3.1). "medior" is a lexicon TITLE mapping to `mid` (D21), NOT a band.
 _SENIORITY_BANDS = {"intern", "junior", "mid", "senior", "staff", "principal", "lead", "manager"}
 _EMPLOYMENT_TYPES = {"full_time", "part_time", "contract", "b2b", "freelance", "internship", "any"}
@@ -269,6 +269,18 @@ def _validate(merged: dict, profile_id: str, catalog: dict, defaults: dict) -> l
             unknown_run = set(run) - {"effort", "effort_by_run_type"}
             if unknown_run:
                 e.append(f"run unknown keys: {sorted(unknown_run)}")
+
+    # NEW (D6): writeback consent — opt-in gate for the staged suggestion loop (§6).
+    wb = merged.get("writeback")
+    if wb is not None:
+        if not isinstance(wb, dict):
+            e.append("writeback must be a mapping {consent}")
+        else:
+            if "consent" in wb and not isinstance(wb["consent"], bool):
+                e.append("writeback.consent must be a bool")
+            unknown_wb = set(wb) - {"consent"}
+            if unknown_wb:
+                e.append(f"writeback unknown keys: {sorted(unknown_wb)}")
 
     hf = merged.get("hard_filters") or {}
     for key, allowed in (("travel", {"none", "occasional_ok", "any"}),

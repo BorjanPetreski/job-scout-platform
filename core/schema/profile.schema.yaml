@@ -123,3 +123,8 @@ run:                                    # optional (Phase 2, D9/D10) — compute
           mid->Sonnet, high->Opus); entitlement-shaped (free=low; paid=mid/high/weekly-deep)
   effort_by_run_type: {run_type: effort}, optional — per-run-type override (design target b),
           e.g. {daily: fast, weekly_deep: high}; each value one of [fast, mid, high]
+
+writeback:                              # optional (Phase 2, D6) — opt-in write-back learning loop
+  consent: bool, optional (default false-if-absent) — when true the setup/run may STAGE generic,
+          non-PII keyword/archetype enrichments to suggestions/<template>.yaml for curator review
+          (core/writeback.py). Never CV/PII, never auto-merged. Absent/false = nothing staged.
