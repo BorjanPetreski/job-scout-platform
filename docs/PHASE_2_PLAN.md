@@ -122,7 +122,9 @@ search:
   subvariant_secondary: null           # NEW (D15): optional; keyword/archetype sets unioned, primary drives comp+tiers
   work_model: [remote]                 # existing; enum remote|hybrid|on_site (already present)
   target_seniority:                    # NEW (D7)
-    bands: [mid, medior]               # enum: intern|junior|mid|medior|senior|staff|principal|lead|manager
+    bands: [mid]                       # enum: intern|junior|mid|senior|staff|principal|lead|manager
+                                       #   "medior" is a TITLE the D21 lexicon maps to mid, NOT a band —
+                                       #   one band, many titles (else [mid] vs [medior] profiles drift)
     strict: false                      # false = scoring input; true = hard filter
   employment_type:                     # NEW (D8)
     accept: [part_time, contract]      # enum: full_time|part_time|contract|b2b|freelance|internship|any
@@ -153,6 +155,18 @@ run:
 - **These keys are genuinely NEW, not extensions of existing ones:** `search.subvariant` does not
   exist in the Phase 1 schema (add it in 2.1 alongside `subvariant_secondary`), and `run:` is a new
   top-level key (extend the loader's `_TOP_KEYS` + the schema doc together).
+- **Two employment vocabularies, one documented mapping (2.1).** The Phase 1
+  `candidate.eligibility.employment_models` enum (`b2b_contractor`/`full_time`/`part_time`/
+  `freelance` — how the person can legally engage) and the new `search.employment_type.accept`
+  enum (D8 — which posting types to surface) are related but not identical, and D8's tokens are
+  locked. 2.1 records the equivalences in the schema doc (`b2b` ≡ `b2b_contractor`; `contract` =
+  fixed-term contract employment; `internship` has no eligibility counterpart) so the templater
+  maps CV/answers consistently, and the validator flags plain contradictions with a named warning
+  (e.g. `accept: [b2b]` while eligibility lacks `b2b_contractor`). D8's enum is unchanged.
+- **`medior` is a lexicon title, not a band.** The band enum is
+  `intern|junior|mid|senior|staff|principal|lead|manager`; the D21 base lexicon maps "medior" →
+  `mid` (a European title synonym). Keeping it out of the enum means a `[mid]` profile and a
+  user who says "medior" resolve to identical behavior instead of drifting apart.
 - **Enforcement mapping — recording a field is not enforcing it.** §8's acceptance depends on
   *behavior*, so the wiring below is explicit build scope (doctrine unchanged: scripts flag,
   Claude decides):
@@ -193,6 +207,13 @@ run:
 
 Extend the existing format with:
 - `platform_tiers:` per-stream tier ordering (seeds `profile.platforms.tiers`) — **new, per D3**.
+  **Seeding mechanics:** a template-ONLY top-level block (like `interview:`), consumed by the setup
+  interview **at profile-creation time — never loader-merged**. Two reasons: (a) a later template
+  tier edit must not silently retier existing profiles — tiers are per-profile conversion DATA once
+  seeded (`borjan-pm`'s live tiers stay untouched by construction); (b) the seed must satisfy
+  tier-coverage (invariant #14) over the whole catalog, so unlisted active platforms get a
+  deterministic rule: catalog `tier_default` if the platform has a slug for the profile's stream,
+  else `disabled` (it can't serve the stream anyway; disabling is recorded, not silent).
 - `salary_estimation_heuristics:` stream-specific **text only** — **no hardcoded band numbers** (D20).
   The floor is user-provided or unset; when unset the judgment layer estimates from the posting using
   this text. (Replaces the earlier numeric `seniority_comp_bands` idea, which would ship stale/
@@ -256,6 +277,12 @@ heavy) — this is separate from the profile's scan-time `run.effort`.
   the **Runs** digest page, and the **📥 New — Unreviewed** view under the parent page; lazy-patch
   platform select options before first write (mechanism exists today); write resulting IDs into
   `profile.output.notion`.
+- **Probe the view-creation assumption FIRST (open API risk):** database/page creation is solidly
+  within the Notion REST API, but creating a saved **view** (the 📥 New — Unreviewed board) may not
+  be — verify at the very start of 2.5, before designing around it. If the API can't do it, the
+  view becomes one more instruct→verify step in the D17 pattern (tell the user how to add it, then
+  probe/confirm) — an honest manual step, never a silent skip; the rest of provision mode is
+  unaffected.
 - **adopt mode:** point at existing `data_source_id`/`page_id`s, **verify schema compatibility, report
   gaps**, do not mutate beyond additive select options.
 - **Idempotent via a marker (D19):** re-running detects existing provisioned DBs (a provisioning
@@ -274,9 +301,13 @@ setup** there.
 - Gate: only runs if the user consented at step 4 (D6).
 - Extract **generic** enrichments only — keyword/archetype-set additions that are role-generic
   (e.g. "Kafka" for backend-java), **never CV text, names, employers, or any PII**.
-- Stage, don't merge: append to a per-template review queue (e.g.
-  `templates/<stream>/<subvariant>.suggestions.yaml` or an equivalent staging file), with provenance
-  (source profile id, date, frequency counter) but **no personal data**.
+- Stage, don't merge: append to a per-template review queue at
+  `suggestions/<stream>/<subvariant>.yaml` — a dedicated top-level directory mirroring the template
+  tree, deliberately **outside `templates/`**: the CI validator rglobs `templates/**/*.yaml` and
+  strict-validates every hit as a template (unknown keys = error), so a staging file inside would
+  fail every CI run. Entries carry provenance (source profile id, date, frequency counter) but
+  **no personal data**. 2.10 gives the staging format its own light CI check (parses, matches the
+  suggestion schema, keyword/archetype keys only — a PII-shaped key is a named error).
 - Curator approves suggestions into the template (Borjan for now). Auto-merge-with-guardrails is a
   **later** upgrade (D6 option b) once the pattern is trusted.
 
@@ -297,7 +328,8 @@ setup** there.
   market. Real CV provided by Borjan.
 - Run the **full interview** end-to-end → `backend-java` classification (optional secondary subvariant
   if he'd take broader JVM/backend, D15) → tailoring (Java/Spring/Kafka concrete terms,
-  `target_seniority: {bands: [mid, medior], strict: false}`, `employment_type: {accept: [part_time,
+  `target_seniority: {bands: [mid], strict: false}` ("medior" resolves to `mid` via the D21 lexicon),
+  `employment_type: {accept: [part_time,
   contract]}`, `fte_fraction: 0.5`, **floor left unset unless he states one**, D20/D22) → provision under
   **Borjan's Notion** (supervised, instruct→verify-by-probe) → validate → **one manual live scan** with
   an honest coverage ledger → schedule config written, cron not wired.
@@ -318,13 +350,13 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 | 2.1 | **Schema extensions + mechanical wiring** — add `subvariant` (**NEW** — not in the Phase 1 schema), `subvariant_secondary`, `target_seniority`, `employment_type`, `compensation.fte_fraction`, `run.effort(+by_run_type)` + the new `run:` top-level key to `profile.schema.yaml` + validator + loader; make `compensation.floor` **optional** per the §3.1 floorless contract (below-floor first-pass disabled when unset); `core/salary.py` gains FTE pro-rating + floorless normalize; update PROFILE_CONFIG_SPEC §2/§3. `borjan-pm` still validates **and scans identically**. | §3.1, D14–D22 |
 | 2.2 | **Template format v2 + judgment-layer wiring** — `platform_tiers` + `salary_estimation_heuristics` (text, no numbers) + `seniority_titles` + inheritance/loader; add `core/data/seniority_lexicon.yaml`; update `skills/job-scout-run/SKILL.md` to enforce `target_seniority` (lexicon-driven scoring / `strict` drop) + `employment_type` + floorless salary estimation per the §3.1 enforcement mapping; update spec §6. | §3.1/§3.3, D20–D22 |
 | 2.3 | **Catalog expansion** — loader `status` rule **first** (`unverified` ⇒ `active: false`, outside tier-coverage — existing profiles validate unchanged); then per-stream slug maps for existing platforms; new stream-appropriate boards as **full `active: false` + `status: unverified` entries**; per-stream tiers move to templates. | §3.2 |
-| 2.4 | **Template library** — build the §2 taxonomy: ⭐ tech-core deepest + battle-tested (incl **backend-java**), business/support/content as groundwork marked coverage-pending. | §2 |
+| 2.4 | **Template library** — build the §2 taxonomy: ⭐ tech-core deepest + battle-tested (incl **backend-java**), business/support/content as groundwork marked coverage-pending. Each ⭐ template ships with a **dry-run fixture profile** (demo-fe-react pattern) so it `--plan`s from day one — `--plan` needs a full valid profile; a template alone can't execute (consumed by 2.10's CI smoke). | §2 |
 | 2.5 | **`core/provision_notion.py`** — provision + adopt modes, token/parent params, instruct→verify-by-probe, idempotent-via-marker, lazy select patch; **secret-storage seam** (encrypt/store/resolve, env fallback). | §5, D17–D19 |
 | 2.6 | **`skills/job-scout-setup/`** — the templater/interview skill: CV-or-Q&A, primary+secondary subvariant, user-chosen posture, full step sequence. | §4, D14–D16 |
-| 2.7 | **Write-back loop** — consent gate, generic-only extraction, staged suggestions, curator merge path. | §6 |
+| 2.7 | **Write-back loop** — consent gate, generic-only extraction, staged suggestions in `suggestions/` (outside `templates/` — the template CI glob strict-validates everything under it), curator merge path. | §6 |
 | 2.8 | **Effort/model tier** — schema field + documented mapping + two-stage design (wiring deferred). | §7 |
 | 2.9 | **First real test** — backend-java onboarding end-to-end; supervised live scan; capture lessons. | §8 |
-| 2.10 | **CI** — extend `validate-platform` to cover new schema/templates/catalog; every template validates; per-⭐-template `--plan` smoke where catalog supports. | — |
+| 2.10 | **CI** — extend `validate-platform` to cover new schema/templates/catalog; every template validates; per-⭐-template `--plan` smoke where catalog supports, driven by the 2.4 **dry-run fixture profiles**; light check for the `suggestions/` staging format (parse + suggestion schema + no PII-shaped keys). | — |
 | 2.11 | **Docs** — update ARCHITECTURE (job-scout-setup, provision_notion, write-back), PROFILE_CONFIG_SPEC (new fields, template v2), PROGRESS. | — |
 
 ## 10. Out of scope for Phase 2
@@ -390,14 +422,15 @@ non-blocking suggestions are optional.
 > tier-coverage validation (§3.2). (2) Enforcement of the new fields was unassigned — now explicit
 > scope in 2.1/2.2 via the §3.1 enforcement mapping. (3) Floorless compensation contract specified
 > (§3.1). (4) `search.subvariant` was mislabeled "existing" — it's NEW, added to the 2.1 field list.
-> **Non-blocking findings** (optional, pick up inside the owning steps; detailed in the gate PR):
-> write-back staging files must live outside `templates/` or be name-excluded from the template CI
-> glob (2.7/2.10); `platform_tiers` seeding mechanics — template-only block, interview-time, never
-> loader-merged, with a rule for unlisted active platforms (2.2/2.6); per-⭐-template `--plan` smoke
-> needs dry-run fixture profiles (2.4/2.10); verify the Notion API can create the saved view early
-> in 2.5, else make it an instruct-step per D17; align/document the `employment_models` vs
-> `employment_type` vocabularies (2.1); drop `medior` from the band enum and map it via the D21
-> lexicon (2.1/2.2).
+> **Non-blocking findings — amended in a same-day second pass (all 10 findings now incorporated;
+> no further gate needed):** write-back staging moved outside `templates/` to a `suggestions/`
+> directory with its own light CI check (§6, 2.7/2.10); `platform_tiers` seeding mechanics
+> specified — template-only block, consumed at interview time, never loader-merged, deterministic
+> rule for unlisted active platforms (§3.3); per-⭐-template `--plan` smoke driven by dry-run
+> fixture profiles shipped with each ⭐ template (§9 2.4/2.10); Notion view-creation API assumption
+> probed first in 2.5 with an instruct→verify fallback per D17 (§5); `employment_models` vs
+> `employment_type` vocabularies mapped + validator warning on plain contradictions (§3.1, 2.1);
+> `medior` dropped from the band enum — a D21 lexicon title resolving to `mid` (§3.1/§8).
 
 ### 12.2 Build model + per-step effort — Claude Opus 4.8
 
