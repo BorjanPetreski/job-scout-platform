@@ -49,16 +49,26 @@ candidate:
 
 search:
   stream: project-management        # catalog category-slug key
+  # subvariant: backend-java        # NEW (Phase 2): primary subvariant; optional — when omitted the
+  #                                 #   `template:` path carries it. (borjan-pm uses the template path.)
+  # subvariant_secondary: null      # NEW (Phase 2, D15): optional; sets unioned at setup, primary drives comp/tiers
   work_model: [remote]              # enum: remote | hybrid | on_site (multi-select)
   keywords:
     core: [project manager, scrum master, delivery manager, agile delivery lead, program manager]
     expanded: [implementation manager, release manager, proxy product owner, service delivery manager]
   archetypes: [Delivery Manager, Scrum Master, Technical PM, BA-leaning]
   regions_acceptable: [worldwide, emea, europe]     # informative for scoring, not a hard filter
+  # target_seniority:               # NEW (Phase 2, D7): what they want to SEE (distinct from
+  #   bands: [mid]                  #   experience_years). enum intern|junior|mid|senior|staff|principal|lead|manager
+  #   strict: false                 #   false = judgment scoring input; true = hard filter. ("medior" title -> mid, D21)
+  # employment_type:                # NEW (Phase 2, D8): which posting types to surface (hard by default)
+  #   accept: [part_time, contract] #   enum full_time|part_time|contract|b2b|freelance|internship|any ('any' disables)
 
 compensation:                       # full spec in §5
-  floor: { amount: 2500, currency: EUR, basis: net, period: month }
+  floor: { amount: 2500, currency: EUR, basis: net, period: month }   # OPTIONAL as of Phase 2 (D20) —
+                                    #   user-provided or unset; when unset the below-floor first-pass is disabled
   gross_net_ratio: 0.72             # net = gross × ratio (country-dependent; template default, user-tunable)
+  # fte_fraction: 0.5               # NEW (Phase 2, D22): pro-rates a SET floor for part-time targets (0<f<=1)
   assume_unstated: judgment         # unpublished salary → judgment-layer estimation heuristics
 
 hard_filters:                       # typed toggles + values; regex machinery lives in the engine
@@ -103,6 +113,12 @@ schedule:
   runs: [{ at: "08:00", label: AM }, { at: "18:00", label: PM }]
   full_sweep_dow: Mon
   freshness_window_h: 48
+
+# run:                              # NEW (Phase 2, D9/D10): compute/model tier — RECORDED + documented
+#   effort: mid                     #   now, NOT wired to model selection yet (lands with the deferred scheduler).
+#   effort_by_run_type:             #   fast->Haiku, mid->Sonnet, high->Opus; entitlement-shaped.
+#     daily: fast
+#     weekly_deep: high
 ```
 
 ## 3. Option sets the setup flows present
@@ -114,8 +130,13 @@ These enums are the "screens". Each field: options, default source, and who rend
 |-------|-------------------|--------------|
 | Stream | template library list (project-management, software-engineering, …) | — (first question) |
 | Subvariant | template's subvariant list (e.g. frontend → react/angular/vue; generic "software developer") | template |
+| Secondary subvariant | optional; a second subvariant whose keyword/archetype sets are unioned in (D15) | — (offered when CV/goal spans two) |
+| Target seniority | intern/junior/mid/senior/staff/principal/lead/manager (multi) + strict toggle (D7) | template / CV-derived |
+| Employment type | full_time/part_time/contract/b2b/freelance/internship (multi) or `any` to disable (D8) | template / CV-derived |
 | Work model | remote / hybrid / on-site (multi) | template (remote) |
-| Salary floor | amount + currency (EUR/USD/GBP/… ISO list) + basis (gross/net) + period (hour/day/month/year) | template band for the stream |
+| Salary floor | amount + currency (EUR/USD/GBP/… ISO list) + basis (gross/net) + period (hour/day/month/year), **or leave unset** (D20 — judgment-time estimation) | user-provided or unset (no shipped numbers) |
+| FTE fraction | 0 < f ≤ 1; pro-rates a set floor for part-time targets (D22) | 0.5 for part-time targets, else unset |
+| Run effort | fast / mid / high compute tier; optional per-run-type override (D9/D10, recorded not yet wired) | template / unset |
 | Gross↔net ratio | number, with per-country presets table | candidate country |
 | Location & eligibility | city/country/timezone; citizenship; employment models (b2b/full-time/either); visa need | — (asked once) |
 | Timezone window | latest acceptable end-of-day local time | 17:00-equivalent |
@@ -156,6 +177,17 @@ Everything compares in the profile's canonical unit: **floor-currency, gross, pe
 - **Unstated salary:** never a drop; the judgment layer applies the template's estimation
   heuristics (e.g. "US/UK HQ paying globally → likely clears") — heuristics text is
   template data because it is stream-specific.
+- **Floorless (Phase 2, D20):** `compensation.floor` is optional. When unset, the machine
+  below-floor first-pass is **disabled** (`normalize_floor` returns `canonical_gross_month:
+  null`, `assess()` returns `unparseable`) and salary judgment falls **entirely** to the
+  template's `salary_estimation_heuristics` — no shipped per-seniority numbers, never an
+  auto-drop. `gross_net_ratio` is required only when a floor is set (still validated 0.3–1.0
+  when present without one).
+- **Part-time (Phase 2, D22):** when a floor **is** set and the target is part-time, the
+  canonical floor is pro-rated by `fte_fraction` (0 < f ≤ 1; 0.5 default seeded by the
+  templater for part-time only) before comparison — a full-time €3,000/mo floor at 0.5 FTE
+  compares against €1,500. Day/hourly rates still normalize via the period model above. A
+  full-time profile (e.g. `borjan-pm`) leaves `fte_fraction` unset and its floor is unchanged.
 
 ## 6. Template format (`templates/<stream>/<subvariant>.yaml`)
 

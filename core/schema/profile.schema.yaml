@@ -31,6 +31,10 @@ candidate:                              # required
 
 search:                                 # [T] usually template-supplied
   stream: str, required — a catalog categories key (e.g. project-management)
+  subvariant: str, optional (Phase 2, NEW) — primary subvariant (e.g. backend-java); when
+                                          omitted the `template:` path is the subvariant carrier
+  subvariant_secondary: str, optional (Phase 2, D15) — keyword/archetype sets unioned across
+                                          the two at setup; PRIMARY drives comp band + stream tiers
   work_model: [str], required, subset of [remote, hybrid, on_site]
   keywords:
     core: [str], required, non-empty     # local TITLE-MATCH substrings, lowercase-insensitive
@@ -39,14 +43,34 @@ search:                                 # [T] usually template-supplied
   regions_acceptable: [str], optional — informative for scoring, not a hard filter
   platform_slugs: {catalog-slug: str|[str]}, optional — per-platform category overrides
                                           (beats the catalog's stream map; subvariant refinement)
+  target_seniority:                       # optional (Phase 2, D7) — what they want to SEE
+                                          #   (distinct from candidate.experience_years, actual)
+    bands: [str], required-when-present, non-empty — subset of
+           [intern, junior, mid, senior, staff, principal, lead, manager]
+           ("medior" is a lexicon TITLE mapping to `mid` per D21, NOT a band)
+    strict: bool, optional (default false) — false = judgment scoring input; true = hard filter
+  employment_type:                        # optional (Phase 2, D8) — which posting types to surface
+    accept: [str], required-when-present, non-empty — subset of
+            [full_time, part_time, contract, b2b, freelance, internship, any]
+            ('any' present = filter disabled; mutually exclusive with other values)
+                                          # vocab map to candidate.eligibility.employment_models:
+                                          #   b2b≡b2b_contractor, contract=fixed-term (no counterpart),
+                                          #   internship (no counterpart); plain contradictions -> load warning
 
 compensation:                           # [T] floor usually template-suggested, always confirmed
-  floor:
+  floor:                                 # OPTIONAL (Phase 2, D20) — user-provided or unset. When
+                                         #   unset the below-floor first-pass is DISABLED and salary
+                                         #   judgment falls to the template's estimation heuristics.
+                                         #   Sub-keys required-when-floor-present, exactly as before:
     amount: number, required, > 0
     currency: str, required — key of core/defaults.yaml salary.fx_to_eur
     basis: str, required, one of [gross, net]
     period: str, required, one of [hour, day, month, year]
-  gross_net_ratio: number, required, 0.3..1.0 — net = gross x ratio (country approximation)
+  gross_net_ratio: number, required-with-a-floor, 0.3..1.0 — net = gross x ratio (country approx);
+                                          optional when floorless (still validated 0.3..1.0 if set)
+  fte_fraction: number, optional (Phase 2, D22) — 0 < f <= 1; pro-rates a SET floor for part-time
+                                          targets before comparison (default 0.5 seeded by the
+                                          templater for part-time only; full-time leaves it unset)
   published_equivalents: {str: number}, optional — hand-set judgment-layer equivalents, verbatim
   assume_unstated: str, optional, one of [judgment] (default judgment)
 
@@ -91,3 +115,11 @@ schedule:                               # optional for dry_run profiles
   runs: [{at: "HH:MM", label: str}]
   full_sweep_dow: str (default Mon)
   freshness_window_h: int (default 48)
+
+run:                                    # optional (Phase 2, D9/D10) — compute/model tier.
+                                        #   RECORDED + documented in Phase 2, NOT wired to actual
+                                        #   model selection yet (lands with the deferred scheduler).
+  effort: str, optional, one of [fast, mid, high] — maps to a model tier (fast->Haiku,
+          mid->Sonnet, high->Opus); entitlement-shaped (free=low; paid=mid/high/weekly-deep)
+  effort_by_run_type: {run_type: effort}, optional — per-run-type override (design target b),
+          e.g. {daily: fast, weekly_deep: high}; each value one of [fast, mid, high]

@@ -181,9 +181,15 @@ def print_plan(cfg: dict) -> None:
     if det:
         print(f"closed-location-list detector: must_include {det['must_include']}")
     sf = hf["salary_floor"]
-    print(f"salary floor: {sf['floor']['amount']} {sf['floor']['currency']} "
-          f"{sf['floor']['basis']}/{sf['floor']['period']} "
-          f"(canonical ≈{sf['canonical_gross_month']} {sf['currency']} gross/month)")
+    if sf.get("floor"):
+        fte = sf.get("fte_fraction")
+        fte_note = f", pro-rated to {fte} FTE" if fte is not None else ""
+        print(f"salary floor: {sf['floor']['amount']} {sf['floor']['currency']} "
+              f"{sf['floor']['basis']}/{sf['floor']['period']} "
+              f"(canonical ≈{sf['canonical_gross_month']} {sf['currency']} gross/month{fte_note})")
+    else:
+        print("salary floor: none set — below-floor first-pass disabled; "
+              "judgment-layer estimation via template heuristics (D20)")
     active = [p for p in cfg["platforms"] if p.get("active")]
     active.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
     print(f"\nrotation ({len(active)} active platforms, tier order):")
