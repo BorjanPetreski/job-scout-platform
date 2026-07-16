@@ -8,7 +8,8 @@
 > plan of record for the Phase 2 build; where it refines the earlier drafts, it wins, and
 > the build should update those docs to match as it goes.
 >
-> Status: **ready to build** · Created: 2026-07-15 · Brainstorm: Opus 4.8 · Build target: Fable 5
+> Status: **ready to build — 2.0 review gate passed, blocking amendments incorporated** ·
+> Created: 2026-07-15 · Brainstorm: Opus 4.8 · Review gate: Fable 5 (2026-07-16) · Build: Opus 4.8 (§12.2)
 
 ---
 
@@ -116,7 +117,8 @@ Additive and **non-breaking** — `borjan-pm` must still validate (fields defaul
 ```yaml
 search:
   stream: software-engineering         # existing
-  subvariant: backend-java             # existing (primary)
+  subvariant: backend-java             # NEW (primary) — NOT in the Phase 1 schema (today the `template:` path is
+                                       #   the only subvariant carrier); optional, defaults from the template path
   subvariant_secondary: null           # NEW (D15): optional; keyword/archetype sets unioned, primary drives comp+tiers
   work_model: [remote]                 # existing; enum remote|hybrid|on_site (already present)
   target_seniority:                    # NEW (D7)
@@ -126,7 +128,8 @@ search:
     accept: [part_time, contract]      # enum: full_time|part_time|contract|b2b|freelance|internship|any
                                        #   'any' present in list = filter disabled
 compensation:
-  floor: null                          # NEW default (D20): user-provided or unset; no template numbers shipped
+  floor: null                          # CHANGED: floor becomes OPTIONAL (Phase 1 requires it) — user-provided or
+                                       #   unset (D20); sub-keys required-when-present; no template numbers shipped
   fte_fraction: 0.5                    # NEW (D22): pro-rates the floor for part-time targets; default 0.5, tunable
 run:
   effort: mid                          # NEW (D9/D10): fast|mid|high  -> model tier; entitlement-shaped
@@ -140,6 +143,27 @@ run:
 - Validator: unknown enum value = named refusal (spec §1 rule 3). `any` in `employment_type.accept`
   is mutually exclusive with other values (validate and error if mixed).
 - `run.effort*` are recorded + documented in Phase 2; **not wired to actual model selection yet** (D10).
+- **Floorless compensation contract (D20 seam — Phase 1 *requires* a floor).** `compensation.floor`
+  becomes **optional**; when present, its four sub-keys (amount/currency/basis/period) stay required
+  exactly as today. When unset: the below-floor machine first-pass is **disabled** (the compiled
+  `salary_floor` is null; `salary.normalize_floor` and the loader's filter compile handle the absent
+  case), `gross_net_ratio` becomes optional too (still validated 0.3..1.0 when present), and salary
+  judgment falls entirely to the template's `salary_estimation_heuristics` — never an auto-drop.
+  `borjan-pm` sets a floor, so its behavior is bit-identical before and after.
+- **These keys are genuinely NEW, not extensions of existing ones:** `search.subvariant` does not
+  exist in the Phase 1 schema (add it in 2.1 alongside `subvariant_secondary`), and `run:` is a new
+  top-level key (extend the loader's `_TOP_KEYS` + the schema doc together).
+- **Enforcement mapping — recording a field is not enforcing it.** §8's acceptance depends on
+  *behavior*, so the wiring below is explicit build scope (doctrine unchanged: scripts flag,
+  Claude decides):
+  - `compensation.fte_fraction` + optional floor → `core/salary.py` (FTE pro-rating per D22,
+    floorless normalize) + the loader's filter compile + `scan.py`'s first-pass (below-floor check
+    skipped when no floor) — **built in 2.1**.
+  - `employment_type` (hard, D8) → the judgment layer: `skills/job-scout-run/SKILL.md` update;
+    `scan.py` contributes cheap flag annotations only where mechanically detectable — **built in 2.2**.
+  - `target_seniority` (soft/strict, D7) → the judgment layer, reading the §3.3 seniority lexicon;
+    `strict: true` is a judgment-enforced hard drop logged with a named reason — **built in 2.2**.
+  - `run.effort(+by_run_type)` → recorded + documented only, no runtime wiring (D10) — 2.1/2.8.
 
 ### 3.2 Catalog changes (`catalog/platforms.yaml`)
 
@@ -150,6 +174,18 @@ run:
   add **full researched entries** (`fetch_mode`, `url_pattern`, `expired_markers`, `quirks`,
   category slugs) with `status: unverified`. They are **not** placed in any profile's active tiers
   until a live smoke test flips them verified. Research the entries; do not stub.
+- **`status: unverified` mechanics (seam with Phase 1 invariant #14 — get this wrong and `borjan-pm`
+  breaks).** The Phase 1 validator errors on any catalog-`active` platform missing from a profile's
+  tiers/disabled, so a new *active* entry would instantly fail **every existing profile's**
+  validation. Therefore: unverified entries ship **`active: false` + `status: unverified`** (the
+  machine-readable reason it's inactive) — outside tier-coverage, zero edits to existing profiles.
+  The loader gains the optional `status` field with one consistency rule: `status: unverified` ⇒
+  `active` must be false (named validation error otherwise). The live smoke test flips
+  `status: verified` + `active: true` **together**, and only that flip pulls the platform into
+  tier-coverage (profiles then place it via tiers/disabled). Within step 2.3 the loader rule lands
+  **before the first new entry**, so CI stays green at every commit. `categories_verify_at_setup`
+  is unchanged — it remains the per-*slug* marker on already-active boards; `status` is the
+  whole-entry marker for new ones.
 - **Per-stream tiers live in templates, not the catalog** (D3). Keep `tier_default` in the catalog as
   a last-resort fallback only; the authoritative per-stream tier ordering is template data.
 
@@ -268,8 +304,9 @@ setup** there.
 - **Acceptance:** valid non-PM profile produced by the interview; provisioning creates real DBs;
   one live scan completes with a sane ledger and correct catalog URLs/keywords/filters for the stream;
   seniority/employment-type semantics behave (mid roles surface, senior deprioritized-with-note, part-
-  time honored per D8, floor pro-rated by FTE if he set one per D22). Capture lessons into the profile /
-  skill / catalog per the friction-logging culture.
+  time honored per D8, floor pro-rated by FTE if he set one per D22 — these behaviors are **wired in
+  2.1/2.2 per the §3.1 enforcement mapping** and *exercised* here, not built here). Capture lessons
+  into the profile / skill / catalog per the friction-logging culture.
 
 ## 9. Ordered build checklist (seed into PROGRESS.md Phase 2 table)
 
@@ -278,9 +315,9 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 | # | Step | Notes |
 |---|------|-------|
 | 2.0 | **Pre-build review gate (Fable 5)** — one scoped adversarial review of this plan; amend for any blocking findings (D1–D23 intact) before 2.1 | §12.1 |
-| 2.1 | **Schema extensions** — add `target_seniority`, `employment_type`, `subvariant_secondary`, `compensation.fte_fraction`, `run.effort(+by_run_type)` to `profile.schema.yaml` + validator + loader; update PROFILE_CONFIG_SPEC §2/§3. `borjan-pm` still validates. | §3.1, D14–D22 |
-| 2.2 | **Template format v2** — `platform_tiers` + `salary_estimation_heuristics` (text, no numbers) + `seniority_titles` + inheritance/loader; add `core/data/seniority_lexicon.yaml`; update spec §6. | §3.3, D20–D22 |
-| 2.3 | **Catalog expansion** — per-stream slug maps for existing platforms; add new stream-appropriate boards as **full `status: unverified` entries**; per-stream tiers move to templates. | §3.2 |
+| 2.1 | **Schema extensions + mechanical wiring** — add `subvariant` (**NEW** — not in the Phase 1 schema), `subvariant_secondary`, `target_seniority`, `employment_type`, `compensation.fte_fraction`, `run.effort(+by_run_type)` + the new `run:` top-level key to `profile.schema.yaml` + validator + loader; make `compensation.floor` **optional** per the §3.1 floorless contract (below-floor first-pass disabled when unset); `core/salary.py` gains FTE pro-rating + floorless normalize; update PROFILE_CONFIG_SPEC §2/§3. `borjan-pm` still validates **and scans identically**. | §3.1, D14–D22 |
+| 2.2 | **Template format v2 + judgment-layer wiring** — `platform_tiers` + `salary_estimation_heuristics` (text, no numbers) + `seniority_titles` + inheritance/loader; add `core/data/seniority_lexicon.yaml`; update `skills/job-scout-run/SKILL.md` to enforce `target_seniority` (lexicon-driven scoring / `strict` drop) + `employment_type` + floorless salary estimation per the §3.1 enforcement mapping; update spec §6. | §3.1/§3.3, D20–D22 |
+| 2.3 | **Catalog expansion** — loader `status` rule **first** (`unverified` ⇒ `active: false`, outside tier-coverage — existing profiles validate unchanged); then per-stream slug maps for existing platforms; new stream-appropriate boards as **full `active: false` + `status: unverified` entries**; per-stream tiers move to templates. | §3.2 |
 | 2.4 | **Template library** — build the §2 taxonomy: ⭐ tech-core deepest + battle-tested (incl **backend-java**), business/support/content as groundwork marked coverage-pending. | §2 |
 | 2.5 | **`core/provision_notion.py`** — provision + adopt modes, token/parent params, instruct→verify-by-probe, idempotent-via-marker, lazy select patch; **secret-storage seam** (encrypt/store/resolve, env fallback). | §5, D17–D19 |
 | 2.6 | **`skills/job-scout-setup/`** — the templater/interview skill: CV-or-Q&A, primary+secondary subvariant, user-chosen posture, full step sequence. | §4, D14–D16 |
@@ -346,6 +383,21 @@ must not regress) — the review can't judge those from `PHASE_2_PLAN.md` in iso
 Effort: **xhigh** (bounded one-shot, high leverage — worth the depth; `high` is the acceptable floor).
 Address any *blocking* findings by amending the plan (keeping D1–D23 intact) before starting 2.1;
 non-blocking suggestions are optional.
+
+> **Gate outcome (2026-07-16, Fable 5 @ xhigh): RUN — 4 blocking findings, all amended into this
+> revision, D1–D23 untouched.** (1) New catalog boards must ship `active: false` + `status:
+> unverified` with a loader consistency rule — a bare active entry fails every existing profile's
+> tier-coverage validation (§3.2). (2) Enforcement of the new fields was unassigned — now explicit
+> scope in 2.1/2.2 via the §3.1 enforcement mapping. (3) Floorless compensation contract specified
+> (§3.1). (4) `search.subvariant` was mislabeled "existing" — it's NEW, added to the 2.1 field list.
+> **Non-blocking findings** (optional, pick up inside the owning steps; detailed in the gate PR):
+> write-back staging files must live outside `templates/` or be name-excluded from the template CI
+> glob (2.7/2.10); `platform_tiers` seeding mechanics — template-only block, interview-time, never
+> loader-merged, with a rule for unlisted active platforms (2.2/2.6); per-⭐-template `--plan` smoke
+> needs dry-run fixture profiles (2.4/2.10); verify the Notion API can create the saved view early
+> in 2.5, else make it an instruct-step per D17; align/document the `employment_models` vs
+> `employment_type` vocabularies (2.1); drop `medior` from the band enum and map it via the D21
+> lexicon (2.1/2.2).
 
 ### 12.2 Build model + per-step effort — Claude Opus 4.8
 
