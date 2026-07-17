@@ -144,6 +144,40 @@ def start_date_passed(text: str, today: date) -> tuple[bool, str]:
     return False, ""
 
 
+# --- Seniority + employment-type signals (Phase 2, D7/D8). ADDITIVE annotations only —
+# never a machine drop. target_seniority (soft/strict) and employment_type (hard) are
+# ENFORCED by the judgment layer (skills/job-scout-run) reading these; scan.py just
+# contributes the cheap mechanical signal where a posting states it plainly. Both run
+# ONLY when the profile sets the field — a profile that sets neither (e.g. borjan-pm)
+# gets byte-identical candidate records.
+def detect_seniority(title: str, lexicon: dict) -> str | None:
+    """Map a posting TITLE to a band via the resolved lexicon (base + template
+    seniority_titles). Word-boundary, case-insensitive; LONGEST key wins on overlap
+    ('tech lead' beats 'lead'). Title only — the JD is the judgment layer's to read."""
+    t = (title or "").lower()
+    for term in sorted(lexicon, key=len, reverse=True):
+        if re.search(r"\b" + re.escape(term) + r"\b", t):
+            return lexicon[term]
+    return None
+
+
+_EMPLOYMENT_MARKERS = {
+    "part_time": r"\bpart[\s-]?time\b",
+    "full_time": r"\bfull[\s-]?time\b",
+    "contract": r"\b(contract(?:or)?|fixed[\s-]term|temporary|interim)\b",
+    "b2b": r"\bb2b\b",
+    "freelance": r"\bfreelanc\w*\b",
+    "internship": r"\b(intern(?:ship)?|trainee|working student|apprentice)\b",
+}
+
+
+def detect_employment(text: str) -> set[str]:
+    """Employment-type tokens a posting states plainly (title + JD). Conservative —
+    a miss is not 'full-time', it's 'unstated' (the judgment layer decides)."""
+    t = (text or "").lower()
+    return {tok for tok, pat in _EMPLOYMENT_MARKERS.items() if re.search(pat, t)}
+
+
 def hard_filter(cand: dict, hf: dict) -> tuple[str | None, list[str]]:
     """Returns (drop_reason, flags). Drop only on the machine-certain patterns."""
     hay = " ".join(str(cand.get(k) or "") for k in ("title", "loc", "salary", "jd_text"))
@@ -181,9 +215,15 @@ def print_plan(cfg: dict) -> None:
     if det:
         print(f"closed-location-list detector: must_include {det['must_include']}")
     sf = hf["salary_floor"]
-    print(f"salary floor: {sf['floor']['amount']} {sf['floor']['currency']} "
-          f"{sf['floor']['basis']}/{sf['floor']['period']} "
-          f"(canonical ≈{sf['canonical_gross_month']} {sf['currency']} gross/month)")
+    if sf.get("floor"):
+        fte = sf.get("fte_fraction")
+        fte_note = f", pro-rated to {fte} FTE" if fte is not None else ""
+        print(f"salary floor: {sf['floor']['amount']} {sf['floor']['currency']} "
+              f"{sf['floor']['basis']}/{sf['floor']['period']} "
+              f"(canonical ≈{sf['canonical_gross_month']} {sf['currency']} gross/month{fte_note})")
+    else:
+        print("salary floor: none set — below-floor first-pass disabled; "
+              "judgment-layer estimation via template heuristics (D20)")
     active = [p for p in cfg["platforms"] if p.get("active")]
     active.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
     print(f"\nrotation ({len(active)} active platforms, tier order):")
@@ -322,6 +362,11 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     # ADDITIVE flags/notes only — never a machine drop, the judgment layer decides).
     # Runs on FULL jd_text, before it is truncated for the cache below.
     comp_idx = dedup.company_index()
+    search_cfg = cfg.get("profile", {}).get("search", {})
+    target_seniority = search_cfg.get("target_seniority")          # None unless profile sets it
+    employment_type = search_cfg.get("employment_type")           # None unless profile sets it
+    et_accept = set((employment_type or {}).get("accept") or [])
+    seniority_lexicon = cfg.get("seniority_lexicon", {})
     for c in survivors:
         flags = set(c.get("flags") or [])
         if not dedup.norm_company(c.get("company", "")):
@@ -349,6 +394,22 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
                                 and dedup.role_family(r.get("role", "")) == fam]
             if len(applied_variants) >= 2:  # location-agnostic country-clone saturation
                 flags.add("applied_variant_saturation")
+        # Seniority signal (D7) — only when the profile targets bands. seniority_off_target
+        # is a soft flag; the judgment layer deprioritizes (soft) or drops (strict).
+        if target_seniority:
+            band = detect_seniority(c.get("title", ""), seniority_lexicon)
+            if band:
+                c["seniority_detected"] = band
+                if band not in set(target_seniority.get("bands") or []):
+                    flags.add("seniority_off_target")
+        # Employment-type signal (D8) — only when the profile constrains it and 'any' is
+        # not the escape. Off-target = a stated type, none of which is in the accept set.
+        if employment_type and "any" not in et_accept:
+            detected = detect_employment(" ".join(str(c.get(k) or "") for k in ("title", "jd_text")))
+            if detected:
+                c["employment_detected"] = sorted(detected)
+                if not (detected & et_accept):
+                    flags.add("employment_off_target")
         c["flags"] = sorted(flags)
 
     # ---- shortlist liveness sweep (4.0, step 8 — ARCHITECTURE.md §6)

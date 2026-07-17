@@ -107,14 +107,33 @@ def to_canonical(amount: float, currency: str, period: str, basis: str,
 
 
 def normalize_floor(compensation: dict, defaults: dict) -> dict:
-    """Profile floor -> canonical gross/month in the floor's own currency."""
-    fl = compensation["floor"]
+    """Profile floor -> canonical gross/month in the floor's own currency.
+
+    Floorless (D20): when `compensation.floor` is unset, the machine below-floor
+    first-pass is DISABLED — canonical_gross_month is None and assess() returns
+    'unparseable' so salary judgment falls entirely to the template's
+    salary_estimation_heuristics (never an auto-drop).
+
+    Part-time (D22): when `fte_fraction` is present, the canonical floor is pro-rated
+    by that fraction before comparison (a full-time 3000/mo floor at 0.5 FTE compares
+    against 1500). The templater sets fte_fraction ONLY for part-time targets; a
+    full-time profile leaves it unset and its floor is unchanged.
+    """
+    fl = compensation.get("floor")
     ratio = float(compensation.get("gross_net_ratio", 0.75))
+    fte = compensation.get("fte_fraction")
+    fte_f = float(fte) if fte is not None else None
+    if not fl:
+        return {"floor": None, "gross_net_ratio": ratio, "canonical_gross_month": None,
+                "currency": None, "fte_fraction": fte_f,
+                "published_equivalents": compensation.get("published_equivalents", {})}
     canonical = to_canonical(float(fl["amount"]), fl["currency"], fl["period"], fl["basis"],
                              fl["currency"], ratio, defaults)
+    if canonical is not None and fte_f is not None:
+        canonical = canonical * fte_f
     return {"floor": dict(fl), "gross_net_ratio": ratio,
             "canonical_gross_month": round(canonical, 2) if canonical else None,
-            "currency": fl["currency"],
+            "currency": fl["currency"], "fte_fraction": fte_f,
             "published_equivalents": compensation.get("published_equivalents", {})}
 
 

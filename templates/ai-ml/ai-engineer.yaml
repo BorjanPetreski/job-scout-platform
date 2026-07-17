@@ -1,0 +1,81 @@
+# Template: AI Engineer (LLM / GenAI) — ⭐ ai-ml stream. No shipped salary numbers (D20).
+schema_version: 1
+template_id: ai-ml/ai-engineer
+label: "AI Engineer (LLM / GenAI)"
+suggest_also: [ai-ml/ml-engineer, software-engineering/backend-python]
+
+defaults:
+  search:
+    stream: ai-ml
+    subvariant: ai-engineer
+    work_model: [remote]
+    keywords:
+      core:
+        - ai engineer
+        - genai engineer
+        - llm engineer
+        - machine learning engineer
+        - applied ai engineer
+      expanded:
+        - prompt engineer
+        - ml engineer
+        - nlp engineer
+        - ai software engineer
+        - rag engineer
+        - forward deployed engineer
+    archetypes: [AI Engineer, Applied ML, LLM/RAG Engineer, ML Platform, Research-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [pure data analyst, prompt-only no-code]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [AI Engineer, LLM Engineer, Machine Learning Engineer]
+    rejected: []
+
+platform_tiers:                       # ai-ml starting tiers (ai-jobs.net stays out until verified)
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  ml engineer i: junior
+  ml engineer ii: mid
+  research scientist: senior
+  applied scientist: senior
+  staff ml engineer: staff
+  ai lead: lead
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Near-perfect: production LLM/GenAI or applied-ML engineering (RAG,
+    fine-tuning, evals, inference infra), strong SWE fundamentals (Python + one systems
+    language), product ownership; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong: applied AI/ML role, LLM or classical ML primary; globally open;
+    salary likely clears; one minor gap OK. A research PREFERENCE is fine unless the role
+    is pure research with no shipping.
+  - 7.0-7.9 — Worth reviewing: AI/ML-adjacent role (data-science-leaning or platform-
+    leaning) where genAI is one of several duties; salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: AI Engineer · Applied ML · LLM/RAG Engineer · ML Platform ·
+  Research-leaning (flag when the role is research-only with no production path).
+
+salary_estimation_heuristics: |
+  AI/ML pays a premium band vs generic SWE. US/UK/Bay-Area-adjacent company paying globally
+  -> likely clears comfortably; funded AI-native startup -> competitive, often equity-heavy
+  (note cash vs equity split); enterprise "AI" team retrofitted onto a legacy shop -> verify,
+  often mid-band. Seniority + published-model/paper credits -> higher band. Unpublished
+  salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

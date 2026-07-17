@@ -48,6 +48,25 @@ defaults:
       keywords: [React Developer, Frontend Engineer]
     rejected: []                    # earns its own evidence-based list per profile
 
+# Template v2 blocks (Phase 2, §3.3) — TEMPLATE-ONLY, never loader-merged. platform_tiers
+# seeds a NEW profile's tiers at interview time; seniority_titles extends the base lexicon.
+platform_tiers:                        # SE-stream starting tier order for NEW profiles
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:                      # SE-specific title -> base band (extends the lexicon)
+  sde i: junior
+  sde ii: mid
+  sde iii: senior
+  software engineer i: junior
+  software engineer ii: mid
+  software engineer iii: senior
+  staff engineer: staff
+  principal engineer: principal
+  engineering lead: lead
+
 scoring_bands: |
   Score 1.0-10.0, one decimal always. Surface only >= threshold.
   - 9.0-10.0 — Near-perfect: modern React (hooks, SSR/Next.js), TypeScript,

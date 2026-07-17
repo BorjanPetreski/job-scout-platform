@@ -1,0 +1,76 @@
+# Template: Python Backend Engineer (backend subvariant). No salary numbers (D20).
+schema_version: 1
+template_id: software-engineering/backend-python
+label: "Python Backend Engineer"
+suggest_also: [software-engineering/backend-java, software-engineering/backend-node, data/data-engineer, ai-ml/ml-engineer]
+
+defaults:
+  search:
+    stream: software-engineering
+    subvariant: backend-python
+    work_model: [remote]
+    keywords:
+      core:
+        - python developer
+        - python engineer
+        - backend engineer
+        - backend developer
+        - django developer
+      expanded:
+        - fastapi developer
+        - flask developer
+        - software engineer
+        - api developer
+        - platform engineer
+        - django engineer
+    archetypes: [Backend Engineer, Python Specialist, Microservices Engineer, API/Platform Engineer, Data-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [pure data analyst, notebooks only]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Python Developer, Backend Engineer, Django]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:
+  sde ii: mid
+  sde iii: senior
+  staff engineer: staff
+  principal engineer: principal
+  engineering lead: lead
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Core Python backend (Django/FastAPI/Flask, REST/async, SQL, Docker/cloud),
+    product ownership; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong Python backend role, one minor gap OK; globally open; salary likely clears.
+    Data/ML adjacency is fine unless the role is data-science-primary.
+  - 7.0-7.9 — Backend role where Python is one of several accepted stacks; salary unconfirmed;
+    minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Backend Engineer · Python Specialist · Microservices Engineer ·
+  API/Platform Engineer · Data-leaning.
+
+salary_estimation_heuristics: |
+  US/UK/EU product company paying globally -> likely clears a senior-backend floor; agency ->
+  verify. Seniority -> higher band. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

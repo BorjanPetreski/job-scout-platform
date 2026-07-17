@@ -1,0 +1,76 @@
+# Template: Technical Support Engineer — it-support stream GROUNDWORK (catalog coverage
+# pending dogfood). No salary numbers (D20).
+schema_version: 1
+template_id: it-support/technical-support
+label: "Technical Support Engineer"
+suggest_also: [it-support/customer-support, it-support/sysadmin]
+
+defaults:
+  search:
+    stream: it-support
+    subvariant: technical-support
+    work_model: [remote]
+    keywords:
+      core:
+        - technical support engineer
+        - support engineer
+        - customer support engineer
+        - technical support specialist
+        - application support
+      expanded:
+        - it support
+        - helpdesk
+        - support analyst
+        - service desk
+        - product support specialist
+    archetypes: [Technical Support, Customer Support, Helpdesk, SysAdmin-leaning, Support Engineer]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [sales support, non-technical call center]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Technical Support Engineer, Support Engineer, IT Support]
+    rejected: []
+
+platform_tiers:
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
+  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  support engineer i: junior
+  support engineer ii: mid
+  senior support engineer: senior
+  support lead: lead
+  support manager: manager
+  head of support: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold. GROUNDWORK bands.
+  - 9.0-10.0 — Technical support engineering (troubleshooting, logs/APIs, some scripting/SQL),
+    product depth, timezone-compatible coverage, salary confirmed above the floor.
+  - 8.0-8.9 — Strong technical support role, product/tooling fit; salary likely clears.
+  - 7.0-7.9 — Adjacent support role (helpdesk/customer support with a technical bent); salary
+    unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Technical Support · Customer Support · Helpdesk · SysAdmin-leaning ·
+  Support Engineer. Timezone/shift coverage is a common hard requirement — read the JD.
+
+salary_estimation_heuristics: |
+  Technical support at a SaaS product company pays a modest-but-fair band; tiered call-center
+  support sits lower. US/UK product paying globally -> likely clears a mid floor. Shift/on-call
+  premiums vary. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model, hard_filters.timezone_window]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

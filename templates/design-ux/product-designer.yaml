@@ -1,0 +1,79 @@
+# Template: Product Designer (UX/UI) — ⭐ design-ux stream. No shipped salary numbers (D20).
+schema_version: 1
+template_id: design-ux/product-designer
+label: "Product Designer (UX/UI)"
+suggest_also: [design-ux/ux-researcher, design-ux/design-systems]
+
+defaults:
+  search:
+    stream: design-ux
+    subvariant: product-designer
+    work_model: [remote]
+    keywords:
+      core:
+        - product designer
+        - ux designer
+        - ux/ui designer
+        - senior product designer
+        - digital product designer
+      expanded:
+        - ui designer
+        - interaction designer
+        - ux/ui designer
+        - experience designer
+        - design lead
+    archetypes: [Product Designer, UX Designer, UI Designer, Design Systems, Research-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [graphic designer only, marketing designer only]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Product Designer, UX Designer, UI Designer]
+    rejected: []
+
+platform_tiers:                       # design-ux (dribbble/behance stay out until verified)
+  1: [justjoin-it, workable, lever, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  designer i: junior
+  designer ii: mid
+  senior designer: senior
+  staff designer: staff
+  design lead: lead
+  head of design: manager
+  design manager: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Near-perfect: end-to-end product design (discovery -> UX -> UI -> handoff),
+    a design-systems fluency, Figma, product-team embedded, portfolio-forward; globally open;
+    salary confirmed above the floor.
+  - 8.0-8.9 — Strong: product/UX design role, modern tooling, one minor gap OK; globally open;
+    salary likely clears. A visual/brand component is fine unless the role is graphic/marketing-
+    design-primary.
+  - 7.0-7.9 — Worth reviewing: design role blending product + visual; salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Product Designer · UX Designer · UI Designer · Design Systems ·
+  Research-leaning (flag when the role is research-only or graphic-design-only).
+
+salary_estimation_heuristics: |
+  Product design at a funded product company pays a solid mid/senior band; agency/studio work
+  is more variable and often lower. US/UK product paying globally -> likely clears; brand/
+  marketing studio -> verify. Seniority + systems ownership -> higher band. Unpublished salary
+  is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

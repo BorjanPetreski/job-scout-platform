@@ -1,0 +1,57 @@
+# seniority_lexicon.yaml — the base title→band lexicon (Phase 2, D21).
+#
+# Maps common seniority TITLES / synonyms to the canonical bands that
+# `search.target_seniority.bands` uses. Templates EXTEND this per stream via their
+# `seniority_titles:` block (stream/region-specific titles like "SDE II", "staff
+# engineer") — the loader deep-merges base + template into `cfg["seniority_lexicon"]`.
+#
+# Consumed by the judgment layer (skills/job-scout-run) and by scan.py's cheap
+# `seniority_detected` annotation: a posting's stated level is mapped to a band so
+# `target_seniority` can score (soft) or hard-filter (strict, D7). Matching is
+# case-insensitive on WORD BOUNDARIES; the LONGEST matching key wins on overlap
+# ("tech lead" beats "lead"). A miss is never a drop — it's a judgment input.
+#
+# Canonical bands (the ONLY valid target_seniority values):
+#   intern | junior | mid | senior | staff | principal | lead | manager
+# "medior" is a TITLE that resolves to `mid` (D21) — deliberately NOT its own band, so a
+# `[mid]` profile and a user who says "medior" behave identically.
+
+titles:
+  # --- intern / entry-into-industry
+  intern: intern
+  internship: intern
+  trainee: intern
+  working student: intern
+  apprentice: intern
+  # --- junior
+  junior: junior
+  jr: junior
+  graduate: junior
+  entry level: junior
+  entry-level: junior
+  associate: junior
+  # --- mid (incl. European "medior"/"regular" synonyms)
+  mid: mid
+  mid level: mid
+  mid-level: mid
+  midlevel: mid
+  medior: mid
+  intermediate: mid
+  regular: mid
+  # --- senior
+  senior: senior
+  sr: senior
+  # --- staff / principal (individual-contributor high bands, D7 orthogonal-to-role)
+  staff: staff
+  principal: principal
+  distinguished: principal
+  # --- lead
+  lead: lead
+  team lead: lead
+  tech lead: lead
+  technical lead: lead
+  # --- manager (people-management band; head/director resolve here — enum tops at manager)
+  manager: manager
+  head of: manager
+  director: manager
+  vp of engineering: manager

@@ -12,10 +12,17 @@
 # categories: stream -> slug (string or list; a list expands to one URL per slug).
 #   A platform with no slug for a profile's stream is skipped-with-honesty in the
 #   ledger ("no category mapping"), never silently.
-# verify_at_setup: slugs marked true were NOT live-verified yet — the Phase 2 setup
-#   flow (or first interactive run) must confirm them before scheduling.
+# categories_verify_at_setup: [streams] — per-SLUG marker: these streams' slugs were NOT
+#   live-verified yet; the Phase 2 setup flow (or first interactive run) must confirm them
+#   before scheduling. (A per-slug marker on an already-ACTIVE board.)
+# status: verified | unverified — whole-ENTRY marker (Phase 2 §3.2) for boards added as
+#   researched-but-not-yet-smoke-tested. RULE (enforced in profile_loader.load_catalog):
+#   status: unverified ⇒ active MUST be false, so a new board stays OUT of every profile's
+#   tier-coverage (invariant #14) until a live smoke test flips status: verified + active:
+#   true together. Distinct from categories_verify_at_setup (per-slug, on active boards).
 #
 # Numeric ids preserved from job-scout-pm v3 config — they define rotation sort order.
+# New Phase 2 boards continue the id sequence (24+) and ship active: false + unverified.
 
 version: 1
 
@@ -33,6 +40,12 @@ platforms:
     categories:
       project-management: project-management
       software-engineering: programming
+      design-ux: design
+      marketing: sales-and-marketing
+      sales: sales-and-marketing
+      devops-sre-platform: devops-sysadmin
+      it-support: customer-support
+    categories_verify_at_setup: [design-ux, marketing, sales, devops-sre-platform, it-support]
     mirrors: []
     expired_markers: ["This job has been closed", "no longer accepting applications"]
     quirks: >-
@@ -146,7 +159,15 @@ platforms:
     categories:
       project-management: project-management
       software-engineering: development
-    categories_verify_at_setup: [software-engineering]
+      data: data
+      design-ux: design
+      marketing: marketing
+      sales: sales
+      it-support: customer-success
+      content-writing: writing
+      people-hr: human-resources
+      devops-sre-platform: system-administration
+    categories_verify_at_setup: [software-engineering, data, design-ux, marketing, sales, it-support, content-writing, people-hr, devops-sre-platform]
     mirrors: []
     expired_markers: []
     quirks: "Category HTML now JS-rendered (2.10.0 regression) — API only, skip HTML. Verified live 2026-07-11. API is an all-category sample; keyword filter does the scoping."
@@ -163,13 +184,24 @@ platforms:
     categories:
       project-management: project-management
       software-engineering: software-development
-    categories_verify_at_setup: [software-engineering]
+      ai-ml: data-science
+      data: data-science
+      design-ux: design
+      marketing: marketing
+      sales: sales
+      it-support: customer-service
+      content-writing: writing
+      people-hr: human-resources
+    categories_verify_at_setup: [software-engineering, ai-ml, data, design-ux, marketing, sales, it-support, content-writing, people-hr]
     # Fetcher pre-filter phrases per stream (jobs/api returns ALL categories; this keeps
     # a Tier-1-volume platform from flooding the pipeline — the real keyword filter
     # still runs in scan.py):
     prefilter_phrases:
       project-management: ["project management"]
       software-engineering: ["software development", "engineering", "developer"]
+      ai-ml: ["machine learning", "ml engineer", "ai engineer", "data scientist"]
+      data: ["data", "analytics", "data engineer"]
+      design-ux: ["design", "ux", "product designer"]
     mirrors: []
     expired_markers: ["This job posting is no longer available"]
     quirks: >-
@@ -206,6 +238,17 @@ platforms:
     categories:
       project-management: project-management
       software-engineering: software-dev
+      ai-ml: data
+      data: data
+      qa: qa
+      design-ux: design
+      marketing: marketing
+      sales: sales
+      it-support: customer-support
+      content-writing: writing
+      people-hr: human-resources
+      devops-sre-platform: devops
+    categories_verify_at_setup: [ai-ml, data, qa, design-ux, marketing, sales, it-support, content-writing, people-hr, devops-sre-platform]
     mirrors: []
     expired_markers: ["This job listing has expired"]
     quirks: >-
@@ -286,7 +329,14 @@ platforms:
     categories:
       project-management: project-management
       software-engineering: engineering
-    categories_verify_at_setup: [software-engineering]
+      data: data
+      design-ux: design
+      marketing: marketing
+      sales: sales
+      it-support: customer-support
+      content-writing: writing
+      people-hr: human-resources
+    categories_verify_at_setup: [software-engineering, data, design-ux, marketing, sales, it-support, content-writing, people-hr]
     mirrors: []
     expired_markers: ["Job Expired", "career opportunity is no longer available"]
     quirks: >-
@@ -308,9 +358,18 @@ platforms:
     categories:
       project-management: project-manager
       software-engineering: engineer
+      ai-ml: machine-learning
+      data: data
+      design-ux: design
+      marketing: marketing
+      sales: sales
+      it-support: customer-support
+      content-writing: writing
+      devops-sre-platform: devops
+    categories_verify_at_setup: [ai-ml, data, design-ux, marketing, sales, it-support, content-writing, devops-sre-platform]
     mirrors: []
     expired_markers: []
-    quirks: "HTML is JS-rendered; public JSON API exists (all categories; first element is a legal notice)."
+    quirks: "HTML is JS-rendered; public JSON API exists (all categories; first element is a legal notice). Tag-based categories: remote-{category}-jobs is a tag URL — the keyword filter does the real scoping."
     notion_platform_name: { tracker: "Remote OK", passed_seen: "Remote OK" }
 
   - id: 16
@@ -465,6 +524,104 @@ platforms:
       logged to date is a keyword/volume signal, not a fetch problem — low overall
       posting count on this SPA at any given snapshot.
     notion_platform_name: { tracker: "Crossover", passed_seen: "Crossover" }
+
+  # -------------------------------------------------------------------------
+  # Phase 2 stream-appropriate boards (§3.2): researched, NOT yet smoke-tested.
+  # Each ships active: false + status: unverified so it stays OUT of tier-coverage
+  # (invariant #14) until a live smoke test flips status: verified + active: true
+  # together. Do not place these in any profile's tiers until then.
+  - id: 24
+    slug: ai-jobs-net
+    name: ai-jobs.net
+    tier_default: 2
+    active: false
+    status: unverified
+    fetch_mode: direct
+    url_patterns:
+      - "https://ai-jobs.net/"
+    categories:
+      ai-ml: all
+      data: all
+    mirrors: []
+    expired_markers: ["This job is no longer available", "no longer accepting applications"]
+    quirks: >-
+      Researched, NOT smoke-tested. Dedicated AI/ML/data board; one board carries every
+      AI/ML/data function, so the keyword filter scopes. At setup: confirm anonymous
+      enumeration (public JSON or SSR HTML) + real expired markers before activating.
+    notion_platform_name: { tracker: "ai-jobs.net", passed_seen: "ai-jobs.net" }
+
+  - id: 25
+    slug: dribbble
+    name: Dribbble Jobs
+    tier_default: 3
+    active: false
+    status: unverified
+    fetch_mode: headless
+    url_patterns:
+      - "https://dribbble.com/jobs"
+    categories:
+      design-ux: all
+    mirrors: []
+    expired_markers: ["This job is no longer available"]
+    quirks: >-
+      Researched, NOT smoke-tested. Design/creative board (product/visual/UX). JS-rendered
+      SPA — headless likely required; verify the enumeration channel at setup.
+    notion_platform_name: { tracker: "Dribbble", passed_seen: "Dribbble" }
+
+  - id: 26
+    slug: behance
+    name: Behance JobList
+    tier_default: 3
+    active: false
+    status: unverified
+    fetch_mode: headless
+    url_patterns:
+      - "https://www.behance.net/joblist"
+    categories:
+      design-ux: all
+    mirrors: []
+    expired_markers: []
+    quirks: >-
+      Researched, NOT smoke-tested. Adobe Behance creative job list; JS-rendered. Verify
+      enumeration + expired markers at setup.
+    notion_platform_name: { tracker: "Behance", passed_seen: "Behance" }
+
+  - id: 27
+    slug: problogger
+    name: ProBlogger Job Board
+    tier_default: 3
+    active: false
+    status: unverified
+    fetch_mode: direct
+    url_patterns:
+      - "https://problogger.com/jobs/"
+    categories:
+      content-writing: all
+    mirrors: []
+    expired_markers: ["This position has been filled", "no longer available"]
+    quirks: >-
+      Researched, NOT smoke-tested. Writing/blogging/content board; largely SSR HTML.
+      Verify freshness dating + expired markers at setup.
+    notion_platform_name: { tracker: "ProBlogger", passed_seen: "ProBlogger" }
+
+  - id: 28
+    slug: icrunchdata
+    name: icrunchdata
+    tier_default: 3
+    active: false
+    status: unverified
+    fetch_mode: direct
+    url_patterns:
+      - "https://icrunchdata.com/jobs/"
+    categories:
+      data: all
+      ai-ml: all
+    mirrors: []
+    expired_markers: ["This job has expired"]
+    quirks: >-
+      Researched, NOT smoke-tested. Data/analytics/AI niche board. Verify anonymous
+      enumeration + expired markers at setup.
+    notion_platform_name: { tracker: "icrunchdata", passed_seen: "icrunchdata" }
 
 # LinkedIn is NOT a platform entry: it is a discovery tripwire only
 # (core/linkedin_tripwire.py). No login, no cookies, guest endpoint only.

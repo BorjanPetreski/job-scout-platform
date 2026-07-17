@@ -1,0 +1,76 @@
+# Template: Technical Writer — content-writing stream GROUNDWORK (catalog coverage pending
+# dogfood; ProBlogger et al. are the new unverified boards). No salary numbers (D20).
+schema_version: 1
+template_id: content-writing/technical-writer
+label: "Technical Writer"
+suggest_also: [content-writing/content-strategist, content-writing/copywriter]
+
+defaults:
+  search:
+    stream: content-writing
+    subvariant: technical-writer
+    work_model: [remote]
+    keywords:
+      core:
+        - technical writer
+        - documentation engineer
+        - developer documentation
+        - technical content writer
+        - api documentation
+      expanded:
+        - content designer
+        - docs engineer
+        - information developer
+        - developer advocate
+        - content strategist
+    archetypes: [Technical Writer, Docs Engineer, Developer Advocate-leaning, Content Strategist, Copywriter-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [marketing copywriter only, seo content mill]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Technical Writer, Documentation, Developer Docs]
+    rejected: []
+
+platform_tiers:
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
+  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  technical writer i: junior
+  technical writer ii: mid
+  senior technical writer: senior
+  staff technical writer: staff
+  docs lead: lead
+  head of content: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold. GROUNDWORK bands.
+  - 9.0-10.0 — Developer-facing technical writing (API docs, SDKs, docs-as-code, git/markdown),
+    a technical domain, product-team embedded; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong technical writing role, docs-as-code fluency; salary likely clears.
+  - 7.0-7.9 — Adjacent content role (content design / strategy with a technical bent); salary
+    unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Technical Writer · Docs Engineer · Developer Advocate-leaning ·
+  Content Strategist · Copywriter-leaning (flag pure-marketing copy roles).
+
+salary_estimation_heuristics: |
+  Developer-facing technical writing at a product/dev-tools company pays a solid mid/senior band;
+  generalist content mills sit much lower. US/UK product paying globally -> likely clears.
+  Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

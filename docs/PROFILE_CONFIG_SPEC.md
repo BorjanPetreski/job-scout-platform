@@ -49,16 +49,26 @@ candidate:
 
 search:
   stream: project-management        # catalog category-slug key
+  # subvariant: backend-java        # NEW (Phase 2): primary subvariant; optional — when omitted the
+  #                                 #   `template:` path carries it. (borjan-pm uses the template path.)
+  # subvariant_secondary: null      # NEW (Phase 2, D15): optional; sets unioned at setup, primary drives comp/tiers
   work_model: [remote]              # enum: remote | hybrid | on_site (multi-select)
   keywords:
     core: [project manager, scrum master, delivery manager, agile delivery lead, program manager]
     expanded: [implementation manager, release manager, proxy product owner, service delivery manager]
   archetypes: [Delivery Manager, Scrum Master, Technical PM, BA-leaning]
   regions_acceptable: [worldwide, emea, europe]     # informative for scoring, not a hard filter
+  # target_seniority:               # NEW (Phase 2, D7): what they want to SEE (distinct from
+  #   bands: [mid]                  #   experience_years). enum intern|junior|mid|senior|staff|principal|lead|manager
+  #   strict: false                 #   false = judgment scoring input; true = hard filter. ("medior" title -> mid, D21)
+  # employment_type:                # NEW (Phase 2, D8): which posting types to surface (hard by default)
+  #   accept: [part_time, contract] #   enum full_time|part_time|contract|b2b|freelance|internship|any ('any' disables)
 
 compensation:                       # full spec in §5
-  floor: { amount: 2500, currency: EUR, basis: net, period: month }
+  floor: { amount: 2500, currency: EUR, basis: net, period: month }   # OPTIONAL as of Phase 2 (D20) —
+                                    #   user-provided or unset; when unset the below-floor first-pass is disabled
   gross_net_ratio: 0.72             # net = gross × ratio (country-dependent; template default, user-tunable)
+  # fte_fraction: 0.5               # NEW (Phase 2, D22): pro-rates a SET floor for part-time targets (0<f<=1)
   assume_unstated: judgment         # unpublished salary → judgment-layer estimation heuristics
 
 hard_filters:                       # typed toggles + values; regex machinery lives in the engine
@@ -103,6 +113,12 @@ schedule:
   runs: [{ at: "08:00", label: AM }, { at: "18:00", label: PM }]
   full_sweep_dow: Mon
   freshness_window_h: 48
+
+# run:                              # NEW (Phase 2, D9/D10): compute/model tier — RECORDED + documented
+#   effort: mid                     #   now, NOT wired to model selection yet (lands with the deferred scheduler).
+#   effort_by_run_type:             #   fast->Haiku, mid->Sonnet, high->Opus; entitlement-shaped.
+#     daily: fast
+#     weekly_deep: high
 ```
 
 ## 3. Option sets the setup flows present
@@ -114,8 +130,13 @@ These enums are the "screens". Each field: options, default source, and who rend
 |-------|-------------------|--------------|
 | Stream | template library list (project-management, software-engineering, …) | — (first question) |
 | Subvariant | template's subvariant list (e.g. frontend → react/angular/vue; generic "software developer") | template |
+| Secondary subvariant | optional; a second subvariant whose keyword/archetype sets are unioned in (D15) | — (offered when CV/goal spans two) |
+| Target seniority | intern/junior/mid/senior/staff/principal/lead/manager (multi) + strict toggle (D7) | template / CV-derived |
+| Employment type | full_time/part_time/contract/b2b/freelance/internship (multi) or `any` to disable (D8) | template / CV-derived |
 | Work model | remote / hybrid / on-site (multi) | template (remote) |
-| Salary floor | amount + currency (EUR/USD/GBP/… ISO list) + basis (gross/net) + period (hour/day/month/year) | template band for the stream |
+| Salary floor | amount + currency (EUR/USD/GBP/… ISO list) + basis (gross/net) + period (hour/day/month/year), **or leave unset** (D20 — judgment-time estimation) | user-provided or unset (no shipped numbers) |
+| FTE fraction | 0 < f ≤ 1; pro-rates a set floor for part-time targets (D22) | 0.5 for part-time targets, else unset |
+| Run effort | fast / mid / high compute tier; optional per-run-type override (D9/D10, recorded not yet wired) | template / unset |
 | Gross↔net ratio | number, with per-country presets table | candidate country |
 | Location & eligibility | city/country/timezone; citizenship; employment models (b2b/full-time/either); visa need | — (asked once) |
 | Timezone window | latest acceptable end-of-day local time | 17:00-equivalent |
@@ -126,6 +147,7 @@ These enums are the "screens". Each field: options, default source, and who rend
 | Platforms | catalog list with template's relevance marks; tiers seeded from `tier_default` | catalog+template |
 | Schedule | 1×/2× daily times, weekly full-sweep day | 08:00+18:00, Mon |
 | Notion | provision new databases (default) or point at existing IDs | provision |
+| Write-back consent | opt in / out of staging generic (non-PII) template enrichments for curator review (D6, `writeback.consent`) | out (opt-in) |
 
 ## 4. Keyword & category model
 
@@ -156,6 +178,17 @@ Everything compares in the profile's canonical unit: **floor-currency, gross, pe
 - **Unstated salary:** never a drop; the judgment layer applies the template's estimation
   heuristics (e.g. "US/UK HQ paying globally → likely clears") — heuristics text is
   template data because it is stream-specific.
+- **Floorless (Phase 2, D20):** `compensation.floor` is optional. When unset, the machine
+  below-floor first-pass is **disabled** (`normalize_floor` returns `canonical_gross_month:
+  null`, `assess()` returns `unparseable`) and salary judgment falls **entirely** to the
+  template's `salary_estimation_heuristics` — no shipped per-seniority numbers, never an
+  auto-drop. `gross_net_ratio` is required only when a floor is set (still validated 0.3–1.0
+  when present without one).
+- **Part-time (Phase 2, D22):** when a floor **is** set and the target is part-time, the
+  canonical floor is pro-rated by `fte_fraction` (0 < f ≤ 1; 0.5 default seeded by the
+  templater for part-time only) before comparison — a full-time €3,000/mo floor at 0.5 FTE
+  compares against €1,500. Day/hourly rates still normalize via the period model above. A
+  full-time profile (e.g. `borjan-pm`) leaves `fte_fraction` unset and its floor is unchanged.
 
 ## 6. Template format (`templates/<stream>/<subvariant>.yaml`)
 
@@ -184,8 +217,15 @@ defaults:                                    # any subset of profile keys from �
 scoring_bands: |                             # stream-specific band criteria text (the 9/8/7 rubric)
   9.0–10.0: modern React (hooks, SSR/Next), TS, product-team ownership, worldwide/EMEA, salary confirmed…
   …
-salary_estimation_heuristics: |
+salary_estimation_heuristics: |              # TEXT ONLY — no hardcoded per-seniority numbers (D20)
   …
+platform_tiers:                              # v2 (Phase 2, D3/§3.3) — per-stream starting tier order
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel]
+seniority_titles:                            # v2 (Phase 2, D21) — extends core/data/seniority_lexicon.yaml
+  sde ii: mid                                #   stream/region-specific title → base band
+  staff engineer: staff
 interview:                                   # Phase 2 hints
   emphasize: [work_model, compensation.floor, candidate.location]
   skip_if_defaulted: [hard_filters.grind_culture, sweep]
@@ -196,6 +236,21 @@ order; the resolved result must validate as a full profile. The current PM setup
 `templates/project-management/delivery-manager.yaml` — extracted from, and verified
 against, today's `config.yaml` + `SKILL.md` so the first template is battle-tested by
 construction.
+
+**Template v2 blocks (Phase 2).** Beyond `scoring_bands` / `salary_estimation_heuristics`
+/ `interview`, a v2 template may carry:
+- `platform_tiers` (D3/§3.3) — the per-stream tier ordering that **seeds** a new profile's
+  `platforms.tiers`. It is **template-only and never loader-merged**: seeded once at
+  interview time, after which the profile's tiers are per-profile conversion DATA (a later
+  template edit never retiers an existing profile — `borjan-pm`'s live tiers stay put by
+  construction). At seed time, active platforms the block doesn't list are placed
+  deterministically — catalog `tier_default` if they carry a slug for the stream, else
+  `disabled` (recorded, not silent).
+- `seniority_titles` (D21) — stream/region-specific title→band entries that extend the base
+  `core/data/seniority_lexicon.yaml`, deep-merged along the `extends` chain and into the
+  resolved `cfg["seniority_lexicon"]` the judgment layer reads for `target_seniority`.
+- `salary_estimation_heuristics` is **text only** — no shipped per-seniority band numbers
+  (D20); the floor is user-provided or unset (judgment-time estimation from this text).
 
 ## 7. Notion provisioning (Phase 2, `core/provision_notion.py`)
 

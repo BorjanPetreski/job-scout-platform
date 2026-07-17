@@ -1,0 +1,76 @@
+# Template: Fullstack JS/TS Engineer (fullstack subvariant). No salary numbers (D20).
+schema_version: 1
+template_id: software-engineering/fullstack-js
+label: "Fullstack JS/TS Engineer"
+suggest_also: [software-engineering/frontend-react, software-engineering/backend-node]
+
+defaults:
+  search:
+    stream: software-engineering
+    subvariant: fullstack-js
+    work_model: [remote]
+    keywords:
+      core:
+        - fullstack developer
+        - full stack developer
+        - full-stack engineer
+        - fullstack engineer
+        - full stack engineer
+      expanded:
+        - react developer
+        - node developer
+        - typescript engineer
+        - javascript engineer
+        - software engineer
+        - mern developer
+    archetypes: [Fullstack Engineer, Frontend-leaning, Backend-leaning, Node/TS Specialist, Product Engineer]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [wordpress, webflow]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Fullstack Engineer, Full Stack Developer, TypeScript]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:
+  sde ii: mid
+  sde iii: senior
+  staff engineer: staff
+  principal engineer: principal
+  engineering lead: lead
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Genuine fullstack (React/Next + Node/TS, DB, deploy), product-team ownership;
+    globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong fullstack role, JS/TS both ends, one minor gap OK; globally open; salary
+    likely clears.
+  - 7.0-7.9 — Fullstack-labelled role skewed heavily to one end, or extra non-JS stack; salary
+    unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Fullstack Engineer · Frontend-leaning · Backend-leaning ·
+  Node/TS Specialist · Product Engineer.
+
+salary_estimation_heuristics: |
+  US/UK/EU product company paying globally -> likely clears a senior floor; agency/outsourcing ->
+  verify, wide variance. Seniority -> higher band. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

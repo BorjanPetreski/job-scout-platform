@@ -1,0 +1,79 @@
+# Template: Growth Marketer — marketing stream GROUNDWORK (catalog coverage pending
+# dogfood — the best boards for this stream are the new unverified ones). No salary
+# numbers (D20).
+schema_version: 1
+template_id: marketing/growth
+label: "Growth Marketer"
+suggest_also: [marketing/performance-paid, marketing/lifecycle-crm]
+
+defaults:
+  search:
+    stream: marketing
+    subvariant: growth
+    work_model: [remote]
+    keywords:
+      core:
+        - growth marketer
+        - growth manager
+        - growth marketing manager
+        - performance marketing manager
+        - digital marketing manager
+      expanded:
+        - demand generation manager
+        - acquisition manager
+        - lifecycle marketing manager
+        - marketing manager
+        - growth lead
+    archetypes: [Growth Marketer, Performance/Paid, Lifecycle/CRM, Demand Gen, Content-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [sales only, community only]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Growth Marketer, Performance Marketing, Demand Generation]
+    rejected: []
+
+platform_tiers:                       # groundwork: general aggregators only until niche boards verify
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
+  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+
+seniority_titles:
+  marketing manager: mid
+  senior growth marketer: senior
+  growth lead: lead
+  head of growth: manager
+  head of marketing: manager
+  cmo: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold. GROUNDWORK bands — refine after
+  dogfooding this stream.
+  - 9.0-10.0 — Full-funnel growth ownership (acquisition + activation + retention), data-driven
+    (experimentation, analytics), globally open, salary confirmed above the floor.
+  - 8.0-8.9 — Strong growth/performance role, one channel deep + adjacent breadth; globally
+    open; salary likely clears.
+  - 7.0-7.9 — Adjacent marketing role (paid-only or lifecycle-only) with growth scope; salary
+    unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Growth Marketer · Performance/Paid · Lifecycle/CRM · Demand
+  Gen · Content-leaning.
+
+salary_estimation_heuristics: |
+  US/UK product/SaaS paying globally -> likely clears a mid/senior marketing floor; early
+  startup -> variable, often equity-weighted; agency -> verify, often lower. Seniority + owned
+  P&L / budget -> higher band. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

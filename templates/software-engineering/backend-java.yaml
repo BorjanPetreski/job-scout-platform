@@ -1,0 +1,103 @@
+# Template: Java / JVM Backend Engineer (backend subvariant) — ⭐ built deepest, the
+# Phase 2 live-test case (senior Java backend eng, post-break, targeting mid part-time).
+# Partial profile (profile-agnostic keys) + stream-specific judgment text. No shipped
+# salary numbers (D20) — floor is user-provided or unset; heuristics text estimates.
+
+schema_version: 1
+template_id: software-engineering/backend-java
+label: "Java / JVM Backend Engineer"
+suggest_also: [software-engineering/backend-node, software-engineering/backend-python, software-engineering/fullstack-js]
+
+defaults:
+  search:
+    stream: software-engineering
+    subvariant: backend-java
+    work_model: [remote]
+    keywords:
+      # Local TITLE-MATCH substrings (not search queries). Core = always-on; the templater
+      # may reweight/select and add CV-obvious concrete terms (Spring Boot, Kafka), never
+      # invent new filter types (D5).
+      core:
+        - java developer
+        - java engineer
+        - backend engineer          # substring covers senior/lead/staff backend engineer
+        - backend developer
+        - spring developer
+      expanded:
+        - jvm engineer
+        - kotlin developer
+        - microservices engineer
+        - software engineer          # broad; JVM roles often titled generically
+        - api developer
+        - platform engineer
+    archetypes: [Backend Engineer, Java/JVM Specialist, Microservices Engineer, API/Platform Engineer, Fullstack-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []              # backend has no ERP-style lock-in; stream-appropriate empty
+    role_exclusion_terms: [pure qa, sdet, pure data engineer]   # flagged, judgment decides
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Java Developer, Backend Engineer, Spring Boot]
+    rejected: []                      # earns its own evidence-based list per profile
+
+# ---------------------------------------------------------------------------
+# Template v2 blocks (§3.3) — TEMPLATE-ONLY, never loader-merged.
+platform_tiers:                       # SE-stream starting tier order for NEW profiles
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:                     # SE-specific title -> base band (extends the lexicon)
+  sde i: junior
+  sde ii: mid
+  sde iii: senior
+  software engineer i: junior
+  software engineer ii: mid
+  software engineer iii: senior
+  staff engineer: staff
+  principal engineer: principal
+  engineering lead: lead
+  java architect: senior              # "architect" here = senior IC, not people-manager
+
+# ---------------------------------------------------------------------------
+# Stream-specific judgment text — read by the run skill's scoring pass.
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal always (8.6, never 9). Anchor the band, adjust by tenths on
+  how many criteria are met. Surface only >= threshold.
+  - 9.0-10.0 — Near-perfect: core Java/JVM backend (Spring Boot / Spring, microservices,
+    REST/gRPC APIs); modern stack (Kafka/messaging, Postgres/SQL, Docker/K8s, cloud);
+    product-team ownership; Worldwide or region-explicit and open to the candidate; salary
+    confirmed above the (user-set or estimated) floor.
+  - 8.0-8.9 — Strong: senior backend role, Java primary (Kotlin/JVM adjacent OK); globally
+    open; salary likely clears; one minor gap OK (e.g. one unfamiliar datastore). A stated
+    cloud/DevOps PREFERENCE is not a stretch — only dock if platform/infra ops is the core
+    daily duty (that's a devops role, not backend).
+  - 7.0-7.9 — Worth reviewing: backend/fullstack role where Java is one of several accepted
+    languages; salary unconfirmed; minor flag (agency placement) or slight stack stretch.
+  - Below threshold — drop silently (log to seen.jsonl with the real reason).
+  Archetype tag BEFORE scoring: Backend Engineer · Java/JVM Specialist · Microservices
+  Engineer · API/Platform Engineer · Fullstack-leaning (flag when frontend is >~30% of the
+  role). Dual-tag genuine hybrids.
+
+salary_estimation_heuristics: |
+  When salary is unpublished: US/UK/DACH product company paying globally -> likely clears a
+  typical senior-backend floor; funded scale-up -> mid/senior bands usually competitive;
+  staffing agency with a Fortune-500 end client -> "unconfirmed, likely clears"; Eastern-
+  European-focused body shop -> "verify, often below a Western floor." Seniority in title
+  (Senior/Staff/Lead) -> higher band. Part-time/fractional -> expect the pro-rated
+  equivalent, not a full-time number. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:                            # Phase 2 hints
+  emphasize: [search.subvariant, search.target_seniority, search.employment_type, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

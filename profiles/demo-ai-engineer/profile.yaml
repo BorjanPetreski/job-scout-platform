@@ -1,0 +1,36 @@
+# Profile: demo-ai-engineer — DRY-RUN fixture for the ai-engineer ⭐ template (CI --plan smoke).
+schema_version: 1
+id: demo-ai-engineer
+template: ai-ml/ai-engineer
+dry_run: true
+
+candidate:
+  display_name: Demo AI Engineer
+  location: { city: Berlin, country: Germany, timezone: Europe/Berlin }
+  location_match_terms: [Germany, Berlin, EU, European Union]
+  citizenship: [DE]
+  eligibility:
+    employment_models: [full_time, b2b_contractor]
+    needs_visa_sponsorship: false
+  experience_years: 6
+  headline: "AI / LLM Engineer"
+
+search:
+  subvariant: ai-engineer
+  target_seniority: { bands: [senior], strict: false }
+  employment_type: { accept: [full_time, b2b] }
+  regions_acceptable: [worldwide, emea, europe]
+
+platforms:
+  tiers:
+    1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+    3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+        remote-ok, pinpoint, deel, crossover]
+  disabled: [europeremotely, otta]
+  ats_boards: { greenhouse: [], lever: [], workable: [], pinpoint: [] }
+  linkedin_tripwire:
+    locations: [European Union, Worldwide]
+
+output:
+  notion: { dry_run: true }

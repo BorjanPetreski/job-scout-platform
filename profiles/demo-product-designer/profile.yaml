@@ -1,0 +1,34 @@
+# Profile: demo-product-designer — DRY-RUN fixture for the product-designer ⭐ template.
+schema_version: 1
+id: demo-product-designer
+template: design-ux/product-designer
+dry_run: true
+
+candidate:
+  display_name: Demo Product Designer
+  location: { city: Amsterdam, country: Netherlands, timezone: Europe/Amsterdam }
+  location_match_terms: [Netherlands, Amsterdam, EU, European Union]
+  citizenship: [NL]
+  eligibility:
+    employment_models: [full_time, freelance]
+    needs_visa_sponsorship: false
+  experience_years: 6
+
+search:
+  subvariant: product-designer
+  target_seniority: { bands: [senior], strict: false }
+  employment_type: { accept: [full_time, freelance] }
+
+platforms:
+  tiers:
+    1: [justjoin-it, workable, lever, greenhouse, himalayas, remotive]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+    3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+        remote-ok, pinpoint, deel, crossover]
+  disabled: [europeremotely, otta]
+  ats_boards: { greenhouse: [], lever: [], workable: [], pinpoint: [] }
+  linkedin_tripwire:
+    locations: [European Union, Worldwide]
+
+output:
+  notion: { dry_run: true }

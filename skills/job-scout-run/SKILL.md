@@ -10,11 +10,11 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.1.0"
-  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Remaining coordinated steps — schedule re-point + ruleset/CI retirement of the legacy required check."
+  version: "4.3.0"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 2 additive: seniority/employment/floorless judgment wiring + run.effort design-and-defer (borjan-pm behavior unchanged)."
   created_by: Borjan
   organization: 2Coders Studio
-  last_updated: "2026-07-14"
+  last_updated: "2026-07-16"
 ---
 
 # Job Scout — generic run skill (one engine, N profiles)
@@ -96,6 +96,12 @@ optional, none is judged-from-memory. `<id>` = the active profile.
      by role+platform and try to recover the company from the JD).
    - `company_prior` list + `applied_variant_saturation` flag: prior seen/applied reqs
      from the SAME company — see the Country-Clone section.
+   - `seniority_detected` (+ `seniority_off_target` flag): the band the posting's TITLE
+     maps to via the resolved seniority lexicon, set only when the profile targets bands
+     (`search.target_seniority`). Off-target is a SOFT signal — resolve it per D7 below.
+   - `employment_detected` (+ `employment_off_target` flag): employment types the posting
+     states plainly, set only when the profile constrains `search.employment_type` (and
+     `any` isn't the escape). Off-target = a stated type outside the accept set — see D8 below.
 3. **Judgment-layer filter pass (you, on EVERY candidate):** the regexes are a first
    pass only — read each JD against the profile's full filter set (Hard Filters
    section below) plus the profile's `filter_notes`. The Spiralyze lesson (3pm-EST
@@ -187,7 +193,7 @@ the PROFILE's values. In unattended mode, an ambiguous case resolves conservativ
 | **Citizenship** | An explicit citizenship clause the candidate doesn't hold (e.g. EU-citizenship for a non-EU candidate) — distinct from visa sponsorship; B2B status does NOT bypass it (Cyclad lesson, in borjan-pm's filter_notes). |
 | **Travel** | Per `hard_filters.travel` — `none` means "occasional"/"25%"/"as needed" all disqualify. |
 | **Timezone** | Work required after `timezone_window.latest_end_local` in the candidate's timezone. **Snippet-blindness caveat:** working-hours requirements routinely appear ONLY in the full posting — the full JD must be read before shortlisting. |
-| **Salary** | Below the profile's floor (use `salary_assessment` + the template's estimation heuristics for unpublished). Borderline = verify, never auto-drop. |
+| **Salary** | Below the profile's floor (use `salary_assessment` + the template's estimation heuristics for unpublished). Borderline = verify, never auto-drop. **Floorless (D20):** when the profile sets no floor, `salary_assessment` is `unparseable` by design — there is NO machine floor; judge salary ENTIRELY from the posting via the template's `salary_estimation_heuristics`, never an auto-drop. **Part-time (D22):** when a floor IS set for a part-time target it is already pro-rated by `fte_fraction` in `salary_assessment` — compare against the pro-rated figure the script reports. |
 | **Tool lock-in** | `tool_lockin_drop` list as PRIMARY skill. |
 | **Clearance** | Any security clearance / public trust, when `clearance: drop`. |
 | **Role exclusions** | `role_exclusion_terms` describing the role's core (e.g. pure-BA for the PM stream) — flagged by scripts, decided by you. |
@@ -197,6 +203,8 @@ the PROFILE's values. In unattended mode, an ambiguous case resolves conservativ
 | **Regional-payroll mismatch** | Benefits/payroll currency signals a target region that excludes the candidate despite a "worldwide" label (Rapido Solutions lesson: MXN benefits under a worldwide tag). |
 | **Closed location list** | A closed country list under a "remote in <region>" label that does not name any of the profile's `location_match_terms` — drop without further verification (enforced first-pass by the detector). |
 | **Non-English JD / ATS** | `non_english_jd` flag: the JD (and usually the application form) is not in a language the candidate can apply in — a local-hire signal the keyword/location filters miss. On boards where the profile marks it a hard drop (JustJoin.it Polish-only, in borjan-pm's filter_notes), drop; otherwise verify the applicant can actually complete the application. |
+| **Target seniority (D7)** | Only when the profile sets `search.target_seniority`. Map the posting's stated level to a band (the scan's `seniority_detected` is the first pass; read the JD's own wording too via the resolved lexicon incl. the template's `seniority_titles` — "medior"→mid, "SDE II"→mid, etc.). **`strict: false` (default) = SOFT:** in-band = full score; well-ABOVE the target band (e.g. `staff` for a `mid` target) = deprioritize **with a one-line note** ("senior-of-target — likely over-levelled"); below-band = flag, judge. **`strict: true` = HARD:** a confidently out-of-band posting is a drop, logged `Filtered Out (seniority: <detected> not in <bands>)`. `seniority_off_target` is the scan's soft hint — never a mechanical drop on its own. |
+| **Employment type (D8)** | Only when `search.employment_type.accept` is set and does NOT contain `any`. The posting's employment type must be in the accept set. Use `employment_detected` as the first pass, but confirm from the JD (the marker may sit only in the body). A posting whose stated type is confidently outside the accept set is a drop, logged `Filtered Out (employment: <detected> not in <accept>)`. Unstated type is NOT a drop — judge it. Caveat (D8): a hard employment filter thins sparse boards — that's the user's informed choice; `any` is the escape. |
 
 ## Scoring
 
@@ -311,6 +319,27 @@ schedules may coexist; dedup absorbs the overlap.
 
 ---
 
+## Run effort / model tier (design-and-defer — NOT wired yet, D9/D10)
+
+The profile may carry `run.effort` (`fast`|`mid`|`high`) and an optional
+`run.effort_by_run_type` (e.g. `{daily: fast, weekly_deep: high}`). These are **recorded
+and documented in Phase 2 but NOT yet wired to actual model selection** — today every run
+uses whatever model the session/scheduler launched with. Do not change your behavior based
+on `run.effort`; it is forward-declared config.
+
+- **Mapping (design target):** `fast → Haiku`, `mid → Sonnet`, `high → Opus`. Entitlement-
+  shaped: free tier = `fast` + unscheduled; paid tiers unlock `mid`/`high` + a weekly deep
+  sweep + scheduling.
+- **Two-stage judgment (design target):** the capable path splits the judgment pass into a
+  cheap-model **triage** of the raw candidate list (obvious drops / clear-keeps) and a
+  capable-model **deep read** of the shortlist survivors, via subagent delegation at the
+  chosen model. `effort_by_run_type` lets a frequent cheap daily sweep coexist with a
+  capable weekly deep sweep.
+- **Why deferred:** model-at-launch belongs with the scheduler (also deferred, D12) — the
+  scheduler picks the launch model per run type, and/or the judgment step spawns a subagent
+  at the chosen model. Phase 2 ships the schema + this design only; the wiring lands with
+  scheduling. See PHASE_2_PLAN §7 / ARCHITECTURE "Effort / model tier".
+
 ## Application Tracking — the ONLY Tracker write path
 
 When the user says they applied ("applied here", "just applied") in a chat session:
@@ -359,7 +388,9 @@ in the user's Project, not this repo).
   `linkedin_tripwire.py` — fetch, liveness, shortlist sweep, tripwire.
 - `core/dedup.py` / `state_sync.py` — seen-log semantics; git state round-trip.
 - `core/notion_sync.py` — one-way Notion push (+ in-place sweep updates; `--applied`).
-- `core/salary.py` — parsing/normalization behind `salary_assessment`.
+- `core/salary.py` — parsing/normalization behind `salary_assessment` (floorless + FTE pro-rating).
+- `core/data/seniority_lexicon.yaml` — base title→band lexicon (D21), extended per stream by
+  templates' `seniority_titles`; resolved into the config for `target_seniority` judgment.
 - `core/validate.py` — platform-wide validator (CI). `core/migrate_state.py` — legacy
   state migration (cutover step).
 - `profiles/<id>/state/` — seen.jsonl, runs.json, fetch_evidence.jsonl, sweep.json,
@@ -443,6 +474,21 @@ best-effort; isolated blocked fetches are expected and are NOT source-down.
 ---
 
 ## Changelog
+
+**4.3.0** (2026-07-16) — Phase 2 step 2.8: documented the `run.effort` / model-tier mapping
+(fast→Haiku, mid→Sonnet, high→Opus), the two-stage judgment design (cheap triage → capable
+shortlist read via subagent), and the entitlement shape. Design-and-defer (D10): recorded +
+documented only, NOT wired to model selection — that lands with the deferred scheduler. No
+runtime behavior change.
+
+**4.2.0** (2026-07-16) — Phase 2 judgment-layer wiring (step 2.2), additive. New profile
+fields become behavior: `target_seniority` (soft scoring / `strict` hard drop via the
+resolved seniority lexicon — base `core/data/seniority_lexicon.yaml` + template
+`seniority_titles`), `employment_type` (hard accept-set filter with the `any` escape),
+floorless salary judgment (no floor → estimate entirely from the posting via the
+template heuristics) and part-time floor pro-rating by `fte_fraction`. scan.py adds the
+cheap `seniority_detected`/`employment_detected` annotations (both fire ONLY when the
+profile sets the field — a profile that sets neither, e.g. `borjan-pm`, is unchanged).
 
 **4.1.0** (2026-07-14) — post-cutover lessons fed back from the first attended run on the
 new engine. Engine: computed candidate annotations (`non_english_jd` Polish-only-JD

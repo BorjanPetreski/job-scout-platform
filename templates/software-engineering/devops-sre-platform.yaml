@@ -1,0 +1,78 @@
+# Template: DevOps / SRE / Platform Engineer. No salary numbers (D20).
+schema_version: 1
+template_id: software-engineering/devops-sre-platform
+label: "DevOps / SRE / Platform Engineer"
+suggest_also: [software-engineering/backend-python, software-engineering/backend-java]
+
+defaults:
+  search:
+    stream: software-engineering
+    subvariant: devops-sre-platform
+    work_model: [remote]
+    keywords:
+      core:
+        - devops engineer
+        - site reliability engineer
+        - platform engineer
+        - sre
+        - infrastructure engineer
+      expanded:
+        - cloud engineer
+        - kubernetes engineer
+        - devops
+        - systems engineer
+        - build engineer
+        - reliability engineer
+    archetypes: [DevOps Engineer, SRE, Platform Engineer, Cloud Engineer, Backend-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [help desk, desktop support]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [DevOps Engineer, SRE, Platform Engineer]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:
+  devops engineer ii: mid
+  senior sre: senior
+  staff sre: staff
+  principal engineer: principal
+  platform lead: lead
+  head of infrastructure: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Core platform/SRE (K8s, IaC/Terraform, CI/CD, cloud, observability, on-call
+    maturity), product-team embedded; globally open; salary confirmed above the floor.
+  - 8.0-8.9 — Strong DevOps/SRE role, cloud + IaC depth, one minor gap OK; globally open; salary
+    likely clears. Note on-call load explicitly.
+  - 7.0-7.9 — DevOps-labelled role skewed to classic sysadmin, or narrow single-cloud; salary
+    unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: DevOps Engineer · SRE · Platform Engineer · Cloud Engineer ·
+  Backend-leaning. On-call intensity is a grind-culture-adjacent flag — read the JD.
+
+salary_estimation_heuristics: |
+  Platform/SRE pays at or above backend-SWE bands at product companies; classic ops sits lower.
+  US/UK product paying globally -> likely clears; MSP/consultancy -> verify. Seniority + on-call
+  -> higher band. Unpublished salary is NEVER an auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model, hard_filters.grind_culture]
+  skip_if_defaulted: [hard_filters.clearance, sweep]

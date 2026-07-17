@@ -1,0 +1,54 @@
+# Profile: demo-backend-java — DRY-RUN fixture for the backend-java ⭐ template (the
+# demo-fe-react pattern). Drives the 2.10 CI `--plan` smoke so the template executes from
+# day one. NOT provisioned (no Notion, no schedule). Also the shape of the Phase 2 live
+# test persona: senior Java backend eng, post-break, targeting mid part-time — so it
+# exercises target_seniority (D7), employment_type (D8), fte_fraction (D22) and the
+# FLOORLESS path (D20 — no floor set, judgment estimates from the posting).
+
+schema_version: 1
+id: demo-backend-java
+template: software-engineering/backend-java
+dry_run: true
+
+candidate:
+  display_name: Demo Backend Engineer
+  location: { city: Skopje, country: North Macedonia, timezone: Europe/Skopje }
+  location_match_terms: [North Macedonia, Macedonia, Skopje]
+  citizenship: [MK]
+  eligibility:
+    employment_models: [b2b_contractor, part_time]
+    needs_visa_sponsorship: false
+  experience_years: 9               # senior by experience; TARGETING mid (post-break survey)
+  headline: "Senior Java / Spring Boot Backend Engineer"
+  tools: [Java, Spring Boot, Kafka, PostgreSQL, Docker, Kubernetes]
+
+search:
+  subvariant: backend-java
+  target_seniority:
+    bands: [mid]                     # wants to SEE mid roles (post-break, part-time survey)
+    strict: false                    # soft — senior deprioritized-with-note, not dropped
+  employment_type:
+    accept: [part_time, contract]    # hard filter; 'any' would disable it
+  regions_acceptable: [worldwide, emea, europe]
+
+compensation:
+  fte_fraction: 0.5                  # part-time target; pro-rates a floor IF one were set
+  # NB: no floor set (D20) — below-floor first-pass disabled; judgment estimates from the
+  # posting via the template's salary_estimation_heuristics.
+
+platforms:
+  tiers:                             # seeded from the template's SE platform_tiers (all 21 active covered)
+    1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+    3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
+        remote-ok, pinpoint, deel, crossover]
+  disabled: [europeremotely, otta]
+  ats_boards: { greenhouse: [], lever: [], workable: [], pinpoint: [] }
+  linkedin_tripwire:
+    locations: [European Union, Worldwide]
+
+run:
+  effort: mid                        # recorded only (D10) — not wired to model selection yet
+
+output:
+  notion: { dry_run: true }

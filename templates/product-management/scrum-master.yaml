@@ -1,0 +1,76 @@
+# Template: Scrum Master / Agile Coach — product-management stream (agile-delivery-leaning,
+# distinct from delivery-manager). No salary numbers (D20).
+schema_version: 1
+template_id: product-management/scrum-master
+label: "Scrum Master / Agile Coach"
+suggest_also: [product-management/delivery-manager, product-management/technical-pm]
+
+defaults:
+  search:
+    stream: project-management
+    subvariant: scrum-master
+    work_model: [remote]
+    keywords:
+      core:
+        - scrum master
+        - agile coach
+        - agile delivery lead
+        - agile project manager
+        - iteration manager
+      expanded:
+        - delivery manager
+        - agile facilitator
+        - release train engineer
+        - kanban coach
+        - proxy product owner
+    archetypes: [Scrum Master, Agile Coach, Delivery Manager, RTE, Technical PM-leaning]
+
+  hard_filters:
+    travel: none
+    clearance: drop
+    grind_culture: drop
+    tool_lockin_drop: []
+    role_exclusion_terms: [business analyst]
+    closed_location_list: drop_if_absent
+
+  scoring:
+    surface_threshold: 7.0
+
+  platforms:
+    linkedin_tripwire:
+      enabled: true
+      keywords: [Scrum Master, Agile Coach, Agile Delivery Lead]
+    rejected: []
+
+platform_tiers:
+  1: [justjoin-it, remotive, workable, lever, himalayas, greenhouse]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk]
+  3: [wwr, jobgether, dynamite, arc, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:
+  scrum master: mid
+  senior scrum master: senior
+  agile coach: senior
+  release train engineer: senior
+  head of delivery: manager
+
+scoring_bands: |
+  Score 1.0-10.0, one decimal. Surface only >= threshold.
+  - 9.0-10.0 — Genuine Scrum Master / Agile Coach (facilitation, impediment removal, team health,
+    metrics), certified (PSM/CSM), product-team embedded; globally open; salary confirmed above
+    the floor.
+  - 8.0-8.9 — Strong SM/Agile role, clear team scope; globally open; salary likely clears.
+  - 7.0-7.9 — SM-adjacent (delivery lead / agile PM); salary unconfirmed; minor flag.
+  - Below threshold — drop silently (log the real reason).
+  Archetype tag BEFORE scoring: Scrum Master · Agile Coach · Delivery Manager · RTE · Technical
+  PM-leaning. A "Scrum Master" that is really a full project manager is a scope flag — note it.
+
+salary_estimation_heuristics: |
+  SM/Agile comp at a funded product company pays a fair mid/senior band; staffing-agency
+  placements vary. US/UK paying globally -> likely clears. Unpublished salary is NEVER an
+  auto-drop (D20).
+
+interview:
+  emphasize: [search.subvariant, search.target_seniority, compensation.floor, candidate.location, work_model]
+  skip_if_defaulted: [hard_filters.grind_culture, hard_filters.clearance, sweep]

@@ -71,6 +71,27 @@ defaults:
       - { name: Remote.co,            reason: "US/Poland-dominated; one Skopje listing found was dated 2024, not a standing signal" }
 
 # ---------------------------------------------------------------------------
+# Template v2 blocks (Phase 2, §3.3). platform_tiers + seniority_titles are
+# TEMPLATE-ONLY: never loader-merged into the effective config. platform_tiers SEEDS a
+# new profile's platforms.tiers at interview time (2.6); an existing profile's live tiers
+# (per-profile conversion DATA) are never retiered by a later template edit. Unlisted
+# active platforms are placed deterministically by the interview (catalog tier_default if
+# they carry a slug for this stream, else disabled — §3.3).
+
+platform_tiers:                        # PM-stream starting tier order for NEW profiles
+  1: [justjoin-it, remotive, workable, lever, himalayas, greenhouse]
+  2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk]
+  3: [wwr, jobgether, dynamite, arc, working-nomads, wttj, landing-jobs, justremote,
+      remote-ok, pinpoint, deel, crossover]
+
+seniority_titles:                      # PM/region-specific title -> base band (extends the lexicon)
+  head of delivery: manager
+  head of pmo: manager
+  delivery lead: lead
+  agile delivery lead: lead
+  programme manager: mid               # UK spelling of program manager (a role, mid by default)
+
+# ---------------------------------------------------------------------------
 # Stream-specific judgment text — read by the run skill's scoring pass.
 
 scoring_bands: |
