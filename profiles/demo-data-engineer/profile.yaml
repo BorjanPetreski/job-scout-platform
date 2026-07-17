@@ -21,8 +21,8 @@ search:
 
 platforms:
   tiers:
-    1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
-    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+    1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive, ai-jobs-net]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc, icrunchdata]
     3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
         remote-ok, pinpoint, deel, crossover]
   disabled: [europeremotely, otta]

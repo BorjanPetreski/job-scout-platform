@@ -546,8 +546,8 @@ platforms:
     slug: ai-jobs-net
     name: ai-jobs.net
     tier_default: 2
-    active: false
-    status: unverified
+    active: true
+    status: verified
     fetch_mode: direct
     url_patterns:
       - "https://ai-jobs.net/"
@@ -557,18 +557,18 @@ platforms:
     mirrors: []
     expired_markers: ["This job is no longer available", "no longer accepting applications"]
     quirks: >-
-      Researched, NOT smoke-tested. Dedicated AI/ML/data board; one board carries every
-      AI/ML/data function, so the keyword filter scopes. At setup: confirm anonymous
-      enumeration (public JSON or SSR HTML) + real expired markers before activating.
+      SMOKE-TESTED live 2026-07-17: SSR HTML, generic harvester extracts ~50 postings
+      (/job/<slug>-<id>/). Dedicated AI/ML/data board — one board carries every AI/ML/data
+      function, so the keyword filter scopes. Serves ai-ml + data streams only (stream-gated).
     notion_platform_name: { tracker: "ai-jobs.net", passed_seen: "ai-jobs.net" }
 
   - id: 25
     slug: dribbble
     name: Dribbble Jobs
     tier_default: 3
-    active: false
-    status: unverified
-    fetch_mode: headless
+    active: true
+    status: verified
+    fetch_mode: direct
     url_patterns:
       - "https://dribbble.com/jobs"
     categories:
@@ -576,8 +576,8 @@ platforms:
     mirrors: []
     expired_markers: ["This job is no longer available"]
     quirks: >-
-      Researched, NOT smoke-tested. Design/creative board (product/visual/UX). JS-rendered
-      SPA — headless likely required; verify the enumeration channel at setup.
+      SMOKE-TESTED live 2026-07-17: SSR HTML, generic harvester extracts ~48 postings
+      (/jobs/<id>-<Title>). Design/creative board (product/visual/UX). Serves design-ux only.
     notion_platform_name: { tracker: "Dribbble", passed_seen: "Dribbble" }
 
   - id: 26
@@ -594,8 +594,9 @@ platforms:
     mirrors: []
     expired_markers: []
     quirks: >-
-      Researched, NOT smoke-tested. Adobe Behance creative job list; JS-rendered. Verify
-      enumeration + expired markers at setup.
+      SMOKE-TESTED 2026-07-17: returns HTTP 403 to anonymous fetches (bot-blocked) — stays
+      unverified/inactive until a headless or authenticated fetcher is built. Adobe Behance
+      creative job list.
     notion_platform_name: { tracker: "Behance", passed_seen: "Behance" }
 
   - id: 27
@@ -612,16 +613,17 @@ platforms:
     mirrors: []
     expired_markers: ["This position has been filled", "no longer available"]
     quirks: >-
-      Researched, NOT smoke-tested. Writing/blogging/content board; largely SSR HTML.
-      Verify freshness dating + expired markers at setup.
+      SMOKE-TESTED 2026-07-17: WPJobBoard WordPress plugin — postings load via the plugin
+      (anonymous SSR anchors are theme assets, not job links). Stays unverified/inactive
+      until a plugin-aware (AJAX/feed) or headless fetcher is built. Writing/content board.
     notion_platform_name: { tracker: "ProBlogger", passed_seen: "ProBlogger" }
 
   - id: 28
     slug: icrunchdata
     name: icrunchdata
     tier_default: 3
-    active: false
-    status: unverified
+    active: true
+    status: verified
     fetch_mode: direct
     url_patterns:
       - "https://icrunchdata.com/jobs/"
@@ -631,8 +633,8 @@ platforms:
     mirrors: []
     expired_markers: ["This job has expired"]
     quirks: >-
-      Researched, NOT smoke-tested. Data/analytics/AI niche board. Verify anonymous
-      enumeration + expired markers at setup.
+      SMOKE-TESTED live 2026-07-17: SSR HTML, generic harvester extracts postings
+      (/jobs/<slug>). Data/analytics/AI niche board. Serves data + ai-ml streams only.
     notion_platform_name: { tracker: "icrunchdata", passed_seen: "icrunchdata" }
 
 # LinkedIn is NOT a platform entry: it is a discovery tripwire only

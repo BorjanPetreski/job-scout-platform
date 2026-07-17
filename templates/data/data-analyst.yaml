@@ -42,10 +42,10 @@ defaults:
       keywords: [Data Analyst, BI Analyst, Product Analyst]
     rejected: []
 
-platform_tiers:
-  1: [himalayas, remotive, workable, lever, greenhouse]
-  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
-  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+platform_tiers:                       # HONEST coverage: 'data' boards + ATS (ai-jobs.net + icrunchdata verified)
+  1: [ai-jobs-net, himalayas, remotive, workable, lever, greenhouse]
+  2: [remote-ok, wwr, working-nomads, nodesk, icrunchdata]
+  3: [pinpoint]
 
 seniority_titles:
   data analyst i: junior

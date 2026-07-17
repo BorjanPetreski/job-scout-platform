@@ -22,7 +22,7 @@ search:
 platforms:
   tiers:
     1: [justjoin-it, workable, lever, greenhouse, himalayas, remotive]
-    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc]
+    2: [remote-rocketship-worldwide, remote-rocketship-europe, nodesk, wwr, arc, dribbble]
     3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, justremote,
         remote-ok, pinpoint, deel, crossover]
   disabled: [europeremotely, otta]
