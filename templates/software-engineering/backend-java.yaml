@@ -31,6 +31,11 @@ defaults:
         - api developer
         - platform engineer
     archetypes: [Backend Engineer, Java/JVM Specialist, Microservices Engineer, API/Platform Engineer, Fullstack-leaning]
+    # Subvariant catalog refinement (plan §4): JustJoin.it's SE default is the JavaScript
+    # category (id 1); backend-java uses the JAVA category (slug 'java' → id 6) so the API
+    # enumerates Java/Kotlin roles instead of JS, sharpening precision before the title filter.
+    platform_slugs:
+      justjoin-it: java
 
   hard_filters:
     travel: none

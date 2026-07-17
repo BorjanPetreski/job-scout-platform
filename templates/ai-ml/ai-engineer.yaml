@@ -42,10 +42,11 @@ defaults:
       keywords: [AI Engineer, LLM Engineer, Machine Learning Engineer]
     rejected: []
 
-platform_tiers:                       # ai-ml starting tiers (ai-jobs.net stays out until verified)
-  1: [justjoin-it, lever, workable, greenhouse, himalayas, remotive]
-  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
-  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel, crossover]
+platform_tiers:                       # HONEST coverage: boards with an 'ai-ml' slug + ATS
+                                      # (ai-jobs.net/icrunchdata stay catalog-unverified until a smoke test)
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [remote-ok, wwr, working-nomads, nodesk]
+  3: [pinpoint]
 
 seniority_titles:
   ml engineer i: junior

@@ -45,7 +45,9 @@ platforms:
       sales: sales-and-marketing
       devops-sre-platform: devops-sysadmin
       it-support: customer-support
-    categories_verify_at_setup: [design-ux, marketing, sales, devops-sre-platform, it-support]
+      qa: programming              # WWR has no dedicated QA category — QA folds into programming
+      ai-ml: programming           # nor a dedicated AI/ML category — folds into programming
+    categories_verify_at_setup: [design-ux, marketing, sales, devops-sre-platform, it-support, qa, ai-ml]
     mirrors: []
     expired_markers: ["This job has been closed", "no longer accepting applications"]
     quirks: >-
@@ -167,7 +169,9 @@ platforms:
       content-writing: writing
       people-hr: human-resources
       devops-sre-platform: system-administration
-    categories_verify_at_setup: [software-engineering, data, design-ux, marketing, sales, it-support, content-writing, people-hr, devops-sre-platform]
+      qa: development                # QA folds into development on Working Nomads
+      ai-ml: data                    # AI/ML folds into the data category
+    categories_verify_at_setup: [software-engineering, data, design-ux, marketing, sales, it-support, content-writing, people-hr, devops-sre-platform, qa, ai-ml]
     mirrors: []
     expired_markers: []
     quirks: "Category HTML now JS-rendered (2.10.0 regression) — API only, skip HTML. Verified live 2026-07-11. API is an all-category sample; keyword filter does the scoping."
@@ -192,7 +196,8 @@ platforms:
       it-support: customer-service
       content-writing: writing
       people-hr: human-resources
-    categories_verify_at_setup: [software-engineering, ai-ml, data, design-ux, marketing, sales, it-support, content-writing, people-hr]
+      qa: software-development       # QA folds into software-development on Himalayas
+    categories_verify_at_setup: [software-engineering, ai-ml, data, design-ux, marketing, sales, it-support, content-writing, people-hr, qa]
     # Fetcher pre-filter phrases per stream (jobs/api returns ALL categories; this keeps
     # a Tier-1-volume platform from flooding the pipeline — the real keyword filter
     # still runs in scan.py):
@@ -336,7 +341,9 @@ platforms:
       it-support: customer-support
       content-writing: writing
       people-hr: human-resources
-    categories_verify_at_setup: [software-engineering, data, design-ux, marketing, sales, it-support, content-writing, people-hr]
+      qa: engineering                # QA folds into the engineering category on NoDesk
+      ai-ml: data                    # AI/ML folds into the data category
+    categories_verify_at_setup: [software-engineering, data, design-ux, marketing, sales, it-support, content-writing, people-hr, qa, ai-ml]
     mirrors: []
     expired_markers: ["Job Expired", "career opportunity is no longer available"]
     quirks: >-
@@ -366,7 +373,8 @@ platforms:
       it-support: customer-support
       content-writing: writing
       devops-sre-platform: devops
-    categories_verify_at_setup: [ai-ml, data, design-ux, marketing, sales, it-support, content-writing, devops-sre-platform]
+      qa: qa                         # Remote OK is tag-based — the 'qa' tag works directly
+    categories_verify_at_setup: [ai-ml, data, design-ux, marketing, sales, it-support, content-writing, devops-sre-platform, qa]
     mirrors: []
     expired_markers: []
     quirks: "HTML is JS-rendered; public JSON API exists (all categories; first element is a legal notice). Tag-based categories: remote-{category}-jobs is a tag URL — the keyword filter does the real scoping."
@@ -400,10 +408,14 @@ platforms:
     categories:
       project-management: pm
       software-engineering: javascript
-    # Numeric category ids for the offers API. PM=15 verified live 2026-07-11 (831 offers).
+    # Numeric category ids for the offers API, keyed by the resolved category SLUG (so a
+    # subvariant can pick a narrower tech category via search.platform_slugs — plan §4).
+    # Verified live 2026-07-17 by sampling by-cursor: pm=15 (831 offers, 2026-07-11);
+    # javascript=1 (JS/TS/frontend); java=6 ("Senior Java/Kotlin Engineer", "Java Tech Lead").
     category_ids:
-      project-management: "15"
-      software-engineering: "1"
+      pm: "15"
+      javascript: "1"
+      java: "6"
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["Offer expired"]
