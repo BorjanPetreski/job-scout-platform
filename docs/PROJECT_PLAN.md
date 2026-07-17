@@ -212,6 +212,12 @@ v3.x shipped:
 - **Lessons become rules**: generic scan-logic lessons go to the engine skill/docs;
   profile-specific ones to the profile; environment frictions to the changelog. Same
   friction-logging culture as v2.x/v3.x.
+- **Every phase ends with human-readable documentation** (standing rule, adopted at the
+  close of Phase 2): the final step of every phase execution/build plan is updating
+  [PLATFORM_GUIDE.md](PLATFORM_GUIDE.md) — the plain-language account of what was built,
+  why, how it works, and what using it looks like — plus any affected reference docs.
+  A phase is not done until the guide reflects it; seed this step into every future
+  phase checklist (Phase 3+) when the checklist is created.
 
 ## 5. Open questions for Borjan
 
