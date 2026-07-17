@@ -240,20 +240,23 @@ platforms:
       - "https://remotive.com/api/remote-jobs?category={category}"
     url_patterns:
       - "https://remotive.com/remote-jobs/{category}"
+    # All slugs VERIFIED live 2026-07-17 against remotive's /categories endpoint (the API
+    # category param is real). Fixes: software-dev→software-development (was an invalid
+    # category — SE profiles got the unfiltered stub), customer-support→customer-service,
+    # ai-ml→artificial-intelligence (remotive has a dedicated AI category).
     categories:
       project-management: project-management
-      software-engineering: software-dev
-      ai-ml: data
+      software-engineering: software-development
+      ai-ml: artificial-intelligence
       data: data
       qa: qa
       design-ux: design
       marketing: marketing
       sales: sales
-      it-support: customer-support
+      it-support: customer-service
       content-writing: writing
       people-hr: human-resources
       devops-sre-platform: devops
-    categories_verify_at_setup: [ai-ml, data, qa, design-ux, marketing, sales, it-support, content-writing, people-hr, devops-sre-platform]
     mirrors: []
     expired_markers: ["This job listing has expired"]
     quirks: >-
@@ -594,18 +597,20 @@ platforms:
     mirrors: []
     expired_markers: []
     quirks: >-
-      SMOKE-TESTED 2026-07-17: returns HTTP 403 to anonymous fetches (bot-blocked) — stays
-      unverified/inactive until a headless or authenticated fetcher is built. Adobe Behance
-      creative job list.
+      SMOKE-TESTED 2026-07-17 (direct + headless): 403 to anonymous direct fetch; a headless
+      render loads the app shell but the job cards arrive via async XHR that never appears in
+      the rendered HTML — render(url)→html can't capture them (the module deliberately exposes
+      no XHR/scroll/click). Stays unverified/inactive: needs a bespoke API-interception fetcher,
+      which isn't worth it for a niche design board (dribbble + the aggregators cover design-ux).
     notion_platform_name: { tracker: "Behance", passed_seen: "Behance" }
 
   - id: 27
     slug: problogger
     name: ProBlogger Job Board
     tier_default: 3
-    active: false
-    status: unverified
-    fetch_mode: direct
+    active: true
+    status: verified
+    fetch_mode: headless
     url_patterns:
       - "https://problogger.com/jobs/"
     categories:
@@ -613,9 +618,10 @@ platforms:
     mirrors: []
     expired_markers: ["This position has been filled", "no longer available"]
     quirks: >-
-      SMOKE-TESTED 2026-07-17: WPJobBoard WordPress plugin — postings load via the plugin
-      (anonymous SSR anchors are theme assets, not job links). Stays unverified/inactive
-      until a plugin-aware (AJAX/feed) or headless fetcher is built. Writing/content board.
+      SMOKE-TESTED live 2026-07-17: WPJobBoard WordPress plugin — a plain fetch shows only
+      theme assets, but a HEADLESS render surfaces the postings (/jobs/job/<slug>/); the
+      generic harvester then extracts them (~9 live). Writing/content board; serves
+      content-writing only. Needs the headless path (fetch_mode: headless).
     notion_platform_name: { tracker: "ProBlogger", passed_seen: "ProBlogger" }
 
   - id: 28

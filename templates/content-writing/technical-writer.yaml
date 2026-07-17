@@ -42,9 +42,10 @@ defaults:
       keywords: [Technical Writer, Documentation, Developer Docs]
     rejected: []
 
-platform_tiers:                       # HONEST coverage: boards with a 'content-writing' slug + ATS
+platform_tiers:                       # HONEST coverage: 'content-writing' boards + ATS
+                                      # (problogger verified 2026-07-17 via the headless path)
   1: [himalayas, remotive, workable, lever, greenhouse]
-  2: [working-nomads, nodesk, remote-ok]
+  2: [problogger, working-nomads, nodesk, remote-ok]
   3: [pinpoint]
 
 seniority_titles:
