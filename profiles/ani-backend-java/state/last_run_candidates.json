@@ -1,0 +1,2371 @@
+{
+ "generated_at": "2026-07-17T06:59:46+00:00",
+ "profile": "ani-backend-java",
+ "run": "2026-07-17 AM",
+ "half": null,
+ "full_sweep": false,
+ "candidates": [
+  {
+   "title": "AI Software Engineering Teaching Experts",
+   "company": "TripleTen",
+   "loc": "Brazil",
+   "url": "https://himalayas.app/companies/tripleten/jobs/ai-software-engineering-teaching-experts-1477345149",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:35:14+00:00",
+   "salary": null,
+   "jd_text": "Description TripleTen is an online teaching platform that empowers people, regardless of their prior experience, to embark on the exciting and challenging journey of mastering tech professions. Our bootcamps focus on training students in Data Analytics, Data Science, Web Development, Quality Assurance (QA) Engineering, and UX/UI Design — in an accessible and practical way, supporting them until they successfully thrive in a new career. 🚀 Our mission is to ensure that every student has the opportunity to successfully master a new profession, find their purpose, and become a valuable member of the tech industry. What is our goal? We are continuously looking for experienced AI Software Engineering professionals who want to support and guide our students on their path to becoming professional developers. This is a full-time teaching role with an expectation of 40 hours per week . The schedule can be flexible, but you must be consistently available to support students throughout their learning journey. How to apply? Apply here. We review applications on a rolling basis and invite selected candidates to record an introductory video where you answer a few questions, and complete a short technical test task. If a vacancy is available, we will assign it to you right away; otherwise, we will keep your profile and completed task on file for future opportunities. 📌 Please submit your CV in English. What you will do Host regular live Q&amp;A sessions to help students unblock and progress ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/c89bcfeb88cef4c5.txt"
+  },
+  {
+   "title": "Senior Software Engineer, Platform (Full Stack)",
+   "company": "OEC",
+   "loc": "Worldwide",
+   "url": "https://himalayas.app/companies/oec/jobs/senior-software-engineer-platform-full-stack",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:35:12+00:00",
+   "salary": null,
+   "jd_text": "OEC provides software solutions to those who work in the automotive parts and repair industry. Our solutions make it easier for automotive industry professionals to buy and sell parts, conduct repair research &amp; planning, optimize estimates, improve the parts supply chain, and more. OEC partners with many of the world’s largest manufacturers, dealers and suppliers, shops and repairers, and service providers, giving our customers access to a comprehensive network and a streamlined workflow. We’re looking for a Senior Software Engineer to help shape and scale the core platform capabilities that power our products and customer experience. This role is ideal for an engineer who thrives in complex environments, enjoys solving distributed systems challenges, and wants to influence platform architecture, developer experience, and modern engineering practices. You’ll work across authentication, authorization, account management, platform services, and internal tooling while partnering closely with product and engineering teams across the organization. If you enjoy building secure, scalable systems and want to have a direct impact on engineering velocity and platform reliability, we’d love to talk. What You’ll Do Design, build, and evolve authentication and authorization capabilities across the platform. Help shape customer account, subscription management, and core platform services. Create secure, scalable, and reusable platform patterns used across engineering teams. Improve dev",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "jd_cache": "state/jd_cache/f803eb723d387b54.txt"
+  },
+  {
+   "title": "Staff Fullstack Software Engineer, Core Performance",
+   "company": "Dropbox",
+   "loc": "United States",
+   "url": "https://himalayas.app/companies/dropbox/jobs/staff-fullstack-software-engineer-core-performance",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:35:10+00:00",
+   "salary": "248200-335800 USD/annual",
+   "jd_text": "Role Description As a Staff Software Engineer at Dropbox , you'll be the singular technical owner of application performance across the Core org — the part of Dropbox that owns every consumer-facing surface: web, iOS, Android, and desktop. This is one of the company's most visible, cross-cutting technical challenges. Your mandate is to make Dropbox feel fast on every surface our customers use. You'll operate at the intersection of measurement, engineering, and product impact, owning ambiguous problems that span the entire stack and translate directly into business outcomes for hundreds of millions of users. There is no existing performance team at Dropbox — you'll define the discipline. You'll start with the web, profiling our highest-traffic React surfaces, producing flame graphs and heat maps, identifying the most valuable opportunities, and driving fixes through to shipped, measured wins. The web is your initial focus and the surface where you'll be most hands-on. From there, you'll lead the performance initiative across iOS, Android, and desktop by partnering with the internal platform experts who own those clients — coordinating strategy, transferring measurement practices, and driving the work, rather than building everything yourself. You'll also work across the Python and Go backend services that all of these surfaces depend on, since perceived performance rarely lives in one layer. Your influence will extend across Core Engineering. You'll define the measurement stan",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "staff",
+   "jd_cache": "state/jd_cache/198f183070ea2346.txt"
+  },
+  {
+   "title": "Principal Software Engineer",
+   "company": "Zelis",
+   "loc": "United States",
+   "url": "https://himalayas.app/companies/zelis/jobs/principal-software-engineer",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:33:58+00:00",
+   "salary": null,
+   "jd_text": "At Zelis , we Get Stuff Done. So, let’s get to it! A Little About Us Zelis is modernizing the healthcare financial experience across payers, providers, and healthcare consumers. We serve more than 750 payers, including the top five national health plans, regional health plans, TPAs and millions of healthcare providers and consumers across our platform of solutions. Zelis sees across the system to identify, optimize, and solve problems holistically with technology built by healthcare experts – driving real, measurable results for clients. At Zelis , AI is woven into the fabric of how we work. Every associate is expected - and empowered - to partner with AI to challenge the status quo, accelerate innovation, and amplify their impact. This is a place for builders with a growth mindset who act with agility, embrace change, and use modern technology to shape smarter solutions, exceptional experiences, and the future of our industry for our clients, customers, and our culture. A Little About You You bring a unique blend of personality and professional expertise to your work, inspiring others with your passion and dedication. Your career is a testament to your diverse experiences, community involvement, and the valuable lessons you've learned along the way. You are more than just your resume; you are a reflection of your achievements, the knowledge you've gained, and the personal interests that shape who you are. Position Overview We are seeking a Principal Software Engineer to desi",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "principal",
+   "jd_cache": "state/jd_cache/91f9b2fce771861d.txt"
+  },
+  {
+   "title": "Manager, Software Engineer",
+   "company": "Zelis",
+   "loc": "United States",
+   "url": "https://himalayas.app/companies/zelis/jobs/manager-software-engineer",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:33:57+00:00",
+   "salary": null,
+   "jd_text": "At Zelis , we Get Stuff Done. So, let’s get to it! A Little About Us Zelis is modernizing the healthcare financial experience across payers, providers, and healthcare consumers. We serve more than 750 payers, including the top five national health plans, regional health plans, TPAs and millions of healthcare providers and consumers across our platform of solutions. Zelis sees across the system to identify, optimize, and solve problems holistically with technology built by healthcare experts – driving real, measurable results for clients. At Zelis , AI is woven into the fabric of how we work. Every associate is expected - and empowered - to partner with AI to challenge the status quo, accelerate innovation, and amplify their impact. This is a place for builders with a growth mindset who act with agility, embrace change, and use modern technology to shape smarter solutions, exceptional experiences, and the future of our industry for our clients, customers, and our culture. A Little About You You bring a unique blend of personality and professional expertise to your work, inspiring others with your passion and dedication. Your career is a testament to your diverse experiences, community involvement, and the valuable lessons you've learned along the way. You are more than just your resume; you are a reflection of your achievements, the knowledge you've gained, and the personal interests that shape who you are. Position Overview Oversees a small team within the Total Rewards funct",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "manager",
+   "jd_cache": "state/jd_cache/8d1dac0d0bd713ff.txt"
+  },
+  {
+   "title": "Senior Java Backend Engineer",
+   "company": "Sinch",
+   "loc": "Spain",
+   "url": "https://himalayas.app/companies/sinch/jobs/senior-java-backend-engineer",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:33:15+00:00",
+   "salary": null,
+   "jd_text": "About Sinch Sinch is pioneering the way the world communicates. More than 150,000 businesses — including Google, Uber, Paypal, Visa, Tinder, and many others — rely on Sinch ’s Customer Communications Cloud to power engaging customer experiences through mobile messaging, voice, and email. Whether you need to verify users or craft omnichannel campaigns, Sinch makes it easy. Our AI-infused Super Network, APIs, and applications ensure you can connect with your customers reliably and securely, at every step of their journey. At Sinch we “Dream Big”, “Win Together”, “Keep it simple”, and “Make it Happen”. These values are our foundation! Essence of the Role As a Senior Software Engineer, you will play a key role in designing and building the next generation of our Contacts Platform. You will work in a dynamic, collaborative environment to develop scalable distributed systems. Your contributions will directly impact the efficiency, performance, and safety of conversations at scale. What You’ll Do Design, develop, and maintain backend services for Contacts Platform, while contributing to our frontend applications. Build high-performance, scalable, and distributed systems. Work with Java, Spring, Kafka, MongoDB, OpenSearch to enhance our product, ensuring safety, efficiency, and responsiveness. Develop internal tools for monitoring, debugging, and optimizing applications at scale. Ensure observability, reliability, and fault tolerance across all services. Collaborate with cross-functi",
+   "keyword_matched": "backend engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "jd_cache": "state/jd_cache/4d42aa2bd9cba358.txt"
+  },
+  {
+   "title": "Java Engineer",
+   "company": "CoorB",
+   "loc": "United States",
+   "url": "https://himalayas.app/companies/coorb/jobs/java-engineer",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:32:27+00:00",
+   "salary": null,
+   "jd_text": "Category: Banking Location: ABOUT CoorB We build full-fledged innovative solutions with a focus on process automation, user experience enhancement, and advanced data analytics. With our extensive industry expertise, we help achieve operational excellence, future-proof your IT investments, and ensure a competitive edge in the ever-evolving finance industry. OUR OPPORTUNITY As Java Senior Software Engineer, you will be responsible for developing and testing software code and meeting customer needs, based on development rules set by your lead. In a nutshell, you’ll be building and growing in a place where we truly love working, and we think you will too. YOU WILL »Developing, testing and debugging software applications using Java. »Seeking and finding solutions to faced problems. »Participating in almost all software life cycle phases: from analysis, design, implementation and integration testing to quality assurance. »Understanding client requirements, analyzing, implementing new enhancements and fixing bugs. »Providing flexible software design that allows the application of change requests in a short time. »Writing documentation such as: user guides, technical documentation and design documents on Confluence. »Participating in the daily, weekly and monthly meetings. Requirements TO BE SUCCESSFUL IN THE ROLE YOU NEED »Bachelor’s degree in computer science or computer engineer. »2-5 years of experience in Java web development. »Good experience with Java Spring boot framework and",
+   "keyword_matched": "java engineer",
+   "flags": [],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "jd_cache": "state/jd_cache/2bdc8eae3a749fee.txt"
+  },
+  {
+   "title": "Senior Software Engineer (.NET / Azure) - Contract (1099)",
+   "company": "Very LLC",
+   "loc": "United States",
+   "url": "https://himalayas.app/companies/very-llc/jobs/senior-software-engineer-net-azure-contract-1099",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:32:25+00:00",
+   "salary": "166400-166400 USD/annual",
+   "jd_text": "About Very (Remote – USA) Very is a fully distributed technology firm led by expert problem-solvers who create efficient, scalable solutions that move commercial, industrial, and consumer products from pilot to production in record time. We believe that real innovation happens in the grind — working shoulder to shoulder with clients who are building the future. Our team thrives on that energy. When we’re not helping clients deliver business-critical outcomes, we’re refining our craft and celebrating what it means to do hard things well. We’ve built a collaborative, tight-knit culture that thrives in both remote and in-person settings. We’ve won numerous workplace awards over the years, including Great Place to Work certification and recognition from Parity.org as a Best Company for Women to Advance. Our clients include well-known brands like Vizio, Peloton, Clear, iHeart Radio, and Fellowes — all determined to leverage connected devices and AI to drive meaningful impact. Our job is simple: help them win. About This Role As a Senior Level Software Engineer, you’ll play a key role in building and maintaining secure, scalable applications that support critical customer and business needs. You’ll work across the stack — from designing backend services to implementing front-end features while collaborating closely with cross-functional teams. This role is hands-on: you’ll translate requirements into well-designed solutions, write production-ready code, participate in code reviews,",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "contract"
+   ],
+   "jd_cache": "state/jd_cache/0c169f04521970bb.txt"
+  },
+  {
+   "title": "Senior Software Engineer (Python) - Contractor",
+   "company": "Very LLC",
+   "loc": "Colombia",
+   "url": "https://himalayas.app/companies/very-llc/jobs/senior-software-engineer-python-contractor",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:32:22+00:00",
+   "salary": "83200-124800 USD/annual",
+   "jd_text": "About Very (Remote – Colombia) Very is a fully distributed technology firm led by expert problem-solvers who create efficient, scalable solutions that move commercial, industrial, and consumer products from pilot to production in record time. We believe that real innovation happens in the grind — working shoulder to shoulder with clients who are building the future. Our team thrives on that energy. When we’re not helping clients deliver business-critical outcomes, we’re refining our craft and celebrating what it means to do hard things well. We’ve built a collaborative, tight-knit culture that thrives in both remote and in-person settings. We’ve won numerous workplace awards over the years, including Great Place to Work certification and recognition from Parity.org as a Best Company for Women to Advance. Our clients include well-known brands like Vizio, Peloton, Clear, iHeart Radio, and Fellowes — all determined to leverage connected devices and AI to drive meaningful impact. Our job is simple: help them win. About This Role As a Senior Software Engineer, you’ll play a key role in building and maintaining secure, scalable applications that support critical customer and business needs. You’ll work across the stack — from designing backend services to implementing front-end features while collaborating closely with cross-functional teams. This role is hands-on: you’ll translate requirements into well-designed solutions, write production-ready code, participate in code reviews, ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "contract"
+   ],
+   "jd_cache": "state/jd_cache/da30a508718444f3.txt"
+  },
+  {
+   "title": "Principal Platform Engineer",
+   "company": "Point Wild",
+   "loc": "Ukraine",
+   "url": "https://himalayas.app/companies/point-wild/jobs/principal-platform-engineer-1594816528",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-16T20:30:26+00:00",
+   "salary": null,
+   "jd_text": "Point Wild helps customers monitor, manage, and protect against the risks associated with their identities and personal information in a digital world. Backed by WndrCo, Warburg Pincus and General Catalyst, Point Wild is dedicated to creating the world’s most comprehensive portfolio of industry-leading cybersecurity solutions. Our vision is to become THE go-to resource for every cyber protection need individuals may face - today and in the future. Join us for the ride! We’re looking for a Principal Platform Engineer to architect and lead the infrastructure strategy for our next-generation Production ML platform on Google Cloud. In this role, you will be the backbone of our high-performance machine learning workloads, ensuring our systems are elastic, secure, and resilient. You won’t just maintain the status quo; you’ll build the \"paved road\" for our engineers, automating everything from model deployment to complex networking perimeters. We are a high-trust, outcome-focused team that moves quickly to solve some of the most challenging problems in the ML space. Core Responsibilities: Infrastructure Management: Design, deploy, and maintain elastic scaling cloud infrastructure (GCP) and containerization tools like Kubernetes for high-performance ML workloads. CI/CD Pipeline Development and maintenance: Build automated pipelines for training, testing, and deploying machine learning models using tools like Jenkins, GitHub Actions, or Airflow. Model Monitoring &amp; Maintenance: Imp",
+   "keyword_matched": "platform engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "principal",
+   "jd_cache": "state/jd_cache/d0cda38339d241c2.txt"
+  },
+  {
+   "title": "Senior Software Engineer, ITDR - India",
+   "company": "JumpCloud",
+   "loc": "India",
+   "url": "https://himalayas.app/companies/jumpcloud/jobs/senior-software-engineer-itdr-india",
+   "platform": "Himalayas",
+   "posted_at": "2026-07-15T20:34:06+00:00",
+   "salary": null,
+   "jd_text": "All roles at JumpCloud ® are Remote unless otherwise specified in the Job Description. About JumpCloud ® JumpCloud ® is the AI-powered unified IT management platform designed to secure the modern workforce. By consolidating identity, device, and access management, JumpCloud provides intelligent, secure IT that scales from human users to autonomous AI agents. We help organizations around the globe eliminate complexity and turn AI risk into an optimized advantage, ensuring the right people and agents have secure access to the right resources at all times. JumpCloud is Intelligent, Secure IT. Do you enjoy solving challenging problems using the latest technologies within a great team? Is knowing your work will be highly visible and mission critical a key component for the next step in your career? At JumpCloud , we’re looking for best-in-class talent to help define the future of modern identity and device management from the ground up. About the Role: JumpCloud is looking for an experienced Senior Software Engineer (L4) to join our growing Security Engineering organization. As the identity landscape evolves, we are expanding our capabilities in Identity Threat Detection &amp; Response (ITDR ). You will be a key technical leader in building the next generation of our active defense platform—ingesting high-volume risk signals, analyzing threats in real-time, and automating the response to stop attacks. This role sits at the intersection of Distributed Systems, Data Engineering, and",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "from_enumeration",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "jd_cache": "state/jd_cache/e7ee477637a54cad.txt"
+  },
+  {
+   "title": "Lead Software Engineer",
+   "company": "MOTIFE",
+   "loc": "Kraków (hybrid)",
+   "url": "https://justjoin.it/job-offer/motife-lead-software-engineer-krakow-javascript-66c6141b",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T08:00:21.609Z",
+   "salary": "190-210 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Lead Software Engineer 49,97 - 55,23 USD Net per hour - B2B Save Apply JavaScript Lead Software Engineer JavaScript Aleja Pokoju 18D , Kraków MOTIFE B2B Contract B2B Team Leader / Manager Hybrid 49,97 - 55,23 USD Net per hour - B2B Job description We support recruitment for a US-based company that is a provider of mission-critical background screening solutions. They work with Fortune 100 clients helping them manage risk and hire the best talent. This role will provide you with an outstanding opportunity to work for an industry-leading company. With over 4500 employees from 30+ different nationalities, you will be working with a diverse bunch of creatives redefining the world of digital background check and verification services across the globe. As a Lead Software Engineer , you will provide hands-on technical leadership to an international development team based in Kraków. You will balance architecture and coding excellence with mentorship and team development, ensuring high-quality software delivery aligned with business priorities. You will collaborate closely with backend teams, Product Owners, and global stakeholders, influencing architectural decisions, improving engineering practices, and strengthening agile delivery standards. Key takeaways: Stack : Angular, TypeScript, NgRx, NestJS (Node.js), PostgreSQL, Microsoft Azure, Docker, Kubernetes, CI/CD ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "lead",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/25b3fab2d3b71ad5.txt"
+  },
+  {
+   "title": "Senior Frontend Software Engineer",
+   "company": "RTB House",
+   "loc": "Warszawa (remote)",
+   "url": "https://justjoin.it/job-offer/rtb-house-senior-frontend-software-engineer-warszawa-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T08:00:24.292Z",
+   "salary": "220-280 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Senior Frontend Software Engineer 57,86 - 73,64 USD Net per hour - B2B Save Apply JavaScript Senior Frontend Software Engineer JavaScript Puławska 182 , Warszawa RTB House Go to company profile Full-time B2B Senior Remote 57,86 - 73,64 USD Net per hour - B2B Job description We are: RTB House is a global company that provides state-of-the-art marketing technologies for top brands and agencies worldwide. Its proprietary ad-buying engine is the first in the world to be powered entirely by Deep Learning algorithms, enabling advertisers to generate outstanding results and reach their goals at every stage of the funnel. We are looking for engineers to join our Bidding Platform organization which is the core of the RTB business, processing over 20 million requests per second to participate in real-time auctions and display advertisements to customers from 90+ countries. If you want to work on technically complex and demanding solutions, this is the opportunity for you! Our Senior Engineers are experts who combine deep technical expertise with a strong sense of ownership, and they take on Tech Lead roles in complex, cross-team projects. You will: Gain deep understanding our ad technology and become familiar with ad industry standards: OpenRTB, MRAID, VAST etc. Design and lead implementation of high-quality frontend solutions for displaying Ads globally, focusing on",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/089ccd617e52b329.txt"
+  },
+  {
+   "title": "Senior Software Engineer | Asana [31-36k PLN CoE]",
+   "company": "Bee Talents",
+   "loc": "Warszawa (hybrid)",
+   "url": "https://justjoin.it/job-offer/bee-talents-senior-software-engineer-asana-31-36k-pln-coe--warszawa-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T09:00:02.480Z",
+   "salary": "31000-36000 pln (permanent)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Senior Software Engineer | Asana [31-36k PLN CoE] 8 284,34 - 9 620,52 USD Gross per month - Permanent Save Apply JavaScript Senior Software Engineer | Asana [31-36k PLN CoE] JavaScript Marcina Kasprzaka 6 , Warszawa Bee Talents Full-time Permanent Senior Hybrid 3 onsite / 2 remote 8 284,34 - 9 620,52 USD Gross per month - Permanent Job description Who are we? We're Bee Talents, an IT recruitment agency that has been helping clients from all around the world in building their technical teams since 2015. Today, we would like to invite you to participate in the recruitment process for Asana. Asana is a leading work management platform for human + AI collaboration. Over 170,000 customers like Accenture, Amazon, Anthropic, and Suzuki rely on Asana to align teams and accelerate organizational impact. Whether it’s managing strategic initiatives, cross-functional programs, or company-wide goals, Asana helps organizations bring clarity to complexity - turning plans into action with AI working alongside teams every step of the way. The company was founded in 2008, now has around 2,000 employees across 13 offices worldwide, and is scaling rapidly. Warsaw is one of its fastest-growing hubs, currently with ~150 people, with an ambitious goal of becoming Asana’s largest global location in the coming years. They have been named to Fortune's Best Workplaces for 7+ years an",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.lever.co/bee-talents/2e56c161-d21a-4599-b532-f406552f9c97?lever-origin=applied\\u0026lever-source%5B%5D=JustJoinIT",
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/8f6b67c2cba55c5f.txt"
+  },
+  {
+   "title": "Full-stack Software Engineer - Claiming Experience",
+   "company": "AirHelp",
+   "loc": "Kraków (hybrid)",
+   "url": "https://justjoin.it/job-offer/airhelp-full-stack-software-engineer---claiming-experience-krakow-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T10:00:15.367Z",
+   "salary": "15000-25000 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Full-stack Software Engineer - Claiming Experience 3 944,77 - 6 574,62 USD Net per month - B2B 3 681,79 - 5 259,70 USD Gross per month - Permanent Save Apply JavaScript Full-stack Software Engineer - Claiming Experience JavaScript al. 3 Maja 9 , Kraków +1 Location AirHelp Full-time B2B, Permanent Mid Hybrid 3 944,77 - 6 574,62 USD Net per month - B2B 3 681,79 - 5 259,70 USD Gross per month - Permanent Job description AirHelp is a global travel tech company on a mission to make every journey smoother. We built our name helping millions of travellers claim the flight compensation they're owed - and that's now the foundation of a broader platform of travel protection and convenience products spanning the entire journey. We are looking for a product-minded Full-stack Software Engineer to join our Claiming Experience team, responsible for the journey that helps travellers start, complete, and submit their claims with confidence. It's one of the highest-leverage surfaces in the company. What happens here moves submission rates, traveller trust, and the cost and speed of everything that happens downstream - legal, documents, operations, comms. Small wins compound. The claiming journey is a real product problem that happens to span frontend, backend, experimentation, document and signature flows, legal requirements, partner integrations, and production reliability.",
+   "keyword_matched": "software engineer",
+   "flags": [],
+   "source_url": "https://apply.workable.com/airhelp/j/E5C81460E4/?utm_source=[JJIT]\\u0026utm_medium=[paidjobboard]",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/22fa24e68fa876d0.txt"
+  },
+  {
+   "title": "Senior Backend Engineer, Content Creation",
+   "company": "Box",
+   "loc": "Warszawa (hybrid)",
+   "url": "https://justjoin.it/job-offer/box-senior-backend-engineer-content-creation-warszawa-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T12:00:10.171Z",
+   "salary": null,
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Senior Backend Engineer, Content Creation Save Apply JavaScript Senior Backend Engineer, Content Creation JavaScript Chmielna 69 , Warszawa Box Full-time Permanent Senior Hybrid Job description What is Box? Box (NYSE:BOX) is the leader in Intelligent Content Management. Our platform enables organizations to fuel collaboration, manage the entire content lifecycle, secure critical content, and transform business workflows with enterprise AI. We help companies thrive in the new AI-first era of business. Founded in 2005, Box simplifies work for leading global organizations, including JLL, Morgan Stanley, and Nationwide. Box is headquartered in Redwood City, CA, with offices across the United States, Europe, and Asia. By joining Box, you will have the unique opportunity to continue driving our platform forward. Content powers how we work. It’s the billions of files and information flowing across teams, departments, and key business processes every single day: contracts, invoices, employee records, financials, product specs, marketing assets, and more. Our mission is to bring intelligence to the world of content management and empower our customers to completely transform workflows across their organizations. With the combination of AI and enterprise content, the opportunity has never been greater to transform how the world works together and at Box you will be o",
+   "keyword_matched": "backend engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/c1d9d674fe37aae4.txt"
+  },
+  {
+   "title": "Senior Software Engineer",
+   "company": "Harvey Nash Technology",
+   "loc": "Warszawa (office)",
+   "url": "https://justjoin.it/job-offer/harvey-nash-technology-senior-software-engineer-warszawa-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T12:00:16.131Z",
+   "salary": "150-175 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Senior Software Engineer 39,45 - 46,02 USD Net per hour - B2B Save Apply JavaScript Senior Software Engineer JavaScript Warsaw , Warszawa Harvey Nash Technology Go to company profile B2B Contract B2B Team Leader / Manager Office 39,45 - 46,02 USD Net per hour - B2B Job description Location: Warsaw, on site Contract Type: B2B 6 months initial contract Rate: up to 220zl/hour What you’ll do: Build and scale cloud-native applications using TypeScript and React Design serverless solutions (AWS) and modern REST APIs Own infrastructure using Terraform / CloudFormation Drive CI/CD and automated deployments Work closely with stakeholders to turn requirements into scalable solutions What you bring: Substantial experience in software engineering (8+ years pref.) Strong TypeScript + React experience Hands-on with AWS (incl. serverless) Experience with CI/CD, APIs, and cloud architecture Solid database knowledge (SQL + NoSQL) Strong communication skills Nice to know: Commercial mindset and focus on business impact Experience in cross-functional teams Exposure to modern, scalable cloud environments If you want to build high-impact, cloud-first solutions in a fast-moving environment, let’s connect. Tech stack English C1 TypeScript advanced React advanced CI/CD regular REST API regular Amazon AWS regular Office location About the company Harvey Nash Technology Harvey Nash ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/354a6c0440b9ee53.txt"
+  },
+  {
+   "title": "Lead Software Engineer",
+   "company": "MOTIFE",
+   "loc": "Kraków (hybrid)",
+   "url": "https://justjoin.it/job-offer/motife-lead-software-engineer-krakow-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T13:00:19.543Z",
+   "salary": "190-210 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Lead Software Engineer 49,97 - 55,23 USD Net per hour - B2B Save Apply JavaScript Lead Software Engineer JavaScript Aleja Pokoju 18D , Kraków MOTIFE B2B Contract B2B Team Leader / Manager Hybrid 49,97 - 55,23 USD Net per hour - B2B Job description We support recruitment for a US-based company that is a provider of mission-critical background screening solutions. They work with Fortune 100 clients helping them manage risk and hire the best talent. This role will provide you with an outstanding opportunity to work for an industry-leading company. With over 4500 employees from 30+ different nationalities, you will be working with a diverse bunch of creatives redefining the world of digital background check and verification services across the globe. As a Lead Software Engineer , you will provide hands-on technical leadership to an international development team based in Kraków. You will balance architecture and coding excellence with mentorship and team development, ensuring high-quality software delivery aligned with business priorities. You will collaborate closely with backend teams, Product Owners, and global stakeholders, influencing architectural decisions, improving engineering practices, and strengthening agile delivery standards. Key takeaways: Stack : Angular, TypeScript, NgRx, NestJS (Node.js), PostgreSQL, Microsoft Azure, Docker, Kubernetes, CI/CD ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "lead",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/b02845773fac4ea4.txt"
+  },
+  {
+   "title": "Senior Software Engineer - Frontend",
+   "company": "Egnyte Poland",
+   "loc": "Poznań (hybrid)",
+   "url": "https://justjoin.it/job-offer/egnyte-poland-senior-software-engineer---frontend-poznan-javascript-13c39a6e",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T14:00:22.090Z",
+   "salary": null,
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Senior Software Engineer - Frontend Save Apply JavaScript Senior Software Engineer - Frontend JavaScript Baraniaka 6 , Poznań Egnyte Poland Full-time B2B Senior Hybrid 3 onsite / 2 remote Job description ABOUT EGNYTE Egnyte is the secure multi-cloud platform for content security and governance that enables organizations to better protect and collaborate on their most valuable content. Established in 2008, Egnyte has democratized cloud content security for more than 22,000 organizations, helping customers improve data security, maintain compliance, prevent and detect ransomware threats, and boost employee productivity on any app, any cloud, anywhere. For more information, visit www.egnyte.com . Our CFS teams are working on core features and components that are used by many services/clients. Team is building the main application that is being used by all our customers. WHAT YOU’LL DO: Developing system components throughout the whole product lifecycle. Building a scalable and maintainable product used by over 350 thousand users every day Cooperating closely with UX designers, product owners, QA engineers, and backend developers to deliver top user experience in the app Influencing the development strategy and technologies of a global product deployed on hundreds of servers around the world Supporting other team members to help them fulfill their potential Lea",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/3da8bfba5924058b.txt"
+  },
+  {
+   "title": "Fullstack Java Developer (React / Angular) (F/M)",
+   "company": "B2Bnetwork",
+   "loc": "Warszawa (remote)",
+   "url": "https://justjoin.it/job-offer/b2bnetwork-fullstack-java-developer-react-angular-f-m--warszawa-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T15:00:06.772Z",
+   "salary": "100-160 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Fullstack Java Developer (React / Angular) (F/M) 26,30 - 42,08 USD Net per hour - B2B Save Apply JavaScript Fullstack Java Developer (React / Angular) (F/M) JavaScript - , Warszawa B2Bnetwork Go to company profile Full-time B2B Mid Remote 26,30 - 42,08 USD Net per hour - B2B Job description O projekcie Poszukujemy Fullstack Java Developera do realizacji projektów dla sektora bankowego i finansowego. Osoba na tym stanowisku będzie odpowiedzialna za rozwój nowoczesnych aplikacji webowych, zarówno po stronie backendu, jak i frontendu, współpracując z zespołami projektowymi w środowisku Agile. Jeżeli lubisz pracę z technologiami Java oraz nowoczesnymi frameworkami frontendowymi i chcesz rozwijać rozwiązania wykorzystywane przez tysiące użytkowników – ta oferta jest dla Ciebie. Twój zakres obowiązków Projektowanie, rozwój i utrzymanie aplikacji webowych w architekturze Fullstack Tworzenie i rozwijanie usług REST API Implementacja nowych funkcjonalności po stronie backendu oraz frontendu Integracja systemów i współpraca z innymi zespołami projektowymi Udział w analizie wymagań biznesowych i technicznych Tworzenie testów jednostkowych oraz dbanie o wysoką jakość kodu Udział w code review oraz procesie ciągłego doskonalenia rozwiązań Współpraca w zespołach Agile/Scrum Nasze wymagania Minimum 3–4 lata doświadczenia komercyjnego na stanowisku Fullstack Developera Bar",
+   "keyword_matched": "java developer",
+   "flags": [
+    "employment_off_target",
+    "non_english_jd"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "language_note": "JD appears predominantly Polish (Polish-only JD/ATS form)",
+   "employment_detected": [
+    "b2b",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/805c23c4640765a3.txt"
+  },
+  {
+   "title": "Software Engineer",
+   "company": "AgileEngine",
+   "loc": "Kraków (remote)",
+   "url": "https://justjoin.it/job-offer/agileengine-software-engineer-krakow-javascript-09ef7f7c",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-15T16:00:06.740Z",
+   "salary": "5599-7410 usd (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Software Engineer 5 599 - 7 410 USD Net per month - B2B Save Apply JavaScript Software Engineer JavaScript Olszańska St, 7 , Kraków +4 Locations AgileEngine Go to company profile Full-time B2B Senior Remote 5 599 - 7 410 USD Net per month - B2B Job description ID73490 AgileEngine is an Inc. 5000 company that creates award-winning software for Fortune 500 brands and trailblazing startups across 17+ industries. We rank among the leaders in areas like application development and AI/ML, and our people-first culture has earned us multiple Best Place to Work awards. Why join us If you're looking for a place to grow, make an impact, and work with people who care, we'd love to meet you! :) About the role We are looking for a Senior React Native Engineer to build and ship cross-platform mobile apps using React Native and Expo while developing web applications in ReactJS and APIs in Node.js for a franchisee engineering team. You will own the engineering lifecycle for your features — architecture, implementation, testing, CI/CD, and production monitoring — writing clean TypeScript and actively using AI tools including Claude and GitHub Copilot as a development accelerator. The role follows Agile practices in a collaborative, product-centric engineering environment. What you will do Build and ship cross-platform mobile apps using React Native and Expo (iOS and Android)",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/6ee55a8012ce1def.txt"
+  },
+  {
+   "title": "Fullstack Software Engineer (react/next.js + .net)",
+   "company": "Just Join IT",
+   "loc": "Warszawa (hybrid)",
+   "url": "https://justjoin.it/job-offer/just-join-it-fullstack-software-engineer-react-next-js-net--warszawa-javascript-4af6d0f6",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T09:00:22.914Z",
+   "salary": "10500-14500 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Fullstack Software Engineer (react/next.js + .net) 2 761,34 - 3 813,28 USD Net per month - B2B 2 761,34 - 3 813,28 USD Gross per month - Mandate Save Apply JavaScript Fullstack Software Engineer (react/next.js + .net) JavaScript Marszałkowska 107 , Warszawa +1 Location Just Join IT Go to company profile Full-time B2B, Mandate Mid Hybrid 2 761,34 - 3 813,28 USD Net per month - B2B 2 761,34 - 3 813,28 USD Gross per month - Mandate Job description Obserwujemy dziś jeden z najbardziej dynamicznych momentów na rynku pracy od lat. Procesy rekrutacyjne zmieniają się szybciej niż kiedykolwiek wcześniej, a technologia, automatyzacja i AI realnie wpływają na sposób, w jaki ludzie szukają pracy, a firmy rekrutują i weryfikują kompetencje. Dlatego budujemy produkty, które zmieniają oblicze rekrutacji i realnie pomagają ludziom znaleźć lepszą pracę. Jesteśmy jednym z największych graczy HR tech w Polsce. Od blisko 10 lat rozwijamy justjoin.it , lidera rynku IT (~0,5 mln użytkowników miesięcznie), rocketjobs.pl , jeden z największych horyzontalnych portali pracy w kraju (~1 mln MAU), oraz Rocket App , mobilnego asystenta kariery opartego o AI. Eksperymentujemy, testujemy i szybko wdrażamy nowe rozwiązania. AI wykorzystujemy zarówno w rozwoju produktów, jak i codziennej pracy zespołów. Działamy bez zbędnej biurokracji, stawiając na dużą samodzielność i odpowiedzialność. 💻",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "non_english_jd"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "language_note": "JD appears predominantly Polish (Polish-only JD/ATS form)",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/054cfd0df22ab02a.txt"
+  },
+  {
+   "title": "Software Security Backend Engineer (Node.js and/or Python)",
+   "company": "Antal Sp. z o.o.",
+   "loc": "Kraków (hybrid)",
+   "url": "https://justjoin.it/job-offer/antal-sp-z-o-o--software-security-backend-engineer-node-js-and-or-python--krakow-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T09:00:24.667Z",
+   "salary": "33500-42000 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Software Security Backend Engineer (Node.js and/or Python) 8 809,99 - 11 045,36 USD Net per month - B2B Save Apply JavaScript Software Security Backend Engineer (Node.js and/or Python) JavaScript Kraków , Kraków Antal Sp. z o.o. Full-time B2B Senior Hybrid 8 809,99 - 11 045,36 USD Net per month - B2B Job description 📍 Location: Kraków (hybrid: 2 days in the office per week) 📄 B2B: 200 - 250 PLN / h 🏦 Industry: Banking We are currently looking for a Senior Software Security Engineer (Node.js and/or Python) to join a strategic global banking initiative focused on building modern, secure and scalable backend platforms within the cybersecurity domain. The role combines hands-on software engineering, cloud-native architecture and security engineering, with strong ownership of production-grade services and engineering excellence. You will work within international cross-functional teams responsible for developing next-generation security products and services, contributing to the migration from vendor-based platforms toward open-source and cloud-native solutions deployed at enterprise scale. Key responsibilities: Design, develop and maintain secure, scalable backend services using Python, Node.js and cloud-native technologies. Build and optimize distributed systems running on Google Cloud Platform and Kubernetes environments. Develop high-quality production code ",
+   "keyword_matched": "backend engineer",
+   "flags": [],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/5500bfe7588d8424.txt"
+  },
+  {
+   "title": "Senior Backend Engineer (Poland, Remote)",
+   "company": "First Connect Insurance",
+   "loc": "Gdańsk (remote)",
+   "url": "https://justjoin.it/job-offer/first-connect-insurance-senior-backend-engineer-poland-remote--gdansk-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T10:00:03.755Z",
+   "salary": "26000-31000 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Senior Backend Engineer (Poland, Remote) 6 837,61 - 8 152,53 USD Net per month - B2B Save Apply JavaScript Senior Backend Engineer (Poland, Remote) JavaScript . , Gdańsk +4 Locations First Connect Insurance Full-time B2B Senior Remote 6 837,61 - 8 152,53 USD Net per month - B2B Job description About First Connect: First Connect Insurance Services is a digital marketplace providing independent insurance agents access to top US carriers and the optionality necessary to grow their businesses. Agents can work with 150+ carriers, selling various insurance policies, including home, auto, small business, and more. We’re on a mission to overhaul the technology agents have access to, putting consumer-grade software at their fingertips. We’ve got thousands of active agents with hundreds joining monthly, and we plan to accelerate our growth. Role Overview: The focus of our team is our flagship product – the Carrier Store. This is the first touchpoint for independent agents on our platform, designed to make discovering and accessing insurance carriers seamless and highly personalized. We don’t believe in blind matching; our platform handles detailed vetting forms, and uses smart recommendation algorithms to connect them with the right partners. As a Senior Backend Engineer in this role, you will own the vetting, and access automation. This is a heavy, core backend doma",
+   "keyword_matched": "backend engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "freelance",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/1a8d581ac0259856.txt"
+  },
+  {
+   "title": "Java Developer",
+   "company": "Connectis",
+   "loc": "Warszawa (hybrid)",
+   "url": "https://justjoin.it/job-offer/connectis-java-developer-warszawa-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T14:00:12.373Z",
+   "salary": "23000-27000 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Java Developer 6 121,42 - 7 186,01 USD Net per month - B2B Save Apply JavaScript Java Developer JavaScript Warszawa , Warszawa Connectis Full-time B2B Mid Hybrid 6 121,42 - 7 186,01 USD Net per month - B2B Job description Wspólnie z naszym Partnerem, liderem w branży bankowej, poszukujemy doświadczonej osoby na stanowisko Java Developer. Projekt dotyczy rozwoju i optymalizacji modułu ubezpieczeń w ramach platformy bankowości internetowej dużej instytucji finansowej z sektora bankowego. Głównym celem projektu jest usprawnienie procesów sprzedaży, obsługi i zarządzania produktami ubezpieczeniowymi oferowanymi klientom indywidualnym i firmowym za pośrednictwem kanałów cyfrowych. 💡 TWOJA ROLA: Pisanie i optymalizacja zapytań SQL (Oracle, PostgreSQL) oraz tworzenie migracji baz danych (Liquibase). Integracja komponentów systemu przez REST API oraz komunikację asynchroniczną (Kafka). Projektowanie i rozwój nowych funkcjonalności w obszarze produktów ubezpieczeniowych. Diagnozowanie i usuwanie błędów oraz optymalizacja wydajności aplikacji. Pisanie testów jednostkowych i integracyjnych (JUnit, Mockito). Współpraca z zespołem programistycznym w metodyce Scrum. Integracja z zewnętrznymi systemami przez SOAP/XML. Zapewnienie jakości kodu poprzez code review. 🔍 CZEGO OCZEKUJEMY OD CIEBIE? Minimum 6 lat doświadczenia jako Java Developer. Znajomość Spring Framework ( Sp",
+   "keyword_matched": "java developer",
+   "flags": [
+    "non_english_jd"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "language_note": "JD appears predominantly Polish (Polish-only JD/ATS form)",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/eac2b34335e0e781.txt"
+  },
+  {
+   "title": "Software Engineer",
+   "company": "AgileEngine",
+   "loc": "Kraków (remote)",
+   "url": "https://justjoin.it/job-offer/agileengine-software-engineer-krakow-javascript-ad73af24",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T15:00:13.051Z",
+   "salary": "5600-7400 usd (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Software Engineer 5 600 - 7 400 USD Net per month - B2B Save Apply JavaScript Software Engineer JavaScript Olszańska St, 7 , Kraków +4 Locations AgileEngine Go to company profile Full-time B2B Senior Remote 5 600 - 7 400 USD Net per month - B2B Job description ID72455 AgileEngine is an Inc. 5000 company that creates award-winning software for Fortune 500 brands and trailblazing startups across 17+ industries. We rank among the leaders in areas like application development and AI/ML, and our people-first culture has earned us multiple Best Place to Work awards. Why join us If you're looking for a place to grow, make an impact, and work with people who care, we'd love to meet you! :) About the role We are looking for a Senior Backend Engineer to design and build scalable middleware services powering digital ordering, payments, loyalty, and third-party integrations across a major consumer platform. You will develop serverless applications using AWS Lambda and API Gateway, build Node.js/TypeScript microservices, design event-driven architectures with SQS/SNS, and implement infrastructure as code with Terraform. The role includes active use of AI-assisted development tools as a core part of the daily engineering workflow. What you will do Develop serverless applications using AWS Lambda and API Gateway; Build and maintain Node.js/TypeScript microservices; Design",
+   "keyword_matched": "software engineer",
+   "flags": [],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/7b623ca06e3a20e7.txt"
+  },
+  {
+   "title": "Backend Developer - part time/full time",
+   "company": "Pirxey",
+   "loc": "Gdańsk (remote)",
+   "url": "https://justjoin.it/job-offer/pirxey-backend-developer---part-time-full-time-gdansk-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T15:00:14.069Z",
+   "salary": "9000-15000 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Backend Developer - part time/full time 2 366,86 - 3 944,77 USD Net per month - B2B Save Apply JavaScript Backend Developer - part time/full time JavaScript - , Gdańsk Pirxey Freelance B2B Mid Remote 2 366,86 - 3 944,77 USD Net per month - B2B Job description Pirxey Kim jesteśmy i co robimy? Jesteśmy grupą ponad 100 doświadczonych programistów z 5-10-letnim stażem w tworzeniu oprogramowania 🚀🧑‍💻. Kierujemy się zdrowym rozsądkiem, robimy rzeczy z sensem i twardo stąpamy po ziemi. Budujemy dobrze dobrane zespoły, które oferują sobie ciągle wsparcie, a dzięki wysokiej jakości naszej pracy z łatwością pozyskujemy nowych klientów. Pracujemy zdalnie. Przede wszystkim z szybko rozwijającymi się, ambitnymi markami z zagranicy - USA, Izrael i inne kraje. Dołączając do zespołu, zyskasz możliwość pracy nad wieloma projektami z różnych branż i domen. Nie jesteśmy tylko Software House’em – pełnimy także rolę partnera i doradcy w procesie budowy produktu. Dzięki naszemu biznesowemu know-how wiemy, jak tworzyć rozwiązania, które odnoszą sukces, i dzielimy się tą wiedzą z klientami. Pracujemy w krótkich, dynamicznych iteracjach , aby na bieżąco weryfikować założenia biznesowe. Na każdym etapie projektu komunikujemy się proaktywnie , dbając o pełną przejrzystość współpracy. Wyróżnia nas make sense policy: kierujemy się zdrowym rozsądkiem robiąc rzeczy, które przynoszą realn",
+   "keyword_matched": "backend developer",
+   "flags": [
+    "non_english_jd"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "language_note": "JD appears predominantly Polish (Polish-only JD/ATS form)",
+   "employment_detected": [
+    "b2b",
+    "freelance",
+    "full_time",
+    "part_time"
+   ],
+   "jd_cache": "state/jd_cache/1e149086bf70593a.txt"
+  },
+  {
+   "title": "Java Senior Software Engineer",
+   "company": "emagine Polska",
+   "loc": "Bengaluru (office)",
+   "url": "https://justjoin.it/job-offer/emagine-polska-java-senior-software-engineer-bengaluru-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T17:10:27.070Z",
+   "salary": null,
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Java Senior Software Engineer Save Apply JavaScript Java Senior Software Engineer JavaScript Centrum , Bengaluru emagine Polska Full-time Any Senior Office Job description Summary: The Java Senior Software Engineer is tasked with transforming software requirements into functional source code while significantly contributing to application systems analysis and programming. The primary goal of this role is to ensure high-performance enterprise-level API development aligned with business needs and customer experience. Responsibilities: Responsible for understanding software requirements and developing them into a working source code. Contribute to application systems analysis and programming activities. Take ownership of applications, demonstrating critical thinking in design and clear communication. Deliver and support scalable, high-performance enterprise-level APIs. Implement enterprise systems while maintaining a focus on quality and customer satisfaction. Collaborate with business stakeholders, project managers, business analysts, and IT teams to gather business needs and requirements. Work within an Agile environment alongside software engineers and enterprise architects. Lead the entire development cycle, conducting design and code reviews, with influence throughout the process from requirements to deployment. Create technical system specifications, ens",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/76ecacd549831b4c.txt"
+  },
+  {
+   "title": "Principal Backend Engineer",
+   "company": "PEOPLE MORE P.S.A.",
+   "loc": "Kraków (remote)",
+   "url": "https://justjoin.it/job-offer/people-more-p-s-a--principal-backend-engineer-krakow-javascript",
+   "platform": "JustJoin.it",
+   "posted_at": "2026-07-16T18:00:04.060Z",
+   "salary": "140-190 pln (b2b)",
+   "jd_text": "Show menu Hide menu Offers Salaries Calculator Companies Geek Favorites History Viewed Saved Matched Chats More Currency Principal Backend Engineer 36,82 - 49,97 USD Net per hour - B2B Save Apply JavaScript Principal Backend Engineer JavaScript . , Kraków +4 Locations PEOPLE MORE P.S.A. B2B Contract B2B Senior Remote 36,82 - 49,97 USD Net per hour - B2B Job description Hello, We are called People More because we treat our employees with respect, but also because the projects we work on are for people and should be easy and pleasant to use. We are technological, but we look at the bigger picture :) The company is made up of people with a huge client base in the country and abroad, for whom we build projects from scratch (UX, UI, frontend, backend, mobile) or in part. We work directly for our clients and also support our partners in their own solutions. This ensures a wide range of projects and the ability to change! We work with clients all over the world. For the project that we are working on with our partner, we are looking for Principal Backend Engineer (Node.js / AI / LLM). Your duties will include: Designing and evolving backend architecture for a scalable product Developing and maintaining backend services using Node.js, TypeScript and NestJS Driving technical and architectural decisions across the platform Building event-driven systems and asynchronous processing workflows Ensuring security, reliability, observability, and maintainability of services Supporting integra",
+   "keyword_matched": "backend engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "principal",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time"
+   ],
+   "jd_cache": "state/jd_cache/42fa10a7e431e67a.txt"
+  },
+  {
+   "title": "Senior Software Engineer - Cloud Partner Integrations",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a57a78eac00a71a5a923de0-senior-software-engineer---cloud-partner-integrations",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer - Cloud Partner Integrations â¢ 1 day ago ClickHouse â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs united states Senior Software Engineer - Cloud Partner Integrations Role overview Qualifications 5+ years building software, with experience on data-heavy or integration-flavored systems Solid backend and systems instincts Experience with modern auth protocols and identity federation Comfortable in ambiguity and shipping before specs are finalized Responsibilities Own end-to-end integration design, code, and production system Own the architecture including auth flows, multi-tenancy, and data movement Run the built solutions, managing infrastructure, CI, and deployment Partner closely with internal teams and document team's direction Key facts Remote from: Sweden , Canada , United States , EMEA Full time Senior (5-10 years) Software Engineer 208 - 238K yearly English Hard skills Back End (Software Engineering) Data Integration Systems Architecture Federated Identity Management JScript TypeScript CI/CD Observability Software As A Service (SaaS) Multidimensional Database Other skills Communication Teamwork Problem Solving Time Management Less More About the company ClickHouse Data Analytics & Business Intelligence ClickHouse is an open-source, column-oriented OLAP database management system that allows users to generate anal",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://job-boards.greenhouse.io/clickhouse/jobs/6115277004?utm_source=Jobgether&#38;utm_content=6a57a78eac00a71a5a923de0-senior-software-engineer---cloud-partner-integrations&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a57a78eac00a71a5a923de0&#34;,&#34;companyId&#34;:&#34;63d29af15426adfb28ac0601&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/59ba6c221ea4cdb6.txt"
+  },
+  {
+   "title": "Senior Full Stack Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69e6388dc646310ee394c450-senior-full-stack-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Full Stack Software Engineer â¢ 30+ days ago FÅ«kÅ« â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Full Stack Software Engineer Role overview Qualifications 5-10 years of relevant experience Proficiency in TypeScript (end-to-end) Strong experience with Python Experience with Node.js or Nest.js Responsibilities Serve as a technical individual contributor with no people management responsibilities Own end-to-end development of the core web platform, covering both frontend and backend Design and implement scalable, secure, and maintainable system architecture Collaborate directly with the CEO and closely with AI/ML and MLOps teams Key facts Remote from: Malaysia , Anywhere Full time Senior (5-10 years) Software Engineer English Hard skills Node.js (Javascript Library) TypeScript Python (Programming Language) Full Stack Development Google Cloud Platform (GCP) Production Code Systems Architecture AWS Cloud Services JavaScript Frameworks Azure Cloud Services Scalability Security Implementation Application Programming Interface (API) Custom Attributes PostgreSQL JavaScript Libraries Docker (Software) Regulatory Compliance Prism Zope (CMS) Docker (Software) Hl7 V2 Architectural Design Other skills Teamwork Communication Less More About the company FÅ«kÅ« Computer Software / SaaS Unknown See less See more Company details Industry Computer ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://apply.workable.com/j/7FB49B3E54?utm_source=Jobgether&#38;utm_content=69e6388dc646310ee394c450-senior-full-stack-software-engineer&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;69e6388dc646310ee394c450&#34;,&#34;companyId&#34;:&#34;681bba972c8e37af1e1eec7c&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/f7f0f41f3eff1337.txt"
+  },
+  {
+   "title": "Senior Software Engineer - Payments & Treasury",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a55048cac00a71a5a8c2107-senior-software-engineer---payments-treasury",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer - Payments & Treasury â¢ 4 days ago Alpaca â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer - Payments & Treasury Role overview Qualifications At least 3 years of experience working on systems at scale Proven experience in building and maintaining microservices Strong coding skills, preferably in Go Experience with client facing APIs Responsibilities Help build and scale the systems and services that form the foundation of Alpaca Build and maintain a modern global payments and treasury platform Design and implement solutions to achieve defined goals Participate in defining those goals Key facts Remote from: North America , EMEA Full time Senior (5-10 years) Software Engineer 2 - 2K yearly English Hard skills Microservices Domain Driven Design Event-Driven Programming Kubernetes Google Cloud Platform (GCP) Microsoft Message Queuing Message Broker Relational Databases PostgreSQL Distributed Control Systems Payment Schedule Ledgers (Accounting) Investment Banking Payment Processing Bank Reconciliations ISO 20022 Brokerage Market Maker Hedge Funds DevOps Other skills Problem Solving Communication Collaboration Teamwork Less More About the company Alpaca Capital Markets & Securities Alpaca builds an API-first stock and crypto brokerage platform. Trade with algorithms, connect with apps, and build servi",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://job-boards.greenhouse.io/alpaca/jobs/6113944004?utm_source=Jobgether&#38;utm_content=6a55048cac00a71a5a8c2107-senior-software-engineer---payments-treasury&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a55048cac00a71a5a8c2107&#34;,&#34;companyId&#34;:&#34;640b3f6779af571b709d9e80&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/1314f51d8a28fa4b.txt"
+  },
+  {
+   "title": "Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/697661cb73a8e8b5e77abd39-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Software Engineer â¢ 30+ days ago PradeepIT Consulting Services Pvt Ltd â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Software Engineer Role overview Qualifications 3+ years of experience Core Java Java 8 Spring Boot Responsibilities Engage with the client's internal teams for bug fixing Perform maintenance of software products Develop new features for software products as independent contractors Key facts Remote from: India , Anywhere Full time Senior (5-10 years) Software Engineer English Hard skills Java (Programming Language) Spring AOP Microservices Java (Programming Language) Salesforce Mobile Application Development SAP CO Open Source Development Adobe XD Application Programming Interface (API) Maintenance Testing Bug Tracking And Management Feature Engineering Remote Administration Other skills Collaboration Communication Less More About the company PradeepIT Consulting Services Pvt Ltd IT Services & IT Consulting Join PradeepIT: Innovating Information Technology and Solutions We pride ourselves on delivering exceptional results in the digital era of Information and Technology. With a track record of successful projects across offshore, nearshore, and onshore locations, we've built a clientele spanning 3 continents and 100+ companies. Our 380+ successful projects reflect our commitment to excellence. At PradeepIT, we prioritize the sat",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/d667b0ee613197f3.txt"
+  },
+  {
+   "title": "Senior Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/697661c473a8e8b5e77abb8b-senior-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer â¢ 30+ days ago PradeepIT Consulting Services Pvt Ltd â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer Role overview Qualifications 4+ years of experience in software development Hands-on backend development experience with Java, Spring Boot, Hibernate, SQL, MongoDB, Jenkins, and Microservices Server-side development experience primarily in Java Experience working with cross-border, distributed teams Responsibilities Create beautiful software experiences for clients using design thinking and lean and agile methodologies. Develop world-class software products using cutting-edge technologies and platforms. Collaborate in a dynamic, transparent, non-hierarchical culture and in fast-paced, value-driven teams to build innovative customer experiences. Mentor and grow the next generation of developers to positively impact the industry. Key facts Remote from: India , Anywhere Full time Software Engineer English Hard skills Java (Programming Language) Spring AOP Microservices Hibernate (Java) Lean Methodologies Design Thinking Jenkins SQL (Programming Language) Custom Attributes Software Development Server-Side MongoDB Agile Software Development Object Model Customer Centricity Software Architecture Product Knowledge Other skills Distributed Team Management Adaptability Communication Teamwork Mentorship Pr",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/b6827b5709daffbb.txt"
+  },
+  {
+   "title": "Software Engineer - 11573",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a210df2f8af0ea2c40432d9-software-engineer---11573",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Software Engineer - 11573 â¢ 30+ days ago Coupa â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Software Engineer - 11573 Role overview Qualifications Minimum of 4-5 years of software development experience Expertise in one or more programming languages (Ruby, Go preferred, Java considered) Experience with modern MVC web frameworks (Ruby on Rails preferred) Bachelor's degree in Computer Science or equivalent experience Responsibilities Design, develop, maintain, and scale Coupaâs platform systems and services Participate in operational design and code review Architect and develop reusable microservices and other platform components Advocate best practices in software development Key facts Remote from: EMEA , APAC Full time Senior (5-10 years) Software Engineer English Hard skills RubyGems Software As A Service (SaaS) Microservices Mvc.net Apache Kafka Java (Programming Language) Kubernetes Amazon Elastic Compute Cloud SQL (Programming Language) NoSQL MySQL Redis MongoDB Other skills Communication Teamwork Problem Solving Less More About the company Coupa Computer Software / SaaS Coupa makes margins multiply through its community-generated AI and industry leading total spend management platform for businesses large and small. Coupa AI is informed by trillions of dollars of direct and indirect spend data across a global network of 10M+ buyers an",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company"
+   ],
+   "source_url": "https://jobs.lever.co/coupa/fb9a1b8e-d5f7-411f-8cb0-530ce198b8b3/apply?lever-origin=applied&#38;lever-source%5B%5D=Jobgether&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a210df2f8af0ea2c40432d9&#34;,&#34;companyId&#34;:&#34;62682a98baccd20b60e98441&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/31ff5d09bba5ab0e.txt"
+  },
+  {
+   "title": "Staff Software Engineer, Product Engineering, EU",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69eb8cefc646310ee39a5c8a-staff-software-engineer-product-engineering-eu",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Staff Software Engineer, Product Engineering, EU â¢ 30+ days ago Ashby â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Staff Software Engineer, Product Engineering, EU Role overview Qualifications Full-stack engineer capable of owning features end-to-end across frontend and backend Experience writing product specs and creating wireframes; ability to collaborate with product and design Strong collaboration and communication skills; ability to work with cross-functional stakeholders Comfort with ambiguity and building flexible abstractions and tooling to improve product leverage Responsibilities Take ownership over a large portion of one product and drive end-to-end deliveryâfrom researching user problems to writing product specs, designing wireframes, and implementing the solution Research competitors and translate insights into product specs and UX designs to influence product direction Design and ship customer-facing TA tooling features (e.g., automated interview scheduling, declarative filters, in-app signing of offers) and collaborate with cross-functional partners to deliver impact Contribute to Ashby's lean engineering culture by working with minimal process, clear ownership, deliberate communication, and rapid shipping of high-impact changes Key facts Remote from: Europe , European Union , EMEA Full time Senior (5-10 years) Software Engi",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/Ashby/c3c7125d-7883-4dff-a2bf-f5a55de4a364/application?utm_source=Jobgether&#38;utm_content=69eb8cefc646310ee39a5c8a-staff-software-engineer-product-engineering-eu&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;69eb8cefc646310ee39a5c8a&#34;,&#34;companyId&#34;:&#34;6408f85f316d2b3324cd7d27&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "staff",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/e87e97e9cd1c15d7.txt"
+  },
+  {
+   "title": "Staff Software Engineer, Product Engineering, UK",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69eb8cefc646310ee39a5c94-staff-software-engineer-product-engineering-uk",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Staff Software Engineer, Product Engineering, UK â¢ 30+ days ago Ashby â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Staff Software Engineer, Product Engineering, UK Role overview Qualifications End-to-end ownership of large features across the full stack (frontend and backend) with a track record of shipping high-quality software. Strong product sense: ability to research customer needs, write product specifications, and create wireframes in collaboration with product and design. Excellent collaboration and communication skills: ability to vet decisions with stakeholders and work with engineers, product managers, and designers. Experience shipping in ambiguous, fast-paced environments with a focus on balancing speed and quality and working with minimal process. Responsibilities Take ownership of a substantial portion of a product and ship features end-to-end, from research and specs to design and implementation. Research competitors and customer needs to inform product direction, write product specifications, and collaborate with design and product teams. Design and implement frontend and backend features, contribute to architecture, and build reusable components and abstractions. Communicate decisions clearly to stakeholders, collaborate with engineers, product managers, and designers, and maintain focus on delivering impactful software. Key",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/Ashby/0020099f-9bb3-4da9-9808-4556564f5301/application?utm_source=Jobgether&#38;utm_content=69eb8cefc646310ee39a5c94-staff-software-engineer-product-engineering-uk&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;69eb8cefc646310ee39a5c94&#34;,&#34;companyId&#34;:&#34;6408f85f316d2b3324cd7d27&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "staff",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/9deee4cfa5cb028b.txt"
+  },
+  {
+   "title": "Senior Software Engineer, Product Engineering, UK",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69eb8cf0c646310ee39a5c9f-senior-software-engineer-product-engineering-uk",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer, Product Engineering, UK â¢ 30+ days ago Ashby â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer, Product Engineering, UK Role overview Qualifications End-to-end ownership of features across the stack (frontend, backend, and infrastructure) with the ability to ship with minimal guidance Experience researching customer problems, writing product specs, and designing wireframes; ability to collaborate with product and design to define solutions Strong collaboration and communication skills; comfortable vetting decisions with stakeholders in a low-process, fast-paced environment Ability to work in ambiguous startup contexts, balancing speed with quality and proactively building reusable tooling and abstractions Responsibilities Own substantial portions of the product end-to-endâfrom research and specs to design, implementation, and delivery Design, build, and ship user-facing features across the stack, including writing specs, wireframes, and collaborating with design/product Create leverage by building and improving reusable building blocks and tooling (e.g., design system, analytics modeling, policy/workflow engines) to enable rapid, scalable development Collaborate with cross-functional partners and stakeholders to understand customer problems, validate solutions, and maintain high-quality, high-v",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/Ashby/472eef28-6e52-43b4-9bff-9113522890f5/application?utm_source=Jobgether&#38;utm_content=69eb8cf0c646310ee39a5c9f-senior-software-engineer-product-engineering-uk&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;69eb8cf0c646310ee39a5c9f&#34;,&#34;companyId&#34;:&#34;6408f85f316d2b3324cd7d27&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/335c840c7d4c862f.txt"
+  },
+  {
+   "title": "Senior Software Engineer, Product Engineering, EU",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69eb8cefc646310ee39a5c7f-senior-software-engineer-product-engineering-eu",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer, Product Engineering, EU â¢ 30+ days ago Ashby â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer, Product Engineering, EU Role overview Qualifications Strong full-stack engineering experience across frontend, backend, and infrastructure as needed. Proven ability to own projects end-to-end in ambiguous product environments, including writing product specs and designing wireframes. Excellent collaboration and communication skills with a track record of balancing speed and quality and taking ownership of outcomes. Ambitious, proactive learner who thrives with minimal process and continuously seeks to improve skills and contribute to product strategy. Responsibilities Take ownership over a substantial feature area and drive end-to-end delivery from problem framing to production. Research competitors and customer needs to inform product specifications, wireframes, and implementation decisions. Collaborate with product managers, designers, and engineers to deliver high-quality, scalable software. Build useful abstractions, tooling, and components to increase leverage and reduce future work for the team. Key facts Remote from: Europe , European Union , EMEA Full time Senior (5-10 years) Software Engineer English Hard skills Responsive Web Design SQL (Programming Language) Full Stack Development Continuous",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/Ashby/3b9b0141-86e7-46b2-b6b4-ed039b84cdc4/application?utm_source=Jobgether&#38;utm_content=69eb8cefc646310ee39a5c7f-senior-software-engineer-product-engineering-eu&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;69eb8cefc646310ee39a5c7f&#34;,&#34;companyId&#34;:&#34;6408f85f316d2b3324cd7d27&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/36ef764a3ebac7b6.txt"
+  },
+  {
+   "title": "Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a586c94ac00a71a5a94253b-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Software Engineer â¢ 1 day ago AkitaBox â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Software Engineer Role overview Qualifications Experience writing JavaScript Comfortable using frameworks such as Angular, React, Flutter, Node.js, Express.js, and Mongoose.js Understands object-oriented programming, automated software testing, databases, development workflow, agile methodology, and testing methodologies Excellent creative problem-solving and analytical skills Responsibilities Implement scalable, secure, low-latency and highly available web applications and APIs Execute full software development lifecycle Design, build, debug, and maintain efficient, reusable, reliable, and readable code Participates in the agile process: helping complete sprints, review code, prepare for releases, participate in planning, participate in sprint retrospectives Key facts Remote from: Anywhere Full time Software Engineer English Hard skills JScript Test Automation Relational Databases Development Management Angular (Web Framework) React Jsx Flutter (Software) Node.js (Javascript Library) Amazon Web Services CI/CD Other skills Creative Problem Solving Analytical Skills Communication Teamwork Less More About the company AkitaBox Computer Software / SaaS Simple. Secure. Seamless. And so much more than a CMMS. Easy enough for everyone on your team to use. Powerful e",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/0b97db12f5991793.txt"
+  },
+  {
+   "title": "Senior Software Engineer C++",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a154c561afd2625c12e3b4e-senior-software-engineer-c",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer C++ â¢ 30+ days ago Autodesk â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer C++ Role overview Qualifications Bachelor's or Master's degree in Computer Science, Engineering, or related field, or equivalent experience. 2+ years of professional software development experience (seniority levels considered). Strong programming skills in C++. Experience with version control systems such as Git and CI/CD workflows. Responsibilities Develop high-quality, secure, and reliable C++ code for Autodesk Fusion; own tasks independently and participate in design and code reviews; ensure code meets engineering standards. Investigate and resolve complex technical issues; troubleshoot efficiently and contribute to testing strategies in collaboration with QA; apply risk management and automation. Document new features, code updates, and technical decisions; maintain clear technical documentation and promote documentation best practices. Work within an Agile development environment; participate in sprint planning, stand-ups, retrospectives, and backlog refinement; communicate progress and risks and assist junior engineers. Key facts Remote from: EMEA Full time Senior (5-10 years) Software Engineer English Hard skills C (Programming Language) C++ (Programming Language) CI/CD Debugging Automated Testing Framework Test ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/4be19b0a28cd21dc.txt"
+  },
+  {
+   "title": "Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a587a83ac00a71a5a943ccd-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Software Engineer â¢ 1 day ago Voltus â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Software Engineer Role overview Qualifications A Bachelorâs degree, or equivalent combination of education and experience, in Computer Science, Software Engineering, or a related technical field. Foundational programming skills in a backend language like Python. A strong desire to learn and grow as a software engineer. Excellent communication and collaboration skills. A genuine passion for our mission to create a cleaner, more resilient energy future. Authorization to work in the US or Canada without sponsorship Responsibilities Write clean, maintainable, and well-tested code to support the teamâs projects. Contribute to the design and implementation of new features and services. Collaborate with your team to troubleshoot and resolve issues in our production environment. Participate in code reviews to learn from and contribute to the team's shared knowledge. Work with stakeholders to understand requirements and translate them into technical solutions. Key facts Remote from: Anywhere Full time Software Engineer English Hard skills Python (Programming Language) PostgreSQL Amazon Web Services FastAPI TypeScript React Jsx Other skills Communication Collaboration Willingness To Learn Less More About the company Voltus Cleantech / Climate Tech Voltus aims to be t",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company"
+   ],
+   "source_url": "https://jobs.lever.co/voltus/f13d367c-97c1-4af3-8e8b-06827017fee2/apply?lever-origin=applied&#38;lever-source%5B%5D=Jobgether&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a587a83ac00a71a5a943ccd&#34;,&#34;companyId&#34;:&#34;649ad504ab050bb96e7b81a2&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/4ed8128fd25f176b.txt"
+  },
+  {
+   "title": "Senior Software Engineer, Agents",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69d47a99aba5fafceeff1666-senior-software-engineer-agents",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer, Agents â¢ 30+ days ago RevenueCat â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer, Agents Role overview Qualifications 5+ years of experience shipping production systems Hands-on experience building with LLMs â including tool use, structured output, context management, evaluation, and orchestration Strong backend fundamentals: reliable, observable, and secure systems Ability to work in a fully remote, early-stage product environment and communicate effectively in a distributed team Responsibilities Build and maintain the foundational agent infrastructure (orchestration, tool execution, context management, evaluation, and trust layer) that enables autonomous agent behavior Ship agent features and contribute to a scalable, reliable, observable backend; own core infrastructure areas (e.g., orchestration, evaluation pipeline, tool framework, or trust/permissions) Collaborate effectively in a fully remote team, participate in code reviews, architectural discussions, and incident response; help mentor others Design and ship new agent capabilities, improve reliability and performance, and contribute to product growth with tens of thousands of developers Key facts Remote from: South America , North America , Central America , EMEA Full time Senior (5-10 years) Software Engineer English Hard skills Clo",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/revenuecat/1d081395-4958-4026-869a-6ffd83062557/application?utm_source=Jobgether&#38;utm_content=69d47a99aba5fafceeff1666-senior-software-engineer-agents&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;69d47a99aba5fafceeff1666&#34;,&#34;companyId&#34;:&#34;62682a98baccd20b60e98547&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/33a033326d7f6f85.txt"
+  },
+  {
+   "title": "Senior Software Engineer, Product",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69d47a95aba5fafceeff1584-senior-software-engineer-product",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer, Product â¢ 30+ days ago RevenueCat â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer, Product Role overview Qualifications 5+ years of professional software engineering experience with ownership of production systems Strong web development fundamentals (HTML, CSS, JavaScript) and experience with component-based UI design and state management; familiarity with modern frontend frameworks (React, Vue, Angular) Experience with an MVC-style web framework (e.g., Django, Flask) and solid understanding of HTTP and browserâserver interactions Ability to work effectively in a fully remote, async-friendly environment and a proactive mindset to identify and implement improvements Responsibilities Design, build, ship, and own end-to-end product features used by thousands of developers and hundreds of millions of end-users Work across frontend, backend, and data boundaries to deliver reliable, high-quality systems with thoughtful tradeoffs Own problem definition through production rollout and long-term maintenance, collaborating with product, design, and other engineers Influence architectural decisions, contribute to the team roadmap, and mentor other engineers to improve reliability, scalability, and performance Key facts Remote from: South America , North America , Central America , EMEA Full time Senior (",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/revenuecat/cf3c6265-8acf-402e-8e1a-e340784dcc2d/application?utm_source=Jobgether&#38;utm_content=69d47a95aba5fafceeff1584-senior-software-engineer-product&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;69d47a95aba5fafceeff1584&#34;,&#34;companyId&#34;:&#34;62682a98baccd20b60e98547&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/ea26d101b4c2eb5d.txt"
+  },
+  {
+   "title": "Software Engineer - Platform / Core Infrastructure - EMEA",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a46f4a4ac00a71a5a776931-software-engineer---platform-core-infrastructure---emea",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Software Engineer - Platform / Core Infrastructure - EMEA â¢ 14 days ago XBOW â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Software Engineer - Platform / Core Infrastructure - EMEA Role overview Qualifications Strong experience building and operating scalable, distributed systems on cloud infrastructure such as AWS or similar. Extensive experience with Containerisation and Orchestration technologies (e.g. Docker and Kubernetes). Experience with event-driven architectures, message queues, or async workflows (for example, using Kafka). A track record of performance tuning across cloud services, databases, and compute layers Responsibilities Design and implement infrastructure systems that scale reliably and securely. Tune and optimize cloud services to drive performance, reliability and maintainability of core services. Develop core services to support unique deployment and infrastructure requirements. Own problems end-to-endâfrom design through deployment to production support. Key facts Remote from: Europe , European Union , EMEA Full time Software Engineer English Hard skills Distributed Computing Amazon Web Services Kubernetes Scalability Infrastructure as Code (IaC) Event-Driven Programming Observability Opensearch Elasticsearch Toolkits Other skills Communication Problem Solving Less More About the company XBOW Cybersecurity XBOW is the",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/xbowcareers/26a474ed-7e22-4d39-9525-3ca19e4fecdd/application?utm_source=Jobgether&#38;utm_content=6a46f4a4ac00a71a5a776931-software-engineer---platform-core-infrastructure---emea&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a46f4a4ac00a71a5a776931&#34;,&#34;companyId&#34;:&#34;6a2172a79cbf6cf32fec0e90&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/95d12429092d2302.txt"
+  },
+  {
+   "title": "Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a47d591ac00a71a5a7921d6-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Software Engineer â¢ 14 days ago Appfire â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Software Engineer Role overview Qualifications Proven record (3+ years) of delivery of multiple complex software development projects or products. Hands-on experience with JavaScript or TypeScript, ideally using React. Strong architectural understanding of web applications, including performance, quality and security aspects. Good understanding of modern Cloud architectures, and practical experience implementing them in AWS or GCP. Responsibilities Be a part of a self-organizing, cross-functional product team and cooperate closely with other Software Engineers, Product Manager, Team Leader, UX Designers. Design, build, and maintain efficient and scalable TypeScript, React, Java SpringBoot based applications. Follow and establish the best engineering practices: automated testing, code reviews. Share your thoughts openly and honestly on what would be the best for the customers and the business. Key facts Remote from: EMEA Full time Software Engineer English Hard skills JScript TypeScript React Jsx Java (Programming Language) Amazon Web Services gRPC Test Automation JIRA Project Collaboration Other skills Problem Solving Communication Adaptability Less More About the company Appfire Computer Software / SaaS Appfire is the leading global provider of software tha",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company"
+   ],
+   "source_url": "https://job-boards.greenhouse.io/appfire/jobs/4711968005?utm_source=Jobgether&#38;utm_content=6a47d591ac00a71a5a7921d6-software-engineer&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a47d591ac00a71a5a7921d6&#34;,&#34;companyId&#34;:&#34;6408f883316d2b3324cd87fe&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "contract",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/9a1eaa7a4cae453b.txt"
+  },
+  {
+   "title": "Senior Software Engineer, Kubernetes",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a585055ac00a71a5a93bbcf-senior-software-engineer-kubernetes",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer, Kubernetes â¢ 1 day ago camunda â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer, Kubernetes Role overview Qualifications Experience using Go or another relevant language for cloud native software development Practical experience with at least one major Cloud Service Provider (AWS, Azure, or GCP) Hands-on experience with Kubernetes and a deep understanding of its core concepts Willingness to work collaboratively within a team, share knowledge, and contribute to a positive engineering culture Responsibilities Design, develop, and maintain Kubernetes Operators to manage the Camunda SaaS offering Collaborate with cross-functional teams (product, engineering, field) to define, ship, and iterate on features Proactively identify opportunities to improve existing codebase(s) for security, stability, and reliability Participate in an on-call rotation and 3rd level escalation support Key facts Remote from: Anywhere Full time Senior (5-10 years) Software Engineer 186 - 279K yearly English Hard skills Kubernetes Kubernetes Infrastructure Automation Amazon Web Services Microsoft Azure gRPC Kubectl Multi-Tenant Cloud Environments Other skills Collaboration Problem Solving Creativity Less More About the company camunda IT Services & IT Consulting Camunda is the leader in process orchestration software. Our sof",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://jobs.ashbyhq.com/camunda/734302a5-a795-4251-bb0f-48fa33199270/application?utm_source=Jobgether&#38;utm_content=6a585055ac00a71a5a93bbcf-senior-software-engineer-kubernetes&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a585055ac00a71a5a93bbcf&#34;,&#34;companyId&#34;:&#34;6271a4f9b849b8ae23dc61e3&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "❓ unverified",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/95824eb49824f1be.txt"
+  },
+  {
+   "title": "Senior Full-Stack Software Engineer, Applied AI",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a525376ac00a71a5a8895d9-senior-full-stack-software-engineer-applied-ai",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Full-Stack Software Engineer, Applied AI â¢ 6 days ago Circle Solutions â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Full-Stack Software Engineer, Applied AI Role overview Qualifications 6+ years experience working as a full-stack engineer on high-traffic production applications Strong proficiency in Ruby on Rails, MySQL / Postgresql, ReactJS Hands-on experience building AI features in production Strong alignment with company values Responsibilities Ship full-stack AI projects end-to-end on a product built in Ruby on Rails backend and React frontend Design and run experiments to validate AI features, measure impact, and guide iteration Build and integrate components for AI infrastructure and optimize them for performance and reliability Help stay up-to-date with the cutting-edge AI research, techniques, and tools Key facts Remote from: Anywhere Full time Senior (5-10 years) Software Engineer 130 - 140K yearly English Hard skills Ruby On Rails React Jsx Full Stack Development MySQL PostgreSQL A/B Testing Performance Improvement Other skills Collaboration Communication Problem Solving Adaptability Less More About the company Circle Solutions Computer Software / SaaS See less See more Company details Industry Computer Software / SaaS Links Website LinkedIn See all jobs Your match analysis Critical gaps 4 Marketplace business model ",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": "https://job-boards.greenhouse.io/circleso/jobs/5112809008?utm_source=Jobgether&#38;utm_content=6a525376ac00a71a5a8895d9-senior-full-stack-software-engineer-applied-ai&#38;utm_campaign=search&#38;utm_medium=website&#34;,&#34;isEasyApply&#34;:false,&#34;_id&#34;:&#34;6a525376ac00a71a5a8895d9&#34;,&#34;companyId&#34;:&#34;696be49073cff3cb49970e45&#34;}",
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/4129c1847252c806.txt"
+  },
+  {
+   "title": "Senior Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a55c984ac00a71a5a8dda75-senior-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Senior Software Engineer â¢ 3 days ago CorServ â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Senior Software Engineer Role overview Qualifications Bachelor's degree in Computer Science, Software Engineering, or 10+ years of related experience Strong proficiency in Java programming language and related frameworks (e.g., Spring, Hibernate) Solid understanding of backend development principles, including RESTful architecture, microservices, and asynchronous processing Experience with relational databases (e.g., MSSQL) and proficiency in writing efficient SQL queries Responsibilities Designing and developing high-quality, scalable, and maintainable backend systems using Java technologies like REST, SOAP, and Hibernate Collaborating with cross-functional teams to gather and analyze requirements and translate them into technical specifications and designs Implementing and maintaining efficient and robust RESTful APIs and microservices Conducting thorough code reviews to ensure the quality and integrity of the software Key facts Remote from: Anywhere Full time Senior (5-10 years) Software Engineer English Hard skills Java (Programming Language) Microservices Agile Software Development Hibernate (Java) SQL (Programming Language) MongoDB CI/CD Apache Maven Gradle Amazon Web Services Personal Security Scrum (Software Development) Other skills Problem So",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior",
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/a68ca8147084a44a.txt"
+  },
+  {
+   "title": "Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/6a53347cac00a71a5a896f1e-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": "Software Engineer â¢ 5 days ago Healthcare Systems and Technologies, LLC â% Your match score Sign in to unlock Complete profile to see match â% Your match score Review match analysis Not a fit for this role remote jobs remote software engineer jobs Software Engineer Role overview Qualifications Strong experience with Ruby on Rails (5+ years preferred) Full stack development experience (frontend + backend) Hands-on experience building and deploying applications in AWS Responsibilities Own the full lifecycle of the survey application (design, development, deployment, maintenance) Build and maintain features using Ruby on Rails across the full stack Architect and deploy cloud-native solutions on AWS Design scalable, reliable backend systems and responsive user experiences Key facts Remote from: Anywhere Full time Software Engineer English Hard skills Ruby On Rails Full Stack Development Amazon Web Services Artificial Intelligence Containerization Infrastructure as Code (IaC) Microsoft Networking Front End (Software Engineering) React Jsx CI/CD DevOps Voice Interaction Conversational User Interface Property Ownership Other skills Problem Solving Willingness To Learn Teamwork Communication Less More About the company Healthcare Systems and Technologies, LLC Digital Health & Health Tech HST Pathways, is a top-ranked, cloud-based Ambulatory Surgery Center software company dedicated to serving the ASC industry. HST was named KLAS Category Leader for Ambulatory Surgical Center So",
+   "keyword_matched": "software engineer",
+   "flags": [
+    "employment_off_target",
+    "missing_company"
+   ],
+   "source_url": null,
+   "jd_status": "fetched_direct",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "b2b",
+    "full_time",
+    "internship"
+   ],
+   "jd_cache": "state/jd_cache/beaf654cdcc9e170.txt"
+  },
+  {
+   "title": "Lead Software Engineer (Java)",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69cf507f5bd3b40540a70121-lead-software-engineer-java",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": null,
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "read_cap_deferred",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "lead"
+  },
+  {
+   "title": "Staff Software Engineer",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69eb7ee8c646310ee39a4184-staff-software-engineer",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": null,
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "read_cap_deferred",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "staff"
+  },
+  {
+   "title": "Software Engineer, Frontend / Full Stack (Identity Platform)",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69a477d07f0cfae7f124e087-software-engineer-frontend-full-stack-identity-platform",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": null,
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company"
+   ],
+   "source_url": null,
+   "jd_status": "read_cap_deferred",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Senior Software Engineer, Frontend",
+   "company": "",
+   "loc": "",
+   "url": "https://jobgether.com/offer/69a477d07f0cfae7f124e06b-senior-software-engineer-frontend",
+   "platform": "Jobgether",
+   "posted_at": null,
+   "salary": null,
+   "jd_text": null,
+   "keyword_matched": "software engineer",
+   "flags": [
+    "missing_company",
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "read_cap_deferred",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Senior Software Engineer – Messaging",
+   "company": "Deel",
+   "loc": "France, Belgium, Estonia, Egypt",
+   "url": "https://www.deel.com/careers/position/?ashby_jid=cc49c183-3b63-4c3b-82a3-add18ca82fcc",
+   "platform": "Deel",
+   "posted_at": "2026-07-16T18:14:31.119Z",
+   "salary": "$$60,000 - $130,000 USD",
+   "jd_text": null,
+   "keyword_matched": "software engineer",
+   "flags": [
+    "seniority_off_target"
+   ],
+   "source_url": null,
+   "jd_status": "read_cap_deferred",
+   "link_status": "✅ live",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Java Backend Developer",
+   "company": "Monks",
+   "loc": "Hilversum, North Holland, Netherlands",
+   "url": "https://nl.linkedin.com/jobs/view/java-backend-developer-at-monks-4432148085",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "backend developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "ZettaOnline",
+   "loc": "Sofia, Sofia City, Bulgaria",
+   "url": "https://bg.linkedin.com/jobs/view/java-developer-at-zettaonline-4437688493",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Software Engineer",
+   "company": "Stealth",
+   "loc": "Amsterdam Area",
+   "url": "https://nl.linkedin.com/jobs/view/software-engineer-at-stealth-4441489335",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Backend Engineer | Spring Boot, Microservices & Cloud",
+   "company": "Luxoft",
+   "loc": "Bucharest, Romania",
+   "url": "https://ro.linkedin.com/jobs/view/java-backend-engineer-spring-boot-microservices-cloud-at-luxoft-4440656479",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "backend engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "DBeaver",
+   "loc": "Budapest, Budapest, Hungary",
+   "url": "https://hu.linkedin.com/jobs/view/java-developer-at-dbeaver-4441497436",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Software Engineer",
+   "company": "ilionx",
+   "loc": "Utrecht, Netherlands",
+   "url": "https://nl.linkedin.com/jobs/view/java-software-engineer-at-ilionx-4441164471",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-17",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Software Engineer",
+   "company": "ilionx",
+   "loc": "Maastricht, Limburg, Netherlands",
+   "url": "https://nl.linkedin.com/jobs/view/java-software-engineer-at-ilionx-4441164482",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-17",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Software Engineer (all genders) - ZEOS (1 year limited contract)",
+   "company": "Zalando",
+   "loc": "Berlin, Germany",
+   "url": "https://de.linkedin.com/jobs/view/software-engineer-all-genders-zeos-1-year-limited-contract-at-zalando-4441669404",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "employment_detected": [
+    "contract"
+   ]
+  },
+  {
+   "title": "Backend Developer (Java)",
+   "company": "HOOLOOVOO",
+   "loc": "Belgrade, Serbia",
+   "url": "https://rs.linkedin.com/jobs/view/backend-developer-java-at-hooloovoo-4441488521",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "backend developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "DBeaver",
+   "loc": "Novi Beograd, Serbia",
+   "url": "https://rs.linkedin.com/jobs/view/java-developer-at-dbeaver-4441602049",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Backend Engineer",
+   "company": "UST",
+   "loc": "Sunnyvale, CA",
+   "url": "https://www.linkedin.com/jobs/view/java-backend-engineer-at-ust-4438770388",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-17",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "backend engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "Virtusa",
+   "loc": "Plano, TX",
+   "url": "https://www.linkedin.com/jobs/view/java-developer-at-virtusa-4412795478",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Senior Backend Engineer",
+   "company": "Ocado Technology",
+   "loc": "Sofia, Sofia City, Bulgaria",
+   "url": "https://bg.linkedin.com/jobs/view/senior-backend-engineer-at-ocado-technology-4433084077",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually",
+    "seniority_off_target"
+   ],
+   "keyword_matched": "backend engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Backend Engineer - POS",
+   "company": "SumUp",
+   "loc": "Berlin, Berlin, Germany",
+   "url": "https://de.linkedin.com/jobs/view/backend-engineer-pos-at-sumup-4378969094",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "backend engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Software Engineer",
+   "company": "Just Eat Takeaway.com",
+   "loc": "Sofia, Sofia City, Bulgaria",
+   "url": "https://bg.linkedin.com/jobs/view/software-engineer-at-just-eat-takeaway-com-4417212525",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Software Engineer - Backend",
+   "company": "Doghouse Recruitment",
+   "loc": "The Randstad, Netherlands",
+   "url": "https://nl.linkedin.com/jobs/view/software-engineer-backend-at-doghouse-recruitment-4440728796",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Backend Engineer | Mid | Go | Browser",
+   "company": "Nord Security",
+   "loc": "Kaunas, Kaunas, Lithuania",
+   "url": "https://lt.linkedin.com/jobs/view/backend-engineer-mid-go-browser-at-nord-security-4441495337",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "backend engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "mid"
+  },
+  {
+   "title": "Software Engineer (Golang) - Online Payments",
+   "company": "SumUp",
+   "loc": "Sofia, Sofia City, Bulgaria",
+   "url": "https://bg.linkedin.com/jobs/view/software-engineer-golang-online-payments-at-sumup-4410192006",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Backend Engineer | Mid | Go | Browser",
+   "company": "Nord Security",
+   "loc": "Vilnius, Vilniaus, Lithuania",
+   "url": "https://lt.linkedin.com/jobs/view/backend-engineer-mid-go-browser-at-nord-security-4441496253",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "backend engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "mid"
+  },
+  {
+   "title": "Senior Software Engineer",
+   "company": "Palo Alto Networks",
+   "loc": "Sofia, Sofia City, Bulgaria",
+   "url": "https://bg.linkedin.com/jobs/view/senior-software-engineer-at-palo-alto-networks-4420124184",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually",
+    "seniority_off_target"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Senior Backend Engineer",
+   "company": "Voice AI Space",
+   "loc": "Berlin, Berlin, Germany",
+   "url": "https://de.linkedin.com/jobs/view/senior-backend-engineer-at-voice-ai-space-4441101530",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually",
+    "seniority_off_target"
+   ],
+   "keyword_matched": "backend engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Backend Software Engineer",
+   "company": "Luminos.AI",
+   "loc": "United States",
+   "url": "https://www.linkedin.com/jobs/view/backend-software-engineer-at-luminos-ai-4440796689",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Software Engineer - (Full-stack Javascript)",
+   "company": "Perlego",
+   "loc": "London, England, United Kingdom",
+   "url": "https://uk.linkedin.com/jobs/view/software-engineer-full-stack-javascript-at-perlego-4440762155",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Senior Software Engineer - Backend",
+   "company": "ARIVE",
+   "loc": "San Ramon, CA",
+   "url": "https://www.linkedin.com/jobs/view/senior-software-engineer-backend-at-arive-4441903090",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-17",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually",
+    "seniority_off_target"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Software Engineer (Full Stack)",
+   "company": "LLMP",
+   "loc": "Islamabad, Islāmābād, Pakistan",
+   "url": "https://pk.linkedin.com/jobs/view/software-engineer-full-stack-at-llmp-4438708499",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Backend Software Engineer",
+   "company": "EnsoData",
+   "loc": "Madison, WI",
+   "url": "https://www.linkedin.com/jobs/view/backend-software-engineer-at-ensodata-4441648381",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Full Stack Software Engineer 5 - Games Social Experiences",
+   "company": "Netflix",
+   "loc": "United States",
+   "url": "https://www.linkedin.com/jobs/view/full-stack-software-engineer-5-games-social-experiences-at-netflix-4401981876",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "Altkom Software",
+   "loc": "Warsaw, Mazowieckie, Poland",
+   "url": "https://pl.linkedin.com/jobs/view/java-developer-at-altkom-software-4441637061",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer Remote",
+   "company": "Wire IT",
+   "loc": "Lisbon, Lisbon, Portugal",
+   "url": "https://pt.linkedin.com/jobs/view/java-developer-remote-at-wire-it-4441144461",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-17",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "PulseRise Technologies",
+   "loc": "Prague, Prague, Czechia",
+   "url": "https://cz.linkedin.com/jobs/view/java-developer-at-pulserise-technologies-4440752434",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Senior Java Software Engineer",
+   "company": "Ovyo",
+   "loc": "Poland",
+   "url": "https://pl.linkedin.com/jobs/view/senior-java-software-engineer-at-ovyo-4441450191",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually",
+    "seniority_off_target"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Java Developer",
+   "company": "Kainos",
+   "loc": "Poland",
+   "url": "https://pl.linkedin.com/jobs/view/java-developer-at-kainos-4421247632",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Senior Java developer",
+   "company": "Radley James",
+   "loc": "Lithuania",
+   "url": "https://lt.linkedin.com/jobs/view/senior-java-developer-at-radley-james-4440652493",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually",
+    "seniority_off_target"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Java Developer",
+   "company": "act digital",
+   "loc": "Lisbon, Portugal",
+   "url": "https://pt.linkedin.com/jobs/view/java-developer-at-act-digital-4440705216",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Software Engineer",
+   "company": "Infor",
+   "loc": "Prague, Prague, Czechia",
+   "url": "https://cz.linkedin.com/jobs/view/software-engineer-at-infor-4422333316",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "Affinity",
+   "loc": "Lisbon, Lisbon, Portugal",
+   "url": "https://pt.linkedin.com/jobs/view/java-developer-at-affinity-4422356524",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Senior Java Engineer",
+   "company": "Wiley",
+   "loc": "Iaşi, Iaşi, Romania",
+   "url": "https://ro.linkedin.com/jobs/view/senior-java-engineer-at-wiley-4438766016",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually",
+    "seniority_off_target"
+   ],
+   "keyword_matched": "java engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   },
+   "seniority_detected": "senior"
+  },
+  {
+   "title": "Backend Software Engineer",
+   "company": "VOIS",
+   "loc": "Bucharest, Bucharest, Romania",
+   "url": "https://ro.linkedin.com/jobs/view/backend-software-engineer-at-vois-4438711833",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "software engineer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  },
+  {
+   "title": "Java Developer",
+   "company": "IDW",
+   "loc": "Lisbon, Portugal",
+   "url": "https://pt.linkedin.com/jobs/view/java-developer-at-idw-4441629309",
+   "platform": "LinkedIn (tripwire)",
+   "posted_at": "2026-07-16",
+   "salary": null,
+   "jd_text": null,
+   "flags": [
+    "LinkedIn guest card — full JD via public job page where it renders; auth-wall → login-walled, open manually"
+   ],
+   "keyword_matched": "java developer",
+   "source_url": null,
+   "jd_status": "linkedin_card_only",
+   "link_status": "❓ tripwire card",
+   "salary_assessment": {
+    "status": "unparseable",
+    "detail": "no parseable salary; apply estimation heuristics"
+   }
+  }
+ ],
+ "sources_down": [
+  "Arc.dev",
+  "Remote Rocketship (worldwide)",
+  "Remote Rocketship (Europe)",
+  "NoDesk",
+  "Dynamite Jobs",
+  "Welcome to the Jungle",
+  "Landing.jobs",
+  "JustRemote",
+  "Crossover"
+ ],
+ "platform_notes": {
+  "Himalayas": "jobs/api newest 1000, stream-prefiltered (HTML listing 403s)",
+  "Remotive": "DEGRADED: anonymous API is a stub (~41 jobs, params ignored); category HTML masks companies and carries no job links",
+  "JustJoin.it": "21 cursor pages (category 1)",
+  "Greenhouse (ATS boards)": "no boards configured yet (profile ats_boards empty)",
+  "Lever (ATS boards)": "no boards configured yet (profile ats_boards empty)",
+  "Workable (ATS boards)": "no boards configured yet (profile ats_boards empty)",
+  "We Work Remotely": "all-jobs RSS (cross-category inherent)",
+  "Arc.dev": "render ModuleNotFoundError on https://arc.dev/remote-jobs/software-engineer; render ModuleNotFoundError on https://arc.dev/remote-jobs/react-developer",
+  "Remote Rocketship (worldwide)": "HTTP 403 on https://www.remoterocketship.com/jobs/anywhere-in-the-world/front-end-developer/; render ModuleNotFoundError on https://www.remoterocketship.com/jobs/anywhere-in-the-world/front-end-developer/",
+  "Remote Rocketship (Europe)": "HTTP 403 on https://www.remoterocketship.com/country/europe/jobs/software-engineering/; render ModuleNotFoundError on https://www.remoterocketship.com/country/europe/jobs/software-engineering/",
+  "NoDesk": "render ModuleNotFoundError on https://nodesk.co/remote-jobs/engineering/",
+  "Dynamite Jobs": "render ModuleNotFoundError on https://dynamitejobs.com/remote-jobs/software-development",
+  "Working Nomads": "exposed_jobs sample (~33 rows; category param ignored)",
+  "Welcome to the Jungle": "render ModuleNotFoundError on https://www.welcometothejungle.com/en/jobs?query=software%20engineer&refinementList%5Boffices.country_code%5D%5B%5D=remote",
+  "Landing.jobs": "render ModuleNotFoundError on https://landing.jobs/jobs?q=software+engineer",
+  "JustRemote": "render ModuleNotFoundError on https://justremote.co/remote-developer-jobs",
+  "Pinpoint HQ (ATS boards)": "no boards configured yet (profile ats_boards empty)",
+  "Deel": "careers-page embedded JSON (Ashby API disabled by Deel)",
+  "Crossover": "render ModuleNotFoundError on https://www.crossover.com/jobs",
+  "LinkedIn (tripwire)": "6 guest requests, 49 unique cards"
+ },
+ "skipped_platforms": {},
+ "shortlist_sweep": {
+  "scope": 0,
+  "checked": 0,
+  "deferred": 0,
+  "stale": 0,
+  "live": 0,
+  "unverifiable": 0,
+  "escalated": 0
+ }
+}
