@@ -42,10 +42,10 @@ defaults:
       keywords: [Technical Support Engineer, Support Engineer, IT Support]
     rejected: []
 
-platform_tiers:
+platform_tiers:                       # HONEST coverage: boards with an 'it-support' slug + ATS only
   1: [himalayas, remotive, workable, lever, greenhouse]
-  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
-  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+  2: [wwr, working-nomads, nodesk, remote-ok]
+  3: [pinpoint]
 
 seniority_titles:
   support engineer i: junior

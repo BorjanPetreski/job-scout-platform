@@ -43,10 +43,16 @@ defaults:
       keywords: [Growth Marketer, Performance Marketing, Demand Generation]
     rejected: []
 
-platform_tiers:                       # groundwork: general aggregators only until niche boards verify
+platform_tiers:                       # HONEST coverage: only boards that carry a 'marketing'
+                                      # slug + ATS (company-scoped). The tech-only boards
+                                      # (jobgether/arc/dynamite/wttj/deel/crossover/RR) have no
+                                      # marketing category, so they're omitted (the interview
+                                      # disables them for this stream — §3.3 — rather than
+                                      # tier-then-skip). Dedicated marketing boards are catalog
+                                      # `unverified` until a smoke test — coverage grows then.
   1: [himalayas, remotive, workable, lever, greenhouse]
-  2: [wwr, working-nomads, nodesk, remote-rocketship-worldwide]
-  3: [jobgether, dynamite, arc, wttj, landing-jobs, remote-ok, deel, crossover]
+  2: [wwr, working-nomads, nodesk, remote-ok]
+  3: [pinpoint]
 
 seniority_titles:
   marketing manager: mid
