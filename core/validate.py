@@ -119,6 +119,14 @@ for skill_md in sorted((paths.REPO_ROOT / "skills").glob("*/SKILL.md")):
         check(0 < len(desc) <= 1024, f"{label}: description length {len(desc)} not in 1..1024")
         check(bool((fm.get("metadata") or {}).get("version")), f"{label}: metadata.version missing")
 
+# 7 — write-back staging files (Phase 2 §6/2.10): parse + suggestion schema + no PII-shaped
+#     keys. suggestions/ lives OUTSIDE templates/ so the template glob never sees it; it gets
+#     its own light check via writeback.validate_suggestion_file.
+import writeback  # noqa: E402
+
+for spath in sorted((paths.REPO_ROOT / "suggestions").rglob("*.yaml")):
+    errors.extend(writeback.validate_suggestion_file(spath))
+
 if errors:
     print("PLATFORM VALIDATION FAILED:")
     for e in errors:

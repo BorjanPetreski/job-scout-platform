@@ -34,7 +34,11 @@ job-scout-platform/
 │   ├── render.py              # headless fetch wrapper (render(url) → html, nothing more)
 │   ├── salary.py              # NEW: salary parsing + normalization to the profile's canonical unit (spec §5)
 │   ├── profile_loader.py      # NEW: load + validate profile.yaml against schema; resolve template inheritance
-│   ├── provision_notion.py    # NEW (Phase 2): create Tracker/Passed-Seen/Runs for a new profile
+│   ├── provision_notion.py    # Phase 2: provision/adopt Tracker/Passed-Seen/Runs (idempotent, D19);
+│   │                          #   instruct→verify-by-probe (D17); writes output.notion into the profile
+│   ├── secrets.py             # Phase 2: secret-storage SEAM (D18) — resolve token by key, env fallback
+│   ├── writeback.py           # Phase 2: opt-in generic-only staged suggestions (D6), PII-guarded
+│   ├── data/                  # Phase 2: seniority_lexicon.yaml (D21 base title→band lexicon)
 │   ├── notion_sync.py         # one-way push, profile-parameterized targets
 │   ├── state_sync.py          # git round-trip, profile-namespaced paths
 │   ├── linkedin_tripwire.py   # guest-endpoint discovery, keywords from profile
@@ -52,7 +56,8 @@ job-scout-platform/
 │       └── state/             # seen.jsonl, runs.json, fetch_evidence.jsonl, jd_cache/, last_run_candidates.json
 ├── skills/
 │   ├── job-scout-run/         # generic scan skill: engine policy + judgment layer, reads profile for all values
-│   └── job-scout-setup/       # Phase 2: setup interview
+│   └── job-scout-setup/       # Phase 2: CV-driven setup interview / templater (provision→persist→validate→scan)
+├── suggestions/               # Phase 2: staged write-back suggestions (outside templates/; own CI check)
 ├── assistant/                 # Phase 3: Claude Projects package (instructions + setup guide)
 ├── app/                       # Phase 4: FE setup/companion app
 ├── docs/                      # this documentation set + PROGRESS.md
