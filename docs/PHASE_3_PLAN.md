@@ -12,6 +12,8 @@
 > design decisions below (the Notion-only bridge, write-ownership by row state, re-verify,
 > the composer) as **still-valid reference for 3a's apply loop** — but the framing, checklist,
 > and D-contract are outdated by the companion reframe. Do not build from this as-is.
+> **The current plan of record for the first sub-phase is [PHASE_3A_PLAN.md](PHASE_3A_PLAN.md)**
+> (voice + knowledge base + the apply loop); 3b/3c get their own plans when they're built.
 
 > The detailed build plan for Phase 3, produced from a design brainstorm and written to be
 > **executed by a build agent in a later session** (the next session picks up here — see
