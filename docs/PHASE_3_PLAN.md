@@ -1,5 +1,18 @@
 # Phase 3 Execution Plan — Application Assistant (Claude Project + Notion MCP)
 
+> ⚠️ **SUPERSEDED (2026-07-17) — being reworked.** This was the first-pass "apply-bot" plan:
+> read the shortlist, draft, record. A follow-up brainstorm expanded Phase 3 into the full
+> **Application Companion** (learn the user's *voice*, grow their *knowledge base*, then draft
+> + interview-prep + debrief + CV-doctor + writing coach), staged **3a → 3b → 3c**, under a
+> new co-equal **data & privacy principle** (client-side is the destination; Claude is the
+> engine, not the vault; no mining). The current vision + phase scope is in
+> **[PROJECT_PLAN.md](PROJECT_PLAN.md) §1/§1a/§3** (the single source of truth). The detailed
+> execution contract below will be **rewritten from a focused Phase-3 planning pass** (per
+> sub-phase, brainstorm → plan → review gate → build). Until then, treat the apply-loop
+> design decisions below (the Notion-only bridge, write-ownership by row state, re-verify,
+> the composer) as **still-valid reference for 3a's apply loop** — but the framing, checklist,
+> and D-contract are outdated by the companion reframe. Do not build from this as-is.
+
 > The detailed build plan for Phase 3, produced from a design brainstorm and written to be
 > **executed by a build agent in a later session** (the next session picks up here — see
 > PROGRESS.md). Companion to [PROJECT_PLAN.md](PROJECT_PLAN.md) §Phase 3 (scope),
