@@ -5,7 +5,7 @@
 > session start/resume. Continue from the state below; never redo ✅ steps; update in the
 > same session as the work; push before the session ends.
 
-Plan of record: [PROJECT_PLAN.md](PROJECT_PLAN.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [PROFILE_CONFIG_SPEC.md](PROFILE_CONFIG_SPEC.md) · **Phase 2 build plan: [PHASE_2_PLAN.md](PHASE_2_PLAN.md)**
+Plan of record: [PROJECT_PLAN.md](PROJECT_PLAN.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [PROFILE_CONFIG_SPEC.md](PROFILE_CONFIG_SPEC.md) · **Phase 2 build plan: [PHASE_2_PLAN.md](PHASE_2_PLAN.md)** · **Phase 3 build plan: [PHASE_3_PLAN.md](PHASE_3_PLAN.md)**
 
 > **PHASE 2 COMPLETE (steps 2.1–2.12, closed 2026-07-17).** All schema/judgment/catalog/
 > template/provisioning/setup/write-back/effort work landed; the **backend-java live test passed**
@@ -13,8 +13,15 @@ Plan of record: [PROJECT_PLAN.md](PROJECT_PLAN.md) · [ARCHITECTURE.md](ARCHITEC
 > ledger and correct D7/D8/D20/D22 semantics — see the session log). `borjan-pm` untouched
 > throughout (prime directive). Design contract + decisions (D1–D23): **[PHASE_2_PLAN.md](PHASE_2_PLAN.md)**.
 > Human-readable guide (2.12): **[PLATFORM_GUIDE.md](PLATFORM_GUIDE.md)**.
-> **NEXT: Phase 3 (Application Assistant)** — seed its checklist from PROJECT_PLAN.md when it
-> starts, **ending with the standing human-readable-documentation step (PROJECT_PLAN §4)**.
+>
+> **PHASE 3 PLANNED (2026-07-17).** Design brainstorm (Opus 4.8) settled the Application Assistant:
+> a claude.ai Claude Project (+ Notion MCP) that reads a profile's `📥 New — Unreviewed` shortlist,
+> walks it role-by-role, re-verifies facts, drafts application materials in the user's voice from
+> Project-held data, and records applications — with **Notion as the sole scanner↔assistant bridge**
+> and the **Tracker firewall sacred**. Design contract + decisions (D1–D16) + build checklist
+> (3.0–3.9): **[PHASE_3_PLAN.md](PHASE_3_PLAN.md)**. **NEXT: Phase 3 build** — begins with the 3.0
+> Fable 5 pre-build review gate (@ xhigh), then the Opus 4.8 build per §12, **ending with the standing
+> human-readable-documentation step (PROJECT_PLAN §4)**.
 
 **Standing production constraint (prime directive): the `borjan-pm` profile is Borjan's live,
 daily job search and is sacred. Phase 2+ is purely additive — never regress its behavior, state,
@@ -31,7 +38,7 @@ archive also stays intact as the reference/parity anchor.)**
 | 0 | Documentation set (plan, architecture, config spec, this log) | ✅ merged (PR #8) |
 | 1 | Core engine extraction + borjan-pm parity + shortlist liveness sweep | 🟡 built — in review; cutover (1.12) pending Borjan |
 | 2 | Template library + setup interview + Notion provisioning | ✅ complete (2.1–2.12; backend-java live test passed; PLATFORM_GUIDE written) |
-| 3 | Application Assistant (Claude Projects package) | ⬜ not started |
+| 3 | Application Assistant (Claude Projects package) | 🟡 planned (D1–D16 + 3.0–3.9 in PHASE_3_PLAN.md); build next |
 | 4 | Setup/companion FE app (Agent SDK) | ⬜ not started |
 
 ## Phase 0 — Documentation (this PR)
@@ -86,9 +93,29 @@ engineer (post-break, targeting mid/medior part-time) under Borjan's Notion, sup
 | 2.11 | Docs: update ARCHITECTURE + PROFILE_CONFIG_SPEC + PROGRESS | ✅ 2026-07-16 | ARCHITECTURE repo-layout updated (provision_notion/secrets/writeback/data/suggestions/job-scout-setup) + §7a effort tier; PROFILE_CONFIG_SPEC §2/§3/§5/§6 (all Phase 2 fields, template v2, floorless/FTE, write-back consent) updated across 2.1/2.2/2.7; PROGRESS this table + session log. — |
 | 2.12 | Human-readable documentation: `docs/PLATFORM_GUIDE.md` (full project assessment → plain-language guide) | ✅ 2026-07-17 | **New standing rule adopted (PROJECT_PLAN §4): every phase's build plan ends with a human-readable documentation step** — seed it into every Phase 3+ checklist. The guide covers purpose, goal, what Phases 0–2 built, how a scan works, the build method, the Maia worked example (+ Ani as the real proof), repo map, glossary. README now points to it as the entry point. |
 
-## Phase 3 / 4
+## Phase 3 — Application Assistant (Claude Project + Notion MCP) (build checklist)
 
-Checklists to be seeded when the phase starts (from PROJECT_PLAN.md scopes). Do not
+**Full plan + locked decisions (D1–D16): [PHASE_3_PLAN.md](PHASE_3_PLAN.md).** Ordered so the
+scanner + `borjan-pm` stay untouched (prime directive) at every step. The assistant is a claude.ai-side
+package + one small composer; **Notion is the only scanner↔assistant bridge**; the **Tracker firewall is
+sacred**. First real test = a supervised full loop on Borjan's live shortlist + an Ani portability proof.
+
+| # | Step | Status | Notes |
+|---|------|--------|-------|
+| 3.0 | Pre-build review gate (Fable 5, xhigh): scoped adversarial review of the plan; fix blocking findings before 3.1 | ⬜ | §12.1 — seam risks: row-collision, PII/boundary leak, cross-process dedup (D7/D15), prime directive |
+| 3.1 | `assistant/` generic package — `instructions/*.md` (apply loop, notion-contract, verification, voice-discipline, answers, data-model) + `README.md` setup guide; extract generic doctrine from `pitching.md` | ⬜ | §2/§3, D2/D3/D6/D9/D10/D13 |
+| 3.2 | Profile-side split — `profiles/borjan-pm/assistant/voice.md` + `data-manifest.md` (the profile residue of `pitching.md`); `gemini-prompt.md` stays put; verify loss-free | ⬜ | §3, D3/D12/D16 |
+| 3.3 | `core/compose_assistant.py` — deterministic, idempotent, PII-free composer: profile.yaml + voice.md + generic package + Notion IDs → `project-instructions.md` | ⬜ | §4, D4/D12 |
+| 3.4 | Notion write-contract formalization + scanner reconciliation check — `notion-contract.md` (§5); verify (tighten only if needed) D15 reconciliation with ZERO scanner behavior change; confirm firewall intact | ⬜ | §5, D6/D7/D11/D15 |
+| 3.5 | Setup / binding walkthrough — finalize `assistant/README.md`: create Project, paste/upload composed instructions, upload data per manifest, connect Notion MCP, probe-read `📥 New — Unreviewed` | ⬜ | §2/§4, D1/D5/D12 |
+| 3.6 | Acceptance — `borjan-pm` real supervised loop (record 1–2 real applications, confirm next-scan dedup) + `ani-backend-java` portability proof; capture lessons | ⬜ | §8, D14 |
+| 3.7 | CI — composer runs clean per profile with a binding; composed output + `voice.md` pass a no-PII check; `assistant/` structure lints; `data-manifest.md` parses | ⬜ | — |
+| 3.8 | Docs — ARCHITECTURE §5 (operationalized transition table), PROFILE_CONFIG_SPEC (binding files + composer), PROGRESS | ⬜ | — |
+| 3.9 | Human-readable documentation — refresh `docs/PLATFORM_GUIDE.md` (Application Assistant, apply loop, boundary, worked example extended through applying) | ⬜ | standing rule (PROJECT_PLAN §4) |
+
+## Phase 4
+
+Checklist to be seeded when the phase starts (from PROJECT_PLAN.md scope). Do not
 pre-plan details here — plans go stale; the plan of record is PROJECT_PLAN.md.
 
 ## Session log
@@ -112,4 +139,5 @@ pre-plan details here — plans go stale; the plan of record is PROJECT_PLAN.md.
 | 2026-07-17 | Niche-board smoke test + per-stream board gating (Opus 4.8, off merged main) | **Smoke-tested the 5 unverified niche boards live:** ai-jobs.net (50 postings), icrunchdata (15), dribbble (48) are clean SSR HTML → **activated** (`status: verified` + `active: true` + generic HARVEST_SPECs added, harvest confirmed end-to-end via the scan path); behance (HTTP 403 anonymous) + problogger (WPJobBoard JS plugin) stay unverified with honest quirks (need headless/custom fetchers). **Engine: proper per-stream board gating** — a board that DECLARES categories now serves ONLY those streams (loader resolver + validator tier-coverage both updated): a stream-specific board can be catalog-active without being fetched for unrelated streams or forced into every profile's tiers. So the 3 new boards serve ai-ml/data (ai-jobs.net, icrunchdata) + design-ux (dribbble) only. Tiered into the ai-ml/data/design templates + their demo fixtures. **Prime directive:** borjan-pm/ani/demo-fe-react resolve **byte-identical (21 active, none of the new boards)** — the gating keeps them out; borjan-pm.yaml untouched. Side effect (more correct): the ai-ml/design demos now gate to their real coverage (were over-fetching non-stream boards). `validate-platform` green. **Readiness note:** config-readiness of the other streams is now high (complete templates, honest tiers, improved catalog coverage), but battle-tested parity with borjan-pm still requires per-profile dogfooding (live scans + learned filter_notes + conversion-tuned tiers) — that's incremental per real onboarding (Ani is the first). Remaining uplift: live-verify the aggregators' per-stream slugs (still verify_at_setup) and headless fetchers for behance/problogger. |
 | 2026-07-17 | Slug verification + headless fetchers + Ani re-scan (Opus 4.8, PR #24) | **(1) Aggregator slug verification:** only Remotive exposes a real category API param — verified against its live `/categories` and fixed 3 bugs (`software-dev`→`software-development` — was INVALID, SE profiles hit the unfiltered stub; `customer-support`→`customer-service`; `ai-ml`: `data`→`artificial-intelligence`); cleared Remotive's verify_at_setup. The other aggregators fetch all-category feeds (slug cosmetic, keyword-scoped) — documented, not falsely "verified". **(2) Headless fetchers:** problogger ACTIVATED (headless render surfaces WPJobBoard postings `/jobs/job/<slug>/`, ~9 live; HARVEST_SPEC + fetch_mode: headless + verified/active; content-writing template tiered). behance NOT activatable (403 direct; headless loads only the app shell, jobs arrive via async XHR that render(url)→html can't capture) — honest quirk, kept unverified. **(3) Ani re-scan (Task validates the JustJoin java/6 fix live):** 94→**319 candidates**, JustJoin 94→**260 real Java/Kotlin** roles (was JS). Judgment pass → **8 mid/regular remote Java B2B roles** in her Notion inbox (Link Group Mid, RITS Mid, BlueSoft banking, Spyrosoft energy=her utilities domain, SCALO, Synerise + scan-1's PradeepIT/CoorB); senior soft-noted, Warsaw onsite/hybrid + Polish-only JDs (×20) dropped; stream-gating correctly skipped ai-ml/data/design boards for the SE profile. borjan-pm/ani byte-identical (21 active); validate green. |
 | 2026-07-17 | Phase 2 step 2.12 — human-readable documentation (Fable 5, branch `claude/phase-2-documentation-awyxah`) | Full project/repo assessment → wrote **[PLATFORM_GUIDE.md](PLATFORM_GUIDE.md)**, the plain-language guide: what the platform is, why it exists, the goal/phase map, what Phases 0–2 actually built (with the live inventory: 28-platform catalog / 25 active, 22 templates over 11 streams, 8 profiles, 18 core modules), how a scan works step-by-step, the three-layer architecture, the build method (PROGRESS contract, plan→review-gate→build, prime directive, dogfooding, honesty principle), the **Maia worked example** (React engineer in Lisbon, onboarding→daily use→Phase 3 outlook) with Ani's real onboarding as the proof, repo map + glossary. README re-pointed at the guide as the entry point. **Adopted the standing rule: every phase execution/build plan ends with a human-readable documentation step** — recorded in PROJECT_PLAN §4, appended as 2.12 to the PHASE_2_PLAN §9 checklist + this table. Docs only — no engine/config change; borjan-pm untouched. |
+| 2026-07-17 | Phase 3 brainstorm + execution plan (branch `claude/job-scout-phase-3-plan-design`) | Interactive design session (Opus 4.8) with Borjan. Settled Phase 3 as the **Application Assistant**: a claude.ai Claude Project (+ Notion MCP) that reads a profile's `📥 New — Unreviewed` shortlist, walks it role-by-role, re-verifies facts, drafts application materials **in the user's voice** from Project-held data (CV/cover-letter bank/articles/past answers), and records applications. Locked 16 decisions (D1–D16). **The load-bearing idea: Notion is the SOLE scanner↔assistant bridge** — the assistant lives on claude.ai, cannot read repo files or run `core/*.py`, so its entire persistence is Notion; the **Tracker row is the cross-process dedup handoff** (D7) and the scanner owns local-state reconciliation (D15), so Phase 3 needs almost no core change. Key settled forks: **`pitching.md` splits along the engine/profile seam** (generic apply doctrine → `assistant/`; profile voice/facts → `profiles/<id>/assistant/voice.md`, D3); the Project is configured by a **build-time composed snapshot** via `core/compose_assistant.py`, not runtime repo reads (D4, preserves the D5 data boundary); **write-ownership partitions by row STATE** so scanner and assistant can't collide (D6); **assistant primary + Claude Code "I applied" chat fallback** as the two scanner-external Tracker writers, firewall intact (D8); **re-verify fetch-first with an honest paste/confirm fallback** for walled JDs (D10); the assistant **may set `Stale/Expired` on directly observed death** (D11); **acceptance = `borjan-pm` real supervised loop + `ani-backend-java` portability proof** (D14). Wrote **[PHASE_3_PLAN.md](PHASE_3_PLAN.md)** (16-decision design contract + ordered 3.0–3.9 checklist, ending with the standing human-readable-doc step); seeded the Phase 3 table above; flagged the next session as the build. Added the **model/effort handoff (§12)**: a scoped Fable 5 pre-build review gate (step 3.0, xhigh) then the Opus 4.8 build with per-step effort tiering (medium/high/xhigh). No code changed — planning only; the scanner + `borjan-pm` untouched (prime directive). |
 | 2026-07-13 | Cutover: state lock + supervised first live run | Routines paused by Borjan. Final `migrate_state.py` = verified no-op (765=765, state already final). **First live run of core v4.0.0** on borjan-pm: 116 candidates, 18 platforms covered, 4 sources down (all known degradations), sweep correctly deferred all 18 unreviewed (<24h). **Caught + fixed a real bug**: salary period inference read monthly non-USD pay 12x too low (63 false below_floor→5 genuine) — currency-neutral EUR-magnitude inference (commit d26927b). Judgment pass under Borjan's **worldwide/EMEA-open-only** policy: 5 shortlisted, 111 dropped (logged to seen.jsonl; drops kept local this run, not pushed to Notion). **REST Notion path live-validated for the first time** (NOTION_TOKEN via env; 5 rows + digest pushed, post-write asserted). Token was shared in chat → Borjan to rotate. Remaining cutover: re-point cloud Routine (Claude via MCP) + laptop task (Borjan), then freeze legacy. |
