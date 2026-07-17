@@ -1,0 +1,124 @@
+schema_version: 1
+id: ani-backend-java
+template: software-engineering/backend-java
+candidate:
+  display_name: Ani Petreska
+  location:
+    city: Skopje
+    country: North Macedonia
+    timezone: Europe/Skopje
+  location_match_terms:
+  - North Macedonia
+  - Macedonia
+  - Skopje
+  citizenship:
+  - MK
+  eligibility:
+    employment_models:
+    - b2b_contractor
+    - part_time
+    needs_visa_sponsorship: false
+  experience_years: 6
+  headline: Senior Java / Spring Boot Backend Engineer
+  tools:
+  - Java
+  - Spring Boot
+  - gRPC
+  - REST
+  - Microsoft SQL Server
+  - JUnit
+  - Spock
+  - Git
+  - JIRA
+  - Scrum
+  certs:
+  - Oracle Certified Associate, Java SE 8
+  domains:
+  - Marketing & Media
+  - Energy/Utilities
+  - Enterprise Integration
+search:
+  subvariant: backend-java
+  target_seniority:
+    bands:
+    - mid
+    strict: false
+  employment_type:
+    accept:
+    - part_time
+    - contract
+  regions_acceptable:
+  - worldwide
+  - emea
+  - europe
+compensation:
+  fte_fraction: 0.5
+platforms:
+  tiers:
+    1:
+    - justjoin-it
+    - lever
+    - workable
+    - greenhouse
+    - himalayas
+    - remotive
+    2:
+    - remote-rocketship-worldwide
+    - remote-rocketship-europe
+    - nodesk
+    - wwr
+    - arc
+    3:
+    - jobgether
+    - dynamite
+    - working-nomads
+    - wttj
+    - landing-jobs
+    - justremote
+    - remote-ok
+    - pinpoint
+    - deel
+    - crossover
+  disabled:
+  - europeremotely
+  - otta
+  ats_boards:
+    greenhouse: []
+    lever: []
+    workable: []
+    pinpoint: []
+  linkedin_tripwire:
+    locations:
+    - European Union
+    - Worldwide
+sweep:
+  recheck_interval_h: 24
+run:
+  effort: mid
+writeback:
+  consent: false
+output:
+  notion:
+    tracker:
+      data_source_id: 4fcc779a-918a-4197-96f4-e1102c171662
+      parent_page_id: 3a0054b0-88af-804e-ba58-c9ff9cf52ba0
+    passed_seen:
+      data_source_id: 4e2d1add-c91f-4eea-8169-f7f03ca1d3f2
+      parent_page_id: 3a0054b0-88af-804e-ba58-c9ff9cf52ba0
+    pinned_pages:
+      job_scout_runs: 3a0054b0-88af-8110-b4e1-ff2e769842e2
+    tracker_status_options:
+    - Applied
+    - Screening
+    - Interview
+    - Offer
+    - Rejected
+    - Withdrawn
+schedule:
+  runs:
+  - at: 08:00
+    label: AM
+  - at: '18:00'
+    label: PM
+  full_sweep_dow: Mon
+  freshness_window_h: 48
