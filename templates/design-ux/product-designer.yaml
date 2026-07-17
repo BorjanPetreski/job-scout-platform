@@ -41,10 +41,11 @@ defaults:
       keywords: [Product Designer, UX Designer, UI Designer]
     rejected: []
 
-platform_tiers:                       # design-ux (dribbble/behance stay out until verified)
-  1: [justjoin-it, workable, lever, greenhouse, himalayas, remotive]
-  2: [remote-rocketship-worldwide, nodesk, wwr, arc]
-  3: [jobgether, dynamite, working-nomads, wttj, landing-jobs, remote-ok, deel, crossover]
+platform_tiers:                       # HONEST coverage: 'design-ux' boards + ATS (dribbble verified;
+                                      # behance stays unverified — 403s anonymous fetches)
+  1: [himalayas, remotive, workable, lever, greenhouse]
+  2: [dribbble, wwr, working-nomads, nodesk, remote-ok]
+  3: [pinpoint]
 
 seniority_titles:
   designer i: junior

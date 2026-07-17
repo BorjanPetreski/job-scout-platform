@@ -43,9 +43,9 @@ defaults:
     rejected: []
 
 platform_tiers:                       # HONEST coverage: boards with an 'ai-ml' slug + ATS
-                                      # (ai-jobs.net/icrunchdata stay catalog-unverified until a smoke test)
-  1: [himalayas, remotive, workable, lever, greenhouse]
-  2: [remote-ok, wwr, working-nomads, nodesk]
+                                      # (ai-jobs.net + icrunchdata smoke-tested + verified 2026-07-17)
+  1: [ai-jobs-net, himalayas, remotive, workable, lever, greenhouse]
+  2: [remote-ok, wwr, working-nomads, nodesk, icrunchdata]
   3: [pinpoint]
 
 seniority_titles:

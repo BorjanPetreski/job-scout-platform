@@ -412,6 +412,10 @@ HARVEST_SPECS: dict[str, dict] = {
     "justremote": {"href": r"/remote-jobs/[a-z-]+/[\w-]+", "base": "https://justremote.co"},
     "landing-jobs": {"href": r"(?:https://landing\.jobs)?/at/[^/]+/[\w-]+", "base": "https://landing.jobs", "company_idx": 2},
     "crossover": {"href": r"/jobs/\d+/[\w-]+/[\w-]+", "base": "https://www.crossover.com", "company_idx": 3},
+    # Phase 2 niche boards — smoke-tested live 2026-07-17 (SSR HTML, harvestable):
+    "ai-jobs-net": {"href": r"/job/[a-z0-9-]+-\d{4,}/?", "base": "https://ai-jobs.net"},
+    "icrunchdata": {"href": r"/jobs/[a-z0-9-]+", "base": "https://icrunchdata.com", "min_hyphens": 1},
+    "dribbble": {"href": r"/jobs/\d+-[\w-]+", "base": "https://dribbble.com"},
 }
 
 

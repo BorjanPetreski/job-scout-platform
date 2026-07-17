@@ -315,7 +315,15 @@ def _validate(merged: dict, profile_id: str, catalog: dict, defaults: dict) -> l
         if s not in cat_slugs:
             e.append(f"platforms references unknown catalog slug {s!r}")
     for slug, p in cat_slugs.items():
-        if p.get("active") and slug not in disabled and slug not in tiered:
+        if not p.get("active") or slug in disabled or slug in tiered:
+            continue
+        # A board that DECLARES categories serves ONLY those streams; one that doesn't serve
+        # this profile's stream (and isn't a company-scoped ATS/board with categories {}) is
+        # auto-inactive here (§3.3), so it needn't be explicitly tiered — a stream-specific
+        # board can be catalog-active without every unrelated profile having to list it.
+        cats = p.get("categories")
+        serves_stream = (not cats) or (stream in cats) or bool(p.get("api_board_pattern"))
+        if serves_stream:
             e.append(f"active platform {slug!r} has no tier and is not disabled "
                      "(tierless = silent skip; invariant #14)")
 
@@ -463,10 +471,14 @@ def _resolve_platforms(merged: dict, catalog: dict) -> tuple[list[dict], dict[st
         api = _expand(cp.get("api_patterns"), mapping if mapping != "all" else None, params) \
             if mapping != "all" else list(cp.get("api_patterns") or [])
 
-        needs_category = any("{category}" in p for p in (cp.get("url_patterns") or [])) or \
-                         any("{category" in p for p in (cp.get("api_patterns") or []))
-        if active and needs_category and mapping is None and not cp.get("api_board_pattern"):
-            skipped[cp["name"]] = f"no category mapping for stream {stream!r}"
+        # A board that declares categories serves ONLY those streams. If the profile's stream
+        # isn't among them (and it's not a company-scoped ATS/board), it's inactive for this
+        # profile — whether or not its URL carries a {category} slot. This lets a stream-
+        # specific board (e.g. ai-jobs.net for ai-ml/data) be catalog-active without being
+        # fetched for unrelated streams (and without every other profile disabling it).
+        cats_map = cp.get("categories")
+        if active and cats_map and mapping is None and not cp.get("api_board_pattern"):
+            skipped[cp["name"]] = f"does not serve stream {stream!r}"
             active = False
 
         entry = {

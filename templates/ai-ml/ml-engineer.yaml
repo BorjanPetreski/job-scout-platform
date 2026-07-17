@@ -42,9 +42,9 @@ defaults:
       keywords: [Machine Learning Engineer, ML Engineer, Applied Scientist]
     rejected: []
 
-platform_tiers:                       # HONEST coverage: boards with an 'ai-ml' slug + ATS
-  1: [himalayas, remotive, workable, lever, greenhouse]
-  2: [remote-ok, wwr, working-nomads, nodesk]
+platform_tiers:                       # HONEST coverage: 'ai-ml' boards + ATS (ai-jobs.net + icrunchdata verified)
+  1: [ai-jobs-net, himalayas, remotive, workable, lever, greenhouse]
+  2: [remote-ok, wwr, working-nomads, nodesk, icrunchdata]
   3: [pinpoint]
 
 seniority_titles:
