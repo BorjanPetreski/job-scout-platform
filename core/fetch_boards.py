@@ -416,6 +416,7 @@ HARVEST_SPECS: dict[str, dict] = {
     "ai-jobs-net": {"href": r"/job/[a-z0-9-]+-\d{4,}/?", "base": "https://ai-jobs.net"},
     "icrunchdata": {"href": r"/jobs/[a-z0-9-]+", "base": "https://icrunchdata.com", "min_hyphens": 1},
     "dribbble": {"href": r"/jobs/\d+-[\w-]+", "base": "https://dribbble.com"},
+    "problogger": {"href": r"/jobs/job/[a-z0-9-]+/?", "base": "https://problogger.com"},  # headless (WPJobBoard)
 }
 
 
