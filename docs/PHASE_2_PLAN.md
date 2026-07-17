@@ -358,6 +358,7 @@ Ordered so nothing breaks `borjan-pm` (which stays production) at any step.
 | 2.9 | **First real test** — backend-java onboarding end-to-end; supervised live scan; capture lessons. | §8 |
 | 2.10 | **CI** — extend `validate-platform` to cover new schema/templates/catalog; every template validates; per-⭐-template `--plan` smoke where catalog supports, driven by the 2.4 **dry-run fixture profiles**; light check for the `suggestions/` staging format (parse + suggestion schema + no PII-shaped keys). | — |
 | 2.11 | **Docs** — update ARCHITECTURE (job-scout-setup, provision_notion, write-back), PROFILE_CONFIG_SPEC (new fields, template v2), PROGRESS. | — |
+| 2.12 | **Human-readable documentation** — write/refresh `docs/PLATFORM_GUIDE.md` (what was built, purpose, goal, how it works, how it was built, worked example). *Added 2026-07-17 as the new standing rule (PROJECT_PLAN §4): every phase execution/build plan ends with this step.* | — |
 
 ## 10. Out of scope for Phase 2
 
