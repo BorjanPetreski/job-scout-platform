@@ -53,6 +53,20 @@ search:
   - europe
 compensation:
   fte_fraction: 0.5
+
+# Profile-learned lessons the judgment layer reads on every scan (from the first live
+# run, 2026-07-16 — these are ANI's lessons; a different profile earns its own):
+filter_notes: |
+  - Kraków/Poland HYBRID roles (JustJoin.it) require on-site days — not remote-compatible
+    for Skopje. Treat "Hybrid <PL city>" as a location drop unless it's clearly remote-first.
+  - LinkedIn (tripwire) is the RICHEST mid-Java signal but login-walled — surface those as
+    "login-walled — open manually" leads, never scored/verified rows (guest tripwire only).
+  - Himalayas/US-tagged Java roles: verify the posting is remote-worldwide/EMEA-eligible for
+    North Macedonia before investing — several are US-restricted despite a generic Java title.
+  - The Java market skews SENIOR + full-time; the mid part-time target soft-surfaces mostly
+    senior roles (noted, not dropped, per target_seniority.strict=false) — that is expected,
+    not a filter bug.
+
 platforms:
   tiers:
     1:
