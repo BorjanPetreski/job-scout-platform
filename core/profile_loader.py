@@ -443,14 +443,19 @@ def _resolve_platforms(merged: dict, catalog: dict) -> tuple[list[dict], dict[st
         slug = cp["slug"]
         active = bool(cp.get("active")) and slug not in disabled
         params: dict = {}
-        cids = cp.get("category_ids") or {}
-        if stream in cids:
-            params["category_id"] = cids[stream]
         pre = (cp.get("prefilter_phrases") or {}).get(stream)
         if pre:
             params["prefilter_phrases"] = list(pre)
 
         mapping = overrides.get(slug, (cp.get("categories") or {}).get(stream))
+        # category_id resolves by the RESOLVED category slug first (so a subvariant override
+        # like backend-java -> justjoin 'java' picks the Java id), then falls back to the
+        # stream key (backward-compatible with any stream-keyed category_ids).
+        cids = cp.get("category_ids") or {}
+        if isinstance(mapping, str) and mapping in cids:
+            params["category_id"] = cids[mapping]
+        elif stream in cids:
+            params["category_id"] = cids[stream]
         urls = _expand(cp.get("url_patterns"), mapping if mapping != "all" else None, params) \
             if mapping != "all" else list(cp.get("url_patterns") or [])
         rss = _expand(cp.get("rss_patterns"), mapping, params) if mapping != "all" \
