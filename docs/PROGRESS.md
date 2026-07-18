@@ -27,8 +27,10 @@ Plan of record: [PROJECT_PLAN.md](PROJECT_PLAN.md) · [ARCHITECTURE.md](ARCHITEC
 > **[PHASE_3_PLAN.md](PHASE_3_PLAN.md)** is **superseded** — its detailed contract is being reworked
 > from a focused per-sub-phase planning pass. **The detailed 3a plan is written:
 > [PHASE_3A_PLAN.md](PHASE_3A_PLAN.md)** (voice + knowledge base + the apply loop; D1–D16 + checklist
-> 3a.0–3a.10). **NEXT: run the 3a.0 Fable 5 pre-build review gate (@ xhigh)** on that plan, amend any
-> blocking findings, then the Opus 4.8 build (§11) — after which Borjan runs a live scan and UATs 3a.
+> 3a.0–3a.10). **The 3a.0 Fable 5 review gate RAN 2026-07-17 (@ xhigh): 8 findings + the D13 ⚑
+> ruling, all amended into the plan (D1–D16 intact; D13 split confirmed) — outcome note in
+> PHASE_3A_PLAN §11.1. NEXT: the Opus 4.8 build (§11.2, steps 3a.1–3a.10)** — after which Borjan
+> runs a live scan and UATs 3a.
 
 **Standing production constraint (prime directive): the `borjan-pm` profile is Borjan's live,
 daily job search and is sacred. Phase 2+ is purely additive — never regress its behavior, state,
@@ -114,7 +116,7 @@ not the vault; no mining; deletable). Substrate for Phase 3 = claude.ai Project 
 
 | Stage | Deliverable | Status |
 |-------|-------------|--------|
-| 3a | **Voice + knowledge base + the apply loop** — learn the user's voice (docs or guided Q&A; user-judged "sounds like you" meter; voice-only docs shredded after extraction) + stand up the KB + run the per-role loop (re-verify → draft in-voice → capture Q&A → unknown-answer→KB-growth → record). **The UAT milestone: Borjan runs a scan, then tests 3a against real jobs.** | 🟡 detailed plan written ([PHASE_3A_PLAN.md](PHASE_3A_PLAN.md), 3a.0–3a.10); Fable 5 gate next |
+| 3a | **Voice + knowledge base + the apply loop** — learn the user's voice (docs or guided Q&A; user-judged "sounds like you" meter; voice-only docs shredded after extraction) + stand up the KB + run the per-role loop (re-verify → draft in-voice → capture Q&A → unknown-answer→KB-growth → record). **The UAT milestone: Borjan runs a scan, then tests 3a against real jobs.** | 🟡 plan written + **3a.0 gate passed 2026-07-17** (8 findings + D13 ⚑ ruling amended, D1–D16 intact); Opus 4.8 build next |
 | 3b | **Interview lifecycle** — on flip-to-Interview: read JD, predict questions, map KB experience onto role gaps; post-interview debrief → honest feedback → KB grows; paste-an-email → flip status. | ⬜ vision-captured |
 | 3c | **CV doctor + writing coach** — assess CV, flag if stale (>6mo), guide rewrite, ingest delta doc (Borjan's self-review prompt, §3x); co-write blog posts/articles in-voice → strengthens candidate + feeds voice/KB loop. | ⬜ vision-captured |
 | 3.x-docs | **Human-readable documentation** — refresh `docs/PLATFORM_GUIDE.md` at each sub-phase (standing rule, PROJECT_PLAN §4). | ⬜ |
@@ -123,6 +125,22 @@ Still-valid reference for 3a's apply loop (settled with Borjan before the refram
 PHASE_3_PLAN): Notion is the only scanner↔companion bridge; write-ownership partitions by row *state*;
 the Tracker row is the cross-process dedup handoff; re-verify fetch-first with a paste fallback; a small
 PII-free composer binds a profile to its Project. These carry into the 3a detailed plan.
+
+### Phase 3a — build checklist (seeded from [PHASE_3A_PLAN.md](PHASE_3A_PLAN.md) §9)
+
+| # | Step | Status | Notes |
+|---|------|--------|-------|
+| 3a.0 | Pre-build review gate (Fable 5, xhigh) | ✅ 2026-07-17 | **8 findings + the D13 ⚑ ruling, all amended into the plan** (D1–D16 intact) — full outcome note: PHASE_3A_PLAN §11.1. Key re-scopes: 3a.4 reconciliation is a BUILD (none exists — scan start reads no Notion; `applied` back-fill was chat-flow-only) + a read-before-write sweep guard (blind `apply_sweep_update` PATCH would clobber companion-resolved rows; `User Declined` has no Tracker row to reconcile from); manual voice/KB re-save mechanic made explicit (no programmatic Project-knowledge write) + two-conversation round-trip in 3a.5; select vocabulary pinned; composer snapshot stamp + optional voice-seed; `pitching.md` stays in place; no-PII check defined. D13 ⚑ resolved: split confirmed |
+| 3a.1 | `assistant/` generic package (voice, KB, apply loop, write contract, consent language) | ⬜ | |
+| 3a.2 | Profile-side split — `voice-seed.md` + `data-manifest.md`; `pitching.md` stays intact | ⬜ | |
+| 3a.3 | `core/compose_assistant.py` (+ compose-date/config-hash stamp; voice-seed optional) | ⬜ | |
+| 3a.4 | Notion write-contract + reconciliation BUILD + read-before-write sweep guard | ⬜ | |
+| 3a.5 | Voice + KB procedure dry-run (incl. two-conversation persistence round-trip) | ⬜ | |
+| 3a.6 | Setup / binding walkthrough (`assistant/README.md` + select-options probe) | ⬜ | |
+| 3a.7 | Acceptance — borjan-pm real loop (dedup + back-fill + sweep no-clobber) + ani portability | ⬜ | |
+| 3a.8 | CI — composer clean; defined no-PII denylist check; structure lints | ⬜ | |
+| 3a.9 | Docs — ARCHITECTURE §5, PROFILE_CONFIG_SPEC, PROGRESS | ⬜ | |
+| 3a.10 | Human-readable documentation — PLATFORM_GUIDE refresh (standing rule) | ⬜ | |
 
 ## Phase 4
 
@@ -133,6 +151,7 @@ pre-plan details here — plans go stale; the plan of record is PROJECT_PLAN.md.
 
 | Date | Session | Work done |
 |------|---------|-----------|
+| 2026-07-17 | Phase 3a step 3a.0 — pre-build review gate (Fable 5 @ xhigh, branch `claude/phase-3a-review-w3gcdk`) | Ran the scoped adversarial review per PHASE_3A_PLAN §11.1 — read the full contract set (PROGRESS, PHASE_3A_PLAN, PROJECT_PLAN §1/§1a/§3, ARCHITECTURE §5, PROFILE_CONFIG_SPEC, borjan-pm `pitching.md`), spot-checked the run skill, and **verified the load-bearing claims against the engine code** (scan.py/sweep.py/notion_sync.py/dedup.py/provision_notion.py). **8 findings + the D13 ⚑ ruling, all amended into the plan (D1–D16 intact).** Blocking: (1) the D8 reconciliation **did not exist** — the scanner never reads Notion at scan start (`notion_sync.py` push-only; `applied` back-fill chat-flow-only), so 3a.4 re-scoped from "verify" to BUILD (token-gated scan-start Tracker read → `seen.jsonl` back-fill, sequenced before the sweep, honest tokenless skip) and §0a re-worded to name it the one permitted additive scanner change; (2) sweep-clobber collision — sweep scope is `seen.jsonl`-only and `apply_sweep_update` blind-PATCHes, so a companion-resolved row (esp. `User Declined`, which has no Tracker row) would be flipped to `Stale/Expired` on posting death → read-before-write sweep guard added to 3a.4. High: (3) claude.ai Projects have no programmatic knowledge write — manual voice/KB re-save mechanic made explicit (§3/§4), 3a.5 dry-run must round-trip across two conversations. Moderate: (4) companion Passed/Seen select values pinned to the provisioned vocabulary (`User Applied Elsewhere`/`User Declined`); (5) composer compose-date + config-hash stamp + re-compose triggers (snapshot drift); (6) `references/pitching.md` stays in place intact (run-skill pitch router — prime directive). Minor: (7) 3a.8 no-PII check defined as a denylist (2.7 writeback guard not reusable); (8) composer handles a voice-seed-less profile (Ani). **D13 ⚑ resolved: Project-knowledge / Notion-state split CONFIRMED** — Q&A log stays in Notion, KB is the draft-time retrieval source, deletion story names both stores. Seeded the 3a build checklist above. Docs only — no code changed; scanner + `borjan-pm` untouched. **NEXT: the Opus 4.8 build (3a.1–3a.10).** |
 | 2026-07-13 | Phase 0 (cloud, branch `claude/job-scout-engine-abstraction-2g5b0o`) | Wrote the four-doc planning set; seeded Phase 1 checklist; PR #8 merged |
 | 2026-07-13 | Phase 1 build (same session/branch, restarted from main) | Built steps 1.1–1.11 end-to-end: catalog, templates (PM + fe-react), profiles (borjan-pm + demo), loader+validator, core extraction, sweep, generic skill, state migration, parity (config diff + live back-to-back runs), CI. Cutover (1.12) deliberately left for Borjan. Env notes: selectolax pip-installed; playwright not needed (`--no-headless` runs); `REQUESTS_CA_BUNDLE=/root/.ccr/ca-bundle.crt` required for live fetches in cloud sessions |
 | 2026-07-13 | Phase 1 merge + cutover prep | PR #9 merged. Hit a self-inflicted merge block: the CI change renamed the job that `main`'s ruleset required by exact name (`Validate job-scout-pm`) → required check went permanently "expected". Fixed by renaming the legacy job back to the exact required name (comment added so it's not re-renamed). Borjan then added an admin bypass + the `Validate platform` required check to the ruleset (permanent guard). Cutover prep PR #10 merged: references copied into the profile + CUTOVER.md runbook. |

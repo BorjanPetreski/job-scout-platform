@@ -9,8 +9,10 @@
 > a later session. Where it refines earlier drafts it wins; the superseded apply-bot
 > [PHASE_3_PLAN.md](PHASE_3_PLAN.md) is retained only as apply-loop reference.
 >
-> Status: **ready for the 3a.0 review gate** · Created: 2026-07-18 · Brainstorm: Opus 4.8 ·
-> Review gate: Fable 5 (planned, step 3a.0) · Build: Opus 4.8 (§11.2)
+> Status: **3a.0 gate passed (2026-07-17) — ready for the Opus 4.8 build (§11.2)** ·
+> Created: 2026-07-18 · Brainstorm: Opus 4.8 ·
+> Review gate: Fable 5 ✅ 2026-07-17 — 8 findings + the D13 ⚑ ruling, all amended (§11.1) ·
+> Build: Opus 4.8 (§11.2)
 
 ---
 
@@ -31,9 +33,12 @@ are new. 3a is the milestone Borjan UATs against real jobs right after a scan.
 ## 0a. Standing principles (both apply — see PROJECT_PLAN §1a)
 
 - **Prime directive:** the scanner and `borjan-pm` are production and untouched. 3a adds a
-  claude.ai-side package plus one small composer and a guarded scanner-side reconciliation
-  check — no change to what a scan fetches, filters, scores, or writes. The **Tracker
-  firewall is sacred** (the scanner never writes the Applications Tracker).
+  claude.ai-side package plus one small composer and **one new, additive scanner-side
+  reconciliation step** (§6 — a scan-start Notion read + `seen.jsonl` back-fill + a
+  read-before-write sweep guard; it does not exist today and is BUILT in 3a.4, the one
+  permitted scanner change) — no change to what a scan fetches from boards, filters,
+  scores, or writes as shortlist rows. The **Tracker firewall is sacred** (the scanner
+  never writes the Applications Tracker; the reconciliation READ does not weaken it).
 - **Data & privacy principle:** the user owns their voice, knowledge base, and source docs;
   all deletable; used only for their own applications; never mined. Client-side is the
   destination (Phase 4); 3a's Project+Notion substrate is the consented interim. CV/PII never
@@ -59,7 +64,7 @@ the 3a.0 review is explicitly invited to stress-test.
 | D10 | **Re-verify fetch-first with an honest paste/confirm fallback** (carried). The companion fetches the posting URL and re-checks the hard facts (still live; eligibility; hours; salary; employment type). On a JS/login/thin wall it asks the user to paste/confirm. Never draft against an unverified posting. |
 | D11 | **The companion may set `Stale/Expired` on a directly observed dead posting** (carried), with a dated note — a shared terminal state neither app resurrects. The sweep remains the proactive staleness engine. |
 | D12 | **A small, PII-free composer binds a profile to its Project.** `core/compose_assistant.py` composes the generic instruction package + a minimal profile-config snapshot (floor for the salary-ask safety check, eligibility for the B2B gate, location/timezone for verification, Notion `data_source_id`s) into `project-instructions.md` the user pastes into the Project. Config only, one-directional (repo→Project), no PII. The **voice profile and knowledge base are NOT composed from the repo** — they are built and held inside the Project (D13). |
-| D13 | **⚑ gate — the substrate-(a) storage split: Project holds knowledge, Notion holds application state.** The **Claude Project** holds the user's source docs, the derived voice profile, and the knowledge base (the material the companion reasons over). **Notion** holds application *state* — the Passed/Seen shortlist rows and the Applications Tracker rows (incl. the submitted answers in the row body so the user can revisit them). Both are storage-option-(a) interim; the durable data model (D14) is designed so both lift into the Phase 4 client-side store unchanged. *Flagged for the gate: is this the right split, or should the Q&A application log also live in the Project?* |
+| D13 | **⚑ gate — the substrate-(a) storage split: Project holds knowledge, Notion holds application state.** The **Claude Project** holds the user's source docs, the derived voice profile, and the knowledge base (the material the companion reasons over). **Notion** holds application *state* — the Passed/Seen shortlist rows and the Applications Tracker rows (incl. the submitted answers in the row body so the user can revisit them). Both are storage-option-(a) interim; the durable data model (D14) is designed so both lift into the Phase 4 client-side store unchanged. *⚑ resolved by the 3a.0 gate: split CONFIRMED — keep. The Q&A log stays in Notion (moving it into the Project would worsen the manual-persistence burden of §3/§4 and lose the user's revisit surface). Answers are deliberately dual-homed — the Notion body is the per-role record, the Project KB entry the reusable knowledge and the draft-time retrieval source — and the consent language names BOTH stores in the deletion story (deleting the Project does not delete Notion bodies).* |
 | D14 | **The durable data model is designed now, substrate-agnostic.** Five user-owned entities (PROJECT_PLAN §3): voice profile, knowledge base, application log, interview records, CV state. **3a builds the first three** (interview records + CV state are 3b/3c) but the model is shaped so 3b/3c extend it and Phase 4 migrates all of it to the client-side store without rework. |
 | D15 | **Acceptance = Borjan's real loop after a live scan + an `ani-backend-java` portability proof** (carried, extended). Borjan onboards his own voice + knowledge base, runs the apply loop on real `New — Unreviewed` roles, records a real application, and the next scan dedups it. Ani proves the package isn't Borjan-shaped. |
 | D16 | **The Gemini cross-check stays scanner-side** (carried) — out of companion scope. |
@@ -77,7 +82,9 @@ Substrate-agnostic entity shapes (the Project/Notion rendering is D13; Phase 4 r
   Project. No PII leaves it to the repo.
 - **Application log** — per role: the posting, the questions asked, the answers submitted, the
   decision (applied/declined + reason), the date. The record the user revisits. On substrate
-  (a): the Notion Tracker/Passed-Seen rows + their page bodies (D13).
+  (a): the Notion Tracker/Passed-Seen rows + their page bodies (D13). Answers are deliberately
+  dual-homed: the Notion body is the per-role *record*; the Project KB entry is the reusable
+  *knowledge* — **the KB, not the Notion body, is the draft-time retrieval source** (3a.0 gate).
 
 ## 3. Voice acquisition (D2/D3/D4) — the procedure the package specifies
 
@@ -85,6 +92,9 @@ Substrate-agnostic entity shapes (the Project/Notion rendering is D13; Phase 4 r
    user, and to answer honestly from real experience), that materials are the user's and
    deletable, and — for anything shared purely to learn voice — that it is **deleted right
    after extraction, never stored** (D4). Nothing is used for training or any secondary use.
+   The consent language also names the **second store** (3a.0 gate): application content
+   recorded to Notion row bodies (§5) is not deleted by deleting the Project — the deletion
+   story covers both stores.
 2. **Gather.** Preferred: the user's own writing. If they have little/none, run the guided
    Q&A (field-tuned questions) instead or in addition (D2).
 3. **Extract → voice profile.** Distill the material into the structured voice profile (§2),
@@ -92,8 +102,11 @@ Substrate-agnostic entity shapes (the Project/Notion rendering is D13; Phase 4 r
 4. **Meter + calibrate (D3).** Show coverage of the voice dimensions, then draft a short blind
    sample; the user judges "me / not me"; refine. Repeat until the **user says it's good
    enough** — their call, no fake score.
-5. **Persist.** Save the voice profile as a Project artifact (D13). Re-runnable to deepen later
-   (3c's writing coach feeds it more material).
+5. **Persist.** Save the voice profile as a Project artifact (D13). **Persistence mechanic
+   (3a.0 gate):** the companion cannot write Project knowledge itself — it regenerates one
+   canonical `voice-profile.md` and the USER saves it to Project knowledge; the package states
+   this manual step honestly. Re-runnable to deepen later (3c's writing coach feeds it more
+   material).
 
 ## 4. Knowledge base (D5) — structure + the growth loop
 
@@ -105,6 +118,12 @@ Substrate-agnostic entity shapes (the Project/Notion rendering is D13; Phase 4 r
 - **Growth loop (the KB's engine):** on a gap the user fills, the companion tightens the
   wording into an honest answer and **stores it back to the KB**, tagged — so the same question
   never needs re-asking and the base compounds over use.
+- **Persistence mechanic (3a.0 gate):** same as the voice profile — claude.ai offers no
+  programmatic write into Project knowledge, so the companion maintains one canonical
+  `knowledge-base.md` it regenerates on every growth event and the USER re-saves to Project
+  knowledge. The package makes this step explicit each time; the 3a.5 dry-run must prove the
+  round-trip across **two separate conversations** (a single-conversation dry-run would pass
+  without ever exercising the KB's actual value).
 
 ## 5. The apply loop (D6–D11) — per role, user-paced
 
@@ -121,8 +140,13 @@ Carried from the settled apply-loop design; now drawing on the voice profile (§
    voice profile on the **first** draft, sourced from the KB with the honest-answer + growth
    loop (§4). Every submittable text in a **copy-block**; analysis outside it.
 6. **Record** — on "applied": create the `Applied` Tracker row (+ submitted answers in the
-   body) and flip the Passed/Seen row out of `New — Unreviewed`. On "pass": flip →
-   `User Declined` + the user's real reason.
+   body) and flip the Passed/Seen row `New — Unreviewed` → **`User Applied Elsewhere`** (the
+   provisioned applied-resolution option). On "pass": flip → **`User Declined`** + the user's
+   real reason. **Vocabulary is pinned (3a.0 gate):** the companion writes only exact select
+   values from the provisioned Passed/Seen vocabulary (`provision_notion.py` REASON_OPTIONS /
+   `notion_sync.py` VALID_REASONS) — a free-text variant would make Notion silently mint a
+   stray option the scanner doesn't recognize. A new label is a 3a.4 provisioning decision
+   (added to both constants), never an ad-hoc MCP write.
 7. **Next role.**
 
 ## 6. Package, binding & composer (D12/D13)
@@ -138,11 +162,33 @@ Carried from the settled apply-loop design; now drawing on the voice profile (§
   mechanism, profile links, domains) + `data-manifest.md` (what to upload to the Project).
   `gemini-prompt.md` stays scanner-side (D16). *Note:* the profile's `voice-seed.md` is
   authored guidance, not PII; the **derived voice profile** lives in the Project (D13).
+  **`references/pitching.md` itself REMAINS in place, intact (3a.0 gate):** the run skill's
+  pitch router loads it at runtime for the Code-lane pitch flow (`borjan-pm` production —
+  prime directive); the split *extracts copies*, it never hollows out the source. And
+  `voice-seed.md` is **optional per profile** — a profile without one (e.g.
+  `ani-backend-java`) gets the guided-Q&A path.
 - **`core/compose_assistant.py`** — deterministic, idempotent, PII-free composer (D12):
   generic package + profile-config snapshot + Notion IDs → `profiles/<id>/assistant/project-instructions.md`.
-- **Scanner reconciliation check** — verify (tighten only if needed) that a Tracker-`Applied`
-  match back-fills `seen.jsonl` and that the sweep skips companion-resolved rows, with **zero**
-  scanner behavior change (D8). Confirm the Tracker firewall intact.
+  **Snapshot-staleness guard (3a.0 gate):** the composer stamps a **compose date +
+  source-config hash** into the output, the package has the companion announce its snapshot
+  date, and the README names the re-compose triggers (any `profile.yaml` change — floor,
+  eligibility, Notion IDs). The Project cannot read the repo, so a stale snapshot drifts
+  silently — the engine's own memory-ID lesson (IDs drift; the profile is the source of
+  truth) applies doubly to a pasted snapshot. Handles a profile with no
+  `assistant/voice-seed.md` (composes the guided-Q&A path).
+- **Scanner reconciliation — a BUILD, not a verification (3a.0 gate).** No reconciliation
+  exists today: the scanner never reads Notion at scan start (`notion_sync.py` is push-only),
+  the `applied` status in `seen.jsonl` is written solely by the chat "I applied" flow, the
+  sweep's scope is `seen.jsonl`-only (`status == "shortlisted"`), and `apply_sweep_update`
+  blind-PATCHes `Reason Passed` — so a companion-resolved row would stay in sweep scope
+  forever and, when the posting dies, be clobbered back to `Stale/Expired` (a D7 violation).
+  3a.4 BUILDS the additive step, in two parts: **(1) a token-gated scan-start Tracker read**
+  → back-fill matching `seen.jsonl` records to `applied` (idempotent; sequenced BEFORE the
+  sweep in the run pipeline so applied rows exit sweep scope the same run; tokenless runs
+  skip it with an honest ledger note); **(2) a read-before-write guard in
+  `apply_sweep_update`** — flip only a row still `New — Unreviewed`, so companion-resolved
+  rows (`User Declined` has no Tracker row to reconcile from) are never clobbered. Board
+  fetch/filter/score untouched; the Tracker firewall intact (the new access is a READ).
 
 ## 7. Acceptance (D15)
 
@@ -154,10 +200,14 @@ Carried from the settled apply-loop design; now drawing on the voice profile (§
   and `seen.jsonl` reconciles. His real job search, done the new way.
 - **Proof — `ani-backend-java`, portability.** Compose Ani's binding; confirm the generic
   package produces a coherent non-Borjan voice-build + apply loop on her real Java shortlist.
-- **Passes when:** voice reaches user-judged good-enough; the KB answers honestly and grows on
-  a filled gap; a real application records correctly to the right DBs; the next scan dedups it;
-  the scanner is behaviorally unchanged (prime directive) and the firewall holds; no CV/PII in
-  the repo (data principle). Capture lessons into `assistant/` (generic) or the profile.
+- **Passes when:** voice reaches user-judged good-enough; the KB answers honestly, grows on
+  a filled gap, and **round-trips across separate conversations** (§4 persistence mechanic);
+  a real application records correctly to the right DBs; the next scan dedups it **and
+  back-fills `seen.jsonl` (3a.4 reconciliation), and a subsequent sweep leaves the
+  companion-resolved rows untouched (no clobber)**; the scanner is behaviorally unchanged
+  beyond the 3a.4 additive step (prime directive) and the firewall holds; no CV/PII in the
+  repo (data principle). Capture lessons into `assistant/` (generic) or the profile —
+  lesson text passes the same no-PII discipline as 3a.8.
 
 ## 8. Out of scope for 3a
 
@@ -166,7 +216,7 @@ Carried from the settled apply-loop design; now drawing on the voice profile (§
 - **The client-side/GDPR store (option b), real UI, the voice meter as a UI element** — **Phase 4**.
 - **Email OAuth auto-ingest, LinkedIn export ingest** — **Phase 5**.
 - **Auto-apply / computer-use / authenticated scraping** — engine law, never.
-- **Any scanner behavior change** beyond the guarded reconciliation check (§6).
+- **Any scanner behavior change** beyond the guarded additive reconciliation build (§6, 3a.4).
 
 ## 9. Ordered build checklist (seed into PROGRESS.md)
 
@@ -176,13 +226,13 @@ Ordered so the scanner + `borjan-pm` stay untouched at every step.
 |---|------|-------|
 | 3a.0 | **Pre-build review gate (Fable 5, xhigh)** — scoped adversarial review of *this plan*; amend blocking findings (D1–D16 intact) before 3a.1. | §11.1 |
 | 3a.1 | **`assistant/` generic package** — voice-acquisition, KB + growth loop, apply loop, Notion write contract, verification, voice/delivery discipline, consent/data-principle language + README setup guide; extract generic doctrine from `pitching.md`. | §3–§6 |
-| 3a.2 | **Profile-side split** — `profiles/borjan-pm/assistant/voice-seed.md` + `data-manifest.md` (residue of `pitching.md`); `gemini-prompt.md` stays put; verify loss-free. | §6, D16 |
-| 3a.3 | **`core/compose_assistant.py`** — deterministic, idempotent, PII-free composer → `project-instructions.md`. | §6, D12 |
-| 3a.4 | **Notion write-contract + scanner reconciliation check** — companion-side contract doc; verify D8 reconciliation with ZERO scanner change; confirm firewall intact. | §5/§6, D6–D11 |
-| 3a.5 | **Voice + KB build procedure** — finalize the §3/§4 procedures in the package; dry-run the voice meter + growth loop end-to-end (no live application yet). | §3/§4, D2–D5 |
-| 3a.6 | **Setup / binding walkthrough** — `assistant/README.md`: create the Project, paste instructions, upload per manifest, connect Notion MCP, probe-read `New — Unreviewed`. | §6, D6/D12/D13 |
-| 3a.7 | **Acceptance** — `borjan-pm` real supervised loop (record 1–2 real applications, confirm next-scan dedup) + `ani-backend-java` portability proof; capture lessons. | §7, D15 |
-| 3a.8 | **CI** — composer runs clean per profile; composed output + `voice-seed.md` pass a no-PII check; `assistant/` structure lints; `data-manifest.md` parses. | — |
+| 3a.2 | **Profile-side split** — `profiles/borjan-pm/assistant/voice-seed.md` + `data-manifest.md` (residue of `pitching.md`); `gemini-prompt.md` stays put; **`references/pitching.md` stays in place intact** (the run-skill pitch router loads it at runtime — prime directive); verify loss-free *including the router still resolving*; `voice-seed.md` optional per profile. | §6, D16 |
+| 3a.3 | **`core/compose_assistant.py`** — deterministic, idempotent, PII-free composer → `project-instructions.md`; stamps compose date + source-config hash (re-compose triggers documented in the README); handles absent `voice-seed.md` (guided-Q&A path). | §6, D12 |
+| 3a.4 | **Notion write-contract + scanner reconciliation BUILD** — companion-side contract doc pinning the exact Passed/Seen select values to the provisioned vocabulary; BUILD the additive scan-start Tracker read → `seen.jsonl` back-fill (token-gated, sequenced before the sweep, honest ledger skip when tokenless) + the read-before-write guard in `apply_sweep_update`; board fetch/filter/score untouched; firewall intact. | §5/§6, D6–D11 |
+| 3a.5 | **Voice + KB build procedure** — finalize the §3/§4 procedures in the package; dry-run the voice meter + growth loop end-to-end (no live application yet), **proving the voice/KB persistence round-trip across TWO separate conversations** (the manual re-save mechanic). | §3/§4, D2–D5 |
+| 3a.6 | **Setup / binding walkthrough** — `assistant/README.md`: create the Project, paste instructions, upload per manifest, connect Notion MCP, probe-read `New — Unreviewed` **+ verify the pinned status select options exist in the profile's DBs**. | §6, D6/D12/D13 |
+| 3a.7 | **Acceptance** — `borjan-pm` real supervised loop (record 1–2 real applications, confirm next-scan dedup + reconciliation back-fill + sweep no-clobber) + `ani-backend-java` portability proof; capture lessons. | §7, D15 |
+| 3a.8 | **CI** — composer runs clean per profile; composed output + `voice-seed.md` pass a no-PII check — **defined as a denylist: emails, phone numbers, postal addresses, CV-body facts beyond what `profile.yaml` already holds** (the 2.7 writeback guard is NOT reusable here — voice-seed legitimately carries URLs + full sentences); `assistant/` structure lints; `data-manifest.md` parses. | — |
 | 3a.9 | **Docs** — ARCHITECTURE §5 (companion transitions), PROFILE_CONFIG_SPEC (binding files + composer), PROGRESS. | — |
 | 3a.10 | **Human-readable documentation** — refresh `docs/PLATFORM_GUIDE.md` (the companion: voice, KB, apply loop; boundary; worked example). *Standing rule, PROJECT_PLAN §4.* | — |
 
@@ -229,6 +279,26 @@ directive). Review prompt:
 
 Effort: **xhigh** (`high` is the acceptable floor). Amend blocking findings (D1–D16 intact)
 before 3a.1; non-blocking suggestions optional.
+
+**Gate outcome (2026-07-17, Fable 5 @ xhigh): RAN — 8 findings + the D13 ⚑ ruling, ALL
+amended into this plan (D1–D16 intact; claims verified against the engine code, not just the
+docs).** Blocking: (1) the D8 reconciliation did not exist in the engine — the scanner never
+reads Notion at scan start and the `applied` back-fill was chat-flow-only, so 3a.4 was
+re-scoped from "verify" to **BUILD** (token-gated Tracker read → `seen.jsonl` back-fill,
+sequenced before the sweep) and §0a re-worded to name it the one permitted additive scanner
+change; (2) the sweep's `seen.jsonl`-only scope + blind `apply_sweep_update` PATCH would
+clobber companion-resolved rows on posting death — and `User Declined` flips have no Tracker
+row to reconcile from — so 3a.4 gained the **read-before-write sweep guard** (flip only rows
+still `New — Unreviewed`). High: (3) claude.ai Projects offer no programmatic knowledge
+write — the manual voice/KB re-save mechanic is now explicit (§3/§4) and 3a.5's dry-run must
+round-trip across two conversations. Moderate: (4) the companion's Passed/Seen select values
+pinned to the provisioned vocabulary (§5.6, 3a.4, 3a.6); (5) composer snapshot staleness —
+compose-date + config-hash stamp + named re-compose triggers (§6, 3a.3); (6)
+`references/pitching.md` stays in place intact — the run-skill pitch router loads it at
+runtime (§6, 3a.2). Minor: (7) the 3a.8 no-PII check defined as a denylist (the 2.7
+writeback guard is not reusable); (8) the composer handles a voice-seed-less profile (Ani,
+guided-Q&A path). **D13 ⚑ resolved: split confirmed** — Q&A log stays in Notion; the KB is
+the draft-time retrieval source; the deletion story names both stores.
 
 ### 11.2 Build model + per-step effort — Claude Opus 4.8
 
