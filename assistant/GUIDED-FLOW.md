@@ -57,10 +57,17 @@ Provision my Notion databases under [parent page], validate my profile, and run 
 
 ## Stage B — Scanning & tracking  ·  Phase 1 · `job-scout-run`
 
-### B1. Run a scan (attended) — ✅
+### B1. Run a scan (attended, full scored) — ✅
 ```
-Run my job scan for [profile]. Score the candidates, push the shortlist to my Notion, and give me the ledger.
+Run a full job scan for [profile] using the job-scout-run skill. Pull state first, run the full
+rotation with --verbose, then do the judgment pass: score and archetype-tag every candidate against
+my filters and filter_notes, shortlist everything at/above my surface threshold, and log each
+decision to seen.jsonl. Push the shortlist to my Notion Passed/Seen Log as "New — Unreviewed" with
+role notes in the page body, run the shortlist sweep + the Tracker reconciliation, append the
+digest line, then push state. Give me the coverage ledger plus the shortlisted roles.
 ```
+> Runs in the repo-aware Claude session (laptop lane), NOT the companion Project — the scanner and
+> the companion are separate contexts bridged only by Notion.
 
 ### B2. Run a scan (unattended / scheduled) — ✅
 ```
@@ -159,36 +166,46 @@ reusable entry and regenerate knowledge-base.md for me to save.
 
 ## Stage E — Companion: the apply loop  ·  Phase 3a
 
-### E1. Work the queue — ✅
+### E1. Work a role — pull + prior-history cross-check — ✅ *(caught a real duplicate in QA)*
 ```
-Pull my "📥 New — Unreviewed" queue and let's work the top role (or: work [company — role]).
-Surface any prior history with the company first.
+Work my "📥 New — Unreviewed" queue — pull [company — role] (or the top role). BEFORE anything
+else, cross-check its Job URL against BOTH my Applications Tracker and Passed/Seen Log and surface
+any prior history: if I've already applied (a Tracker row with the same URL), tell me plainly —
+don't treat it as fresh and don't create a duplicate Tracker row. Surface prior reqs from the same
+company too.
+```
+> Why this matters: in QA this caught a role already applied to 8 days ago whose Passed/Seen row
+> had never been flipped out of `New — Unreviewed` — preventing a wasted re-application. The
+> prior-history cross-check is the companion's dedup safety net on top of the scanner's.
+
+### E2. Re-verify + recommend (don't draft yet) — ✅
+```
+Re-verify this posting before we draft: fetch the URL and check against my snapshot — still live?
+eligible (worldwide/EMEA-remote for me, no visa/citizenship clause)? hours? employment type (drives
+the closing gate — the contractor angle only if it's freelance/contract/B2B)? salary vs my floor
+(flag if unpublished)? If you can't read it, tell me and I'll paste the JD: [paste]. Then give me
+the verification read + an apply/pass recommendation. Do NOT draft yet.
 ```
 
-### E2. Re-verify (auto) / paste behind a wall — ✅
-```
-Re-verify this posting against my constraints before we draft — is it still live, eligible, the
-right hours/employment type, salary? If you can't read it, tell me and I'll paste it: [paste JD].
-```
-
-### E3. Draft on apply — ✅
+### E3. Draft on apply — 📋 *(pending live confirmation)*
 ```
 I want to apply. Draft the cover letter / email / form answers in my voice, from my knowledge
 base, honest about any gaps, each submittable in its own copy-block.
 ```
 
-### E4. Record — applied — ✅
+### E4. Record — applied — ✅ *(flip-half proven on OSF; Tracker-create pending a fresh role)*
 ```
 I applied to this one. Create the Applied Tracker row (my submitted answers in the body) and flip
-the Passed/Seen row to "User Applied Elsewhere".
+the Passed/Seen row to "User Applied Elsewhere". If a Tracker row with this Job URL already exists,
+do NOT duplicate it — just flip the Passed/Seen row.
 ```
 
-### E5. Record — declined — ✅
+### E5. Record — declined — 📋 *(pending live confirmation)*
 ```
 I'm passing on this — reason: [reason]. Flip the Passed/Seen row to "User Declined" with that reason.
 ```
 
-### E6. Mark a dead posting — ✅
+### E6. Mark a dead posting — 📋 *(pending live confirmation)*
 ```
 This posting is dead/expired — I checked. Flip its Passed/Seen row to "Stale/Expired" with a dated note.
 ```
@@ -226,8 +243,10 @@ paste steps (B4/F1's paste-an-email) with automated capture.
 
 ## Maintenance (standing rule)
 
-- **Add to this file whenever a step's prompt is tuned** — new phase, new skill, a dogfood
-  refinement. Current → retroactive → future: nothing evaporates in chat.
+- **Fold each tuned prompt in the moment the step is *proven*, not batched at the end**
+  (standing cadence, Borjan 2026-07-18): capture per proven step in its own small PR — a long
+  session can be stopped at any time, so never let proven prompts sit un-banked in chat. Capture
+  when proven (not while still a draft), then mark ✅.
 - **Keep prompts app-ready:** context values in `[brackets]`, one clear action each, no repo-path
   assumptions the app can't satisfy (Stage-B CLI entries are the exception — they're operator
   tools until Phase 4 wraps them).
