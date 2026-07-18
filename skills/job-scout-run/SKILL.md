@@ -10,8 +10,8 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.3.0"
-  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 2 additive: seniority/employment/floorless judgment wiring + run.effort design-and-defer (borjan-pm behavior unchanged)."
+  version: "4.4.0"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless)."
   created_by: Borjan
   organization: 2Coders Studio
   last_updated: "2026-07-16"
@@ -80,6 +80,12 @@ optional, none is judged-from-memory. `<id>` = the active profile.
    liveness pass, **runs the shortlist liveness sweep** (re-checks accumulated
    `New — Unreviewed` rows; confident-stale rows are retired with a queued Notion flip
    — see the sweep section), and prints the coverage ledger. It does NOT score.
+   **Scan-start reconciliation (3a.4, D8):** with `NOTION_TOKEN` set, the scan first READS
+   the profile's Applications Tracker and back-fills any matching seen.jsonl record to
+   `applied` — so a role the Application Companion (Phase 3a, claude.ai side) recorded as
+   applied dedups this run and exits the sweep's scope. It is READ-ONLY on the Tracker (the
+   firewall holds), token-gated (tokenless → an honest ledger skip line), and idempotent; it
+   changes nothing about what the scan fetches, filters, scores, or writes as shortlist rows.
 2. **Read the results:** `profiles/<id>/state/last_run_candidates.json` + the
    per-candidate JD cache files. Each candidate carries: title, company, loc, url,
    platform, posted_at, salary, `keyword_matched`, `flags[]` (regex first-pass hits +
@@ -474,6 +480,16 @@ best-effort; isolated blocked fetches are expected and are NOT source-down.
 ---
 
 ## Changelog
+
+**4.4.0** (2026-07-18) — Phase 3a step 3a.4: the ONE permitted scanner change — a scan-start
+**Application-Tracker reconciliation**. With `NOTION_TOKEN` set, `core/scan.py` READS the
+Tracker before dedup/sweep and back-fills matching seen.jsonl records to `applied`, so a role
+the Application Companion recorded as applied dedups on the next scan and leaves the sweep's
+scope (the D8 cross-process dedup handoff). Plus a read-before-write guard in
+`notion_sync.apply_sweep_update` (flip only rows still `New — Unreviewed`, never clobber a
+companion-resolved `User Declined`/`User Applied Elsewhere` row). READ-ONLY on the Tracker
+(firewall intact), token-gated (tokenless = honest ledger skip, byte-identical behavior),
+idempotent. No change to what a scan fetches, filters, scores, or writes as shortlist rows.
 
 **4.3.0** (2026-07-16) — Phase 2 step 2.8: documented the `run.effort` / model-tier mapping
 (fast→Haiku, mid→Sonnet, high→Opus), the two-stage judgment design (cheap triage → capable

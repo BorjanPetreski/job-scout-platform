@@ -199,15 +199,40 @@ def find_page_by_url(ds_id: str, url: str) -> str | None:
     return results[0]["id"] if results else None
 
 
+def _current_reason(page_id: str) -> str | None:
+    """Read a Passed/Seen row's current `Reason Passed` select (the sweep read-before-write
+    guard). None if the page can't be read or carries no select value."""
+    r = _req("GET", f"{API}/pages/{page_id}")
+    if r.status_code != 200:
+        return None
+    sel = (r.json().get("properties", {}).get("Reason Passed", {}) or {}).get("select") or {}
+    return sel.get("name")
+
+
 def apply_sweep_update(ds_id: str, rec: dict, cfg: dict) -> bool:
     """Flip an existing row per the record's notion_update: Reason Passed and/or a
-    dated sweep note appended to Notes. Falls back to create if the row never synced."""
+    dated sweep note appended to Notes. Falls back to create if the row never synced.
+
+    Read-before-write guard (3a.4, write-ownership by row STATE / D7): the sweep only owns
+    the `New — Unreviewed` → `Stale/Expired` transition. A row the companion or the user has
+    already resolved (`User Applied Elsewhere`, `User Declined`, or any non-`New — Unreviewed`
+    reason) is left untouched — a blind PATCH would clobber it back to `Stale/Expired` when the
+    posting later dies (a `User Declined` flip has no Tracker row to reconcile the local
+    `seen.jsonl` from, so its record is still `shortlisted` and stays in sweep scope). The
+    guard checks the LIVE Notion reason before writing, never the stale local record."""
     upd = rec.get("notion_update") or {}
     page_id = find_page_by_url(ds_id, rec.get("url") or "")
     if not page_id:
         # row never made it to Notion (e.g. sweep ran before a failed sync) — create it
         typed_create_page(ds_id, build_passed_seen_properties(rec, cfg),
                           [rec.get("notes") or ""])
+        return True
+    current = _current_reason(page_id)
+    if current != "New — Unreviewed":
+        # resolved by the companion/user (or unreadable) — do NOT clobber. Treated as handled
+        # so the record is marked synced and the sweep won't retry the write forever.
+        print(f"[sweep-guard] {rec.get('url')}: Notion row is {current!r} (companion/user-resolved) "
+              f"— skipping sweep flip, no clobber", file=sys.stderr)
         return True
     props: dict = {}
     if upd.get("reason"):
@@ -355,9 +380,80 @@ def sync_applied(url: str, dry_run: bool = False) -> None:
     print(f"Tracker row created: {page_id}")
 
 
+def reconcile_applied_from_tracker(cfg: dict) -> dict:
+    """Scan-start cross-process dedup handoff (3a.4, D8). READ the Applications Tracker and
+    back-fill any matching `seen.jsonl` record to `status: applied`, so a role the companion
+    recorded as applied (Tracker row created on claude.ai) dedups on the next scan AND leaves
+    the shortlist sweep's scope (which is `shortlisted`-only) the same run.
+
+    This is the ONE additive scanner-side reconciliation step. It is:
+      * READ-ONLY on the Tracker — the firewall (the scanner never WRITES the Tracker) is
+        intact; the new access is a query, nothing more;
+      * token-gated — no `NOTION_TOKEN` → honest skip, reported in the ledger, no behavior
+        change; dry-run profiles skip too (no Tracker);
+      * idempotent — a record already `applied` is left alone (no redundant append), so
+        re-running the scan does not grow `seen.jsonl`;
+      * inert to the write path — `sync_scan` only pushes non-applied statuses, so a
+        back-filled `applied` record triggers no Notion write and never re-touches its
+        companion-owned Passed/Seen row.
+
+    Never fetches boards, filters, scores, or writes shortlist rows.
+    Returns counters for the ledger: {tokenless, tracker_rows, backfilled, already, unmatched}.
+    """
+    result = {"tokenless": False, "tracker_rows": 0, "backfilled": 0, "already": 0,
+              "unmatched": 0, "skipped": None}
+    if cfg["notion"].get("dry_run"):
+        result["skipped"] = "dry-run profile"
+        return result
+    ds_id = (cfg["notion"].get("tracker") or {}).get("data_source_id")
+    if not ds_id:
+        result["skipped"] = "no tracker data_source_id"
+        return result
+    if not os.environ.get("NOTION_TOKEN"):
+        result["tokenless"] = True
+        return result
+
+    urls: list[str] = []
+    cursor = None
+    while True:
+        body: dict = {"page_size": 100}
+        if cursor:
+            body["start_cursor"] = cursor
+        r = _req("POST", f"{API}/data_sources/{ds_id}/query", json=body)
+        if r.status_code != 200:
+            result["skipped"] = f"tracker query {r.status_code}"
+            return result
+        data = r.json()
+        for row in data.get("results", []):
+            u = (row.get("properties", {}).get("Job URL", {}) or {}).get("url")
+            if u:
+                urls.append(u)
+        if not data.get("has_more"):
+            break
+        cursor = data.get("next_cursor")
+    result["tracker_rows"] = len(urls)
+
+    seen = dedup.load_seen()
+    for u in urls:
+        rec = seen["by_url"].get(dedup.norm_url(u))
+        if rec is None:
+            result["unmatched"] += 1          # Manual-Entry role the scanner never saw — nothing to reconcile
+            continue
+        if rec.get("status") == "applied":
+            result["already"] += 1            # idempotent: already reconciled
+            continue
+        note = ((rec.get("notes") or "") + " | reconciled applied from Applications Tracker "
+                "(companion/chat apply)").strip(" |")
+        dedup.update(u, {"status": "applied", "reason": "User Applied Elsewhere", "notes": note})
+        result["backfilled"] += 1
+    return result
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--applied", metavar="URL", help="interactive applied flow (Tracker write)")
+    ap.add_argument("--reconcile", action="store_true",
+                    help="scan-start dedup handoff: back-fill seen.jsonl 'applied' from the Tracker")
     ap.add_argument("--digest", metavar="LINE", help="digest line for the Runs page")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--profile", default=None)
@@ -366,5 +462,7 @@ if __name__ == "__main__":
         paths.set_profile(args.profile)
     if args.applied:
         sync_applied(args.applied, dry_run=args.dry_run)
+    elif args.reconcile:
+        print(json.dumps(reconcile_applied_from_tracker(_cfg()), ensure_ascii=False))
     else:
         sync_scan(dry_run=args.dry_run, digest_line=args.digest)
