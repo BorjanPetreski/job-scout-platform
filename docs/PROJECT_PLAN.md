@@ -283,12 +283,21 @@ Scope (high-level; gets its own spec when Phase 3 ships):
    into a store on the user's side, with Claude called statelessly. Everything deletable;
    nothing mined. This is the phase that makes the §1a principle literally true (Phase 3's
    `secrets.py` seam + ARCHITECTURE §8 storage-adapter boundary are the hooks it lands on).
+5. **Prompt-driven wizard over a curated prompt library (Borjan, 2026-07-18).** The app is
+   not freeform chat: the user sees a **simple action** — a button, a plain question, "Next",
+   "Yes" — and it fires a **curated, battle-tested prompt in the background.** The prompt is
+   the unit of interaction; the UI is a thin trigger over it. Those prompts are captured *as
+   they are tuned* in **[assistant/GUIDED-FLOW.md](../assistant/GUIDED-FLOW.md)** (current +
+   retroactive + future), so Phase 4 wires UI triggers to proven prompts instead of
+   re-inventing them. Each entry is a versioned asset; the button label is the Action, the
+   background call is the Prompt.
 
 **Design constraint imposed now (so Phases 1–3 stay compatible):** every setup and run
 operation must be scriptable/headless — no step may exist only as a human-readable
 instruction. If a human must click something (e.g. paste a Notion token), the flow exposes
 it as a discrete, promptable step. The Phase 2 interview and the Phase 3 companion composer
-are built against this from the start.
+are built against this from the start — and every tuned prompt is banked in
+[assistant/GUIDED-FLOW.md](../assistant/GUIDED-FLOW.md).
 
 ### Phase 5 — Platform + integrations
 
@@ -347,6 +356,12 @@ v3.x shipped:
   why, how it works, and what using it looks like — plus any affected reference docs.
   A phase is not done until the guide reflects it; seed this step into every future
   phase checklist (Phase 3+) when the checklist is created.
+- **Bank every tuned prompt in the guided-flow library** (standing rule, adopted 2026-07-18):
+  whenever a user-facing step's prompt is fine-tuned through dogfooding/QA, capture it in
+  [assistant/GUIDED-FLOW.md](../assistant/GUIDED-FLOW.md) as a `{simple action → background
+  prompt}` entry — current, retroactive, and future. The prompts are the app's golden path;
+  Phase 4 wires UI triggers to them (a button label is the Action, the background call is the
+  Prompt) instead of re-inventing them. Nothing evaporates in chat.
 
 ## 5. Open questions
 
