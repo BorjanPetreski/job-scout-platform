@@ -67,6 +67,23 @@ PROGRESS log shows being done by hand (JustJoin category IDs, Remotive slug, beh
 but **triggered by a signal instead of by chance**, and always through the catalog/validator (no
 ad-hoc scanner edits; prime directive holds).
 
+### Layer 1.5 — self-healing (in-scan remediation) (Borjan, 2026-07-18)
+
+Between the mechanical scan and the Layer-2 review, a bounded **self-healing** step that recovers
+the *mechanically-recoverable* failures within the same run:
+
+- **Safe to auto-heal:** retry-with-backoff on transient failures; escalate direct→headless fetch
+  when a board blocks the plain request; fail over to a known alternate endpoint/mirror.
+- **NOT auto-healed (flag for Layer 2):** a selector/endpoint that actually changed, a board to
+  activate/deactivate, any catalog-structure edit — these need diagnosis + review, never an
+  automatic edit (a wrong auto-edit could silently corrupt results → violates honest-failure).
+
+**Effect:** fewer "sources down" per run, less manual repair, more resilient coverage.
+**Guardrails (non-negotiable):** stay conservative; **always report what was healed** ("recovered
+X via headless") so the honest-failure signal survives — never silently paper over real rot; and
+respect per-host politeness so retries don't read as scraping and trip more bot-walls. Done greedily
+it hides the very signals the health loop needs; done conservatively it's a strict win.
+
 ### The hook — reuse the recompute counter
 
 `runs.json` already carries `recompute.sessions_since` / `due_at_sessions` that prints "⚠ tier
