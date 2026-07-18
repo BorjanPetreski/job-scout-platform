@@ -63,6 +63,87 @@ is *born sellable* (clean diligence, real retention hooks, low COGS) instead of 
 engine/core → templates + guided setup → the AI companion (voice/KB/loop) → the app + client-side
 store → platform + integrations + accounts/tiers → **GTM / marketing & sales prep** → run or sell.
 
+## The starter kit — concrete reusable assets (with pointers)
+
+The method above is the *how*; this is the *what to lift*. A deep pass over this repo (2026-07-18)
+sorting every asset into **reusable → genericize** vs **product-specific → leave**. For the next
+app, copy the left column, strip the domain nouns, keep the machinery. Together these are ~70% of a
+new AI-native product's scaffolding before you write a line of domain logic.
+
+### A. The documentation skeleton — lift the shapes, empty the content
+The whole `docs/` system transfers as templates:
+- **`PROJECT_PLAN.md`** — vision + standing principles + phase map + §3x parked-ideas + execution
+  discipline. The single source of truth. *(Reusable structure; swap the product.)*
+- **`PROGRESS.md`** — the session-resume contract (read-first, never-redo-done, update-in-session,
+  push-before-end) + per-phase checklists + session log. **The biggest single reuse** — it's the
+  multi-session-build discipline itself.
+- **Per-phase `PHASE_N_PLAN.md`** + the **review-gate prompt** (see PHASE_3A_PLAN §11.1) + the
+  **`*_ACCEPTANCE.md`** live-UAT runbook shape.
+- **`ARCHITECTURE.md`**, **`*_CONFIG_SPEC.md`**, **`PLATFORM_GUIDE.md`** (plain-language guide),
+  **`HEALTH_MONITORING.md`**, **`GUIDED-FLOW.md`** (prompt library), and this playbook +
+  `BUSINESS_NOTES.md`. All shape-reusable.
+
+### B. The layered config architecture — the crown jewel
+A three-layer config system: **registry (capabilities) + templates (type presets) + instances
+(the specific user/tenant) → one resolved effective config**, schema-validated in CI.
+- **`core/profile_loader.py`** — the resolver: merges registry + template + instance, applies
+  extends-chains, emits the effective config; strict validation with named errors/warnings.
+- **`core/schema/*.yaml`** + **`core/validate.py`** — schema-driven validation wired to a **single
+  CI required check** (compiles code + validates every template/instance + state integrity + skill
+  frontmatter).
+- **`core/paths.py`** — instance-namespaced state resolution (explicit → env → auto-pick), so the
+  system is multi-tenant from day one.
+- Directory layout: `catalog/` (registry) · `templates/<stream>/` (presets) · `profiles/<id>/`
+  (instances) · `suggestions/` (staged write-back) · `assistant/` (companion package).
+- **Genericize:** rename `profile`→`instance/tenant`, swap the domain fields in the schema, keep
+  the merge/resolve/validate machinery verbatim.
+
+### C. AI two-layer architecture + the companion binding
+- **`core/scan.py` shape** — a *mechanical orchestrator* that emits structured JSON for a *model
+  judgment* layer ("scripts flag, the model decides"); `--plan` dry-run, `--verbose` progress, an
+  honest ledger. Reuse the split, not the board logic.
+- **`core/compose_assistant.py` + `assistant/`** — bind a repo's config to a **claude.ai Project**:
+  a PII-free config snapshot + generic doctrine composed into a **bootstrap (→ custom instructions)
+  + full doc (→ Project knowledge)**, compose-date + config-hash stamped, idempotent. This
+  "companion binding" is reusable for *any* claude.ai-Project-backed product.
+- **`assistant/GUIDED-FLOW.md`** — the curated-prompt library (UI trigger → background prompt).
+- **`skills/*/SKILL.md`** — frontmatter conventions + the router pattern (load only what the task
+  needs) + the skill-audit discipline.
+
+### D. State, data & external-integration patterns
+- **`core/dedup.py`** — append-only last-wins JSONL event log with idempotent supersede + normalized
+  matching. A reusable *event-log + provenance* pattern (swap the match keys).
+- **`core/state_sync.py`** — git round-trip for instance state, union-merge on concurrent writes.
+- **`core/secrets.py`** — the secret seam (resolve token via override → env, never in repo).
+- **`core/provision_notion.py`** — idempotent **provision-or-adopt** of external resources with
+  **instruct→verify-by-probe** (probe the API first; script what's scriptable, flag what isn't).
+- **`core/notion_sync.py`** — typed external writes with **post-write assertion**, a
+  **tokenless→pending-export** fallback (hand off to an MCP session), and **write-ownership
+  partitioning** (two processes can't collide). Reusable for any external system of record.
+- **`core/sweep.py`** — rate-limited periodic re-check of an accumulated queue (freshness/liveness).
+- **`core/writeback.py`** — a consent-gated, PII-guarded, **staged + human-curated feedback loop**.
+
+### E. External-dependency resilience
+For any product standing on fragile external sources/APIs: **honest-failure** (report degraded,
+never silently-wrong) + `fetch_evidence`-style telemetry + the **scheduled health-review + repair**
+loop in `HEALTH_MONITORING.md` (Layer-1 signal emitter + Layer-2 diagnose/repair on a cadence).
+
+### F. Process & quality artifacts
+- The **Fable-5 adversarial review-gate prompt**, the **effort-tiering table**, the **no-PII
+  denylist**, the **prime-directive byte-identical proof**, feature-branch-per-phase + small PRs +
+  a single required CI check. All lift as-is.
+
+### What does NOT transfer (product-specific — leave it)
+`core/fetch_boards.py`, `render.py`, `check_links.py`, `linkedin_tripwire.py`, `salary.py`,
+`core/data/seniority_lexicon.yaml`, the `catalog/` + `templates/` *content*, and the job-hunt
+doctrine. The *shapes* around them (fetch→judge, registry+template+instance, voice/KB) reuse; the
+domain logic is thrown away and rewritten. `migrate_state.py` / `parity_diff.py` are one-off
+migration tools, but the *parity discipline* (prove byte-identical vs a baseline) reuses.
+
+> **Turn this into an actual starter repo when app #2 begins:** copy A–F, delete the "does not
+> transfer" list, empty the schema + docs of job-scout nouns, and you have a validated, CI-green,
+> companion-bindable, multi-tenant skeleton on day one.
+
 ## Build *for the flip* (bake valuation in from day one)
 
 A product is worth a multiple of **revenue × retention × defensibility**, discounted for risk
