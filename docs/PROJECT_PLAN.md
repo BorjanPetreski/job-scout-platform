@@ -317,6 +317,17 @@ Standing rule carried from Phase 1: nothing in Phases 1–4 may assume single-te
 that is expensive to unwind — hence profile-namespaced state, per-profile targets, and the
 storage-adapter boundary from the start.
 
+### Phase 6 — GTM / launch (marketing & sales prep)
+
+**After the product is built, a dedicated go-to-market phase** (Borjan, 2026-07-18: "phase
+latest + 1 for marketing and sales preparation"): positioning + pricing, the sales/marketing
+materials (site, deck, one-pagers, demo), advertising + social, and — depending on the chosen
+path (§ business notes) — white-label/B2B sales collateral or a marketplace-flip listing package.
+The strategy that feeds it is captured early and refreshed with real numbers in
+**[BUSINESS_NOTES.md](BUSINESS_NOTES.md)**; the repeatable build/sell method is
+**[BUILD_AND_FLIP_PLAYBOOK.md](BUILD_AND_FLIP_PLAYBOOK.md)**. Scope firms up once there's traction
+data (MRR, retention, COGS) — every GTM decision hinges on it.
+
 ## 3x. Parked ideas & inputs to collect (so nothing is lost)
 
 Captured here the moment they come up, with a phase pointer — even the far-out ones. This is
@@ -332,6 +343,9 @@ the "nothing gets summarized-away" list.
 | **Email auto-ingest (scoped OAuth)** | 5 | Read-only, job-sender-filtered, opt-in. Paste-based in 3b. |
 | **LinkedIn export ingest** | 5 | User's own data export, never scraping. |
 | **Free vs paid tiers / accounts / one-time setup** | 5 | Already shaped by the `run.effort` entitlement axis (ARCHITECTURE §7a) and the D18 secret/account seam. Pricing instinct + open-source-or-not TBD (Borjan: "more in Phase 4"). |
+| **In-product ads (web-platform route)** | 6 / tier design | If web-platform/free-tier: an ad surface as a free-user revenue lever — weigh against the premium/privacy positioning ("we don't mine you"). Later-phase decision. See [BUSINESS_NOTES.md](BUSINESS_NOTES.md). |
+| **Monetization & valuation strategy** | 6 (GTM) | White-label/B2B as the primary wedge, consumer SaaS as demo, flip-after-traction; valuation = f(revenue, retention, defensibility), not code. Living in [BUSINESS_NOTES.md](BUSINESS_NOTES.md). |
+| **Reusable build-and-flip framework** | meta / cross-product | The disciplined method itself, extracted to reuse on the next app (build → flip → repeat; maybe eventually our own flip marketplace — Borjan). Living in [BUILD_AND_FLIP_PLAYBOOK.md](BUILD_AND_FLIP_PLAYBOOK.md). |
 
 ## 4. Execution discipline (multi-session builds)
 
