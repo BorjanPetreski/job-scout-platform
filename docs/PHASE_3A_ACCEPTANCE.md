@@ -30,8 +30,9 @@ If you changed `profile.yaml` since, re-compose first: `python3 core/compose_ass
 Follow [`assistant/SETUP.md`](../assistant/SETUP.md) — the short version:
 
 1. On claude.ai, create a **Project** ("Job Applications — Borjan").
-2. Paste **all** of `profiles/borjan-pm/assistant/project-instructions.md` into the Project's
-   custom instructions.
+2. Paste `profiles/borjan-pm/assistant/**project-bootstrap.md**` into the Project's custom
+   instructions, and **upload `project-instructions.md` into Project knowledge** (the full
+   doctrine is too long for the custom-instructions field — see SETUP.md §3).
 3. Upload your materials into Project knowledge per
    `profiles/borjan-pm/assistant/data-manifest.md` (CV, cover letter, quarterly review, past
    answers, articles). Anything you share *only* for tone, the companion shreds after extraction.

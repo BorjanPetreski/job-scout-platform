@@ -29,10 +29,12 @@ human running the setup and the acceptance dry-run, not for the Project's instru
 ## How binding works
 
 1. The engine composes the generic modules + a **PII-free profile snapshot** (floor, eligibility,
-   location/timezone, Notion `data_source_id`s) into
-   `profiles/<id>/assistant/project-instructions.md` via `core/compose_assistant.py`.
-2. The user creates a **claude.ai Claude Project**, pastes those instructions, uploads their
-   materials per the profile's `assistant/data-manifest.md`, and connects the **Notion MCP**.
+   location/timezone, Notion `data_source_id`s) via `core/compose_assistant.py` into **two** files:
+   the full **`project-instructions.md`** (→ Project *knowledge*) and a compact
+   **`project-bootstrap.md`** (→ the Project *custom-instructions* field, which caps at ~4k chars).
+2. The user creates a **claude.ai Claude Project**, pastes the **bootstrap** into custom
+   instructions, uploads **`project-instructions.md`** + their materials (per the profile's
+   `assistant/data-manifest.md`) into Project knowledge, and connects the **Notion MCP**.
 3. The companion builds the user's voice profile and knowledge base **inside the Project** (the
    repo never sees the user's CV/PII — the data principle), and works the Notion shortlist.
 
