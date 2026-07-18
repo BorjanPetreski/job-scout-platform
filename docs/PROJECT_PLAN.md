@@ -242,6 +242,24 @@ drafts a real application in it, records it, and the next scan dedups it — plu
 pass proving the package isn't Borjan-shaped (a second profile, e.g. `ani-backend-java`).
 No scanner code changes; the Tracker firewall and the data principle hold throughout.
 
+#### Interstitial — Platform Health & Self-Healing (built between 3a and 3b)
+
+**A cross-cutting scanner-ops capability, scheduled for a full build right after 3a acceptance
+and before 3b** (Borjan, 2026-07-18: "we should fully build this before continuing with 3b …
+this should be here early so it gets clearly buffed as we move in higher phases"). Board rot is
+the scanner's slowest inevitable failure mode; the engine should measure its own health
+continuously and honestly, and Claude should diagnose + repair on a cadence — before erosion
+costs real jobs. Design (Layer-1 `core/health.py` emits trend/severity signals from the existing
+`runs.json` + `fetch_evidence.jsonl` telemetry; Layer-2 scheduled Claude "health review" fetches
+suspect boards, diagnoses selector/endpoint/slug/bot-wall drift, and repairs the catalog through
+the validator; a `health_review_due` counter reuses the recompute mechanism) and the honest-
+failure floor it builds on are in the **living seed [HEALTH_MONITORING.md](HEALTH_MONITORING.md)**.
+It is **cross-cutting and gets reinforced each phase** — new platforms ship health baselines,
+multi-profile health separates platform vs config faults, Phase 4 surfaces a health view + keeps
+the time-series, Phase 5 extends monitoring to every new integration/connector. Built via the
+standard pipeline (brainstorm → detailed plan → Fable 5 gate → Opus 4.8 build); prime directive
+holds (repairs land in the catalog through CI, never ad-hoc scanner edits).
+
 ### Phase 4 — The app + client-side store
 
 **Goal:** what Phases 2–3 do conversationally, done through screens — for users who will
