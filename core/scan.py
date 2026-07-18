@@ -15,6 +15,8 @@ Usage:
   scan.py --full-sweep        ignore the freshness window (scheduler runs this on Mondays)
   scan.py --no-headless       skip headless escalations (fast smoke run)
   scan.py --no-sweep          skip the shortlist liveness sweep (parity/debug only)
+  scan.py --verbose|-v        stream per-phase / per-platform progress to STDERR (the stdout
+                              ledger is unchanged; a long silent run becomes watchable)
 
 What gets auto-logged to seen.jsonl by a scan (everything else is Claude's call):
   dropped/Filtered Out    auto_drop_patterns or the closed-location-list detector matched
@@ -252,7 +254,13 @@ def print_plan(cfg: dict) -> None:
 
 
 def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool = True,
-             run_shortlist_sweep: bool = True) -> dict:
+             run_shortlist_sweep: bool = True, verbose: bool = False) -> dict:
+    def _log(msg: str) -> None:
+        """Opt-in progress to STDERR (never stdout — the ledger stays machine-parseable).
+        Additive observability only; changes nothing the scan fetches/filters/scores/writes."""
+        if verbose:
+            print(f"[scan] {msg}", file=sys.stderr, flush=True)
+
     validate_config(cfg)
     # ---- scan-start reconciliation (3a.4, D8): READ the Applications Tracker and back-fill
     # matching seen.jsonl records to `applied` BEFORE dedup + the sweep, so a companion-recorded
@@ -260,7 +268,15 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     # Tracker firewall holds (read-only); board fetch/filter/score untouched. Runs before
     # load_seen so the reload reflects the back-filled statuses.
     import notion_sync
+    _log("reconciling applied roles from the Applications Tracker (read-only)…")
     reconcile = notion_sync.reconcile_applied_from_tracker(cfg)
+    if reconcile.get("tokenless"):
+        _log("  reconcile skipped — no NOTION_TOKEN")
+    elif reconcile.get("skipped"):
+        _log(f"  reconcile skipped — {reconcile['skipped']}")
+    else:
+        _log(f"  reconcile: {reconcile['tracker_rows']} tracker rows, "
+             f"{reconcile['backfilled']} back-filled, {reconcile['already']} already")
     seen = dedup.load_seen()
     keywords = [k.lower() for k in (cfg["keywords"]["core"] + cfg["keywords"]["expanded"])]
     caps = cfg.get("caps", {})
@@ -275,8 +291,16 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         mid = (len(platforms) + 1) // 2
         platforms = platforms[:mid] if half == "AM" else platforms[mid:]
 
-    results = [fetch_boards.fetch_platform(p, cfg) for p in platforms]
+    _log(f"fetching {len(platforms)} active platforms (tier order)…")
+    results = []
+    for i, p in enumerate(platforms, 1):
+        _log(f"  [{i}/{len(platforms)}] T{p.get('tier','?')} {p.get('name','?')}…")
+        r = fetch_boards.fetch_platform(p, cfg)
+        _log(f"      → {len(r.get('candidates') or [])} raw"
+             + (" · SOURCE DOWN" if r.get('source_down') else ""))
+        results.append(r)
     if cfg["linkedin_tripwire"].get("enabled", True):
+        _log("  LinkedIn tripwire…")
         results.append(linkedin_tripwire.fetch_tripwire(cfg))
 
     sources_down = [r["platform"] for r in results if r["source_down"]]
@@ -307,8 +331,12 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
                 continue
             new_cands.append(c)
 
+    _log(f"triage done: {len(new_cands)} new candidates survive keyword+freshness+dedup+hard-filter "
+         f"({dropped} auto-dropped)")
+
     # ---- full JD reads for survivors lacking one (local parses; cap is politeness)
     max_reads = int(caps.get("max_full_reads_per_run", 15))
+    _log(f"reading full JDs (up to {max_reads})…")
     reads = 0
     for c in new_cands:
         c["source_url"] = None
@@ -334,6 +362,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     verdicts = {}
     if to_check:
         urls = [u for _, u in to_check]
+        _log(f"liveness pass on {len(urls)} URLs…")
         for res in check_links.check_urls(urls, cfg, use_headless=use_headless):
             verdicts[res["url"]] = res
     survivors = []
@@ -428,7 +457,9 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     sweep_counts = {"scope": 0, "checked": 0, "stale": 0, "unverifiable": 0,
                     "escalated": 0, "live": 0, "deferred": 0}
     if run_shortlist_sweep:
+        _log("shortlist liveness sweep (re-checking accumulated New — Unreviewed rows)…")
         sweep_counts = sweep.run_sweep(cfg, use_headless=use_headless)
+    _log("writing candidates JSON + ledger…")
 
     # ---- cache JDs, emit candidates JSON
     jd_cache = paths.jd_cache_dir()
@@ -519,6 +550,9 @@ if __name__ == "__main__":
     ap.add_argument("--no-headless", action="store_true", help="skip headless escalation")
     ap.add_argument("--no-sweep", action="store_true",
                     help="skip the shortlist liveness sweep (parity/debug only)")
+    ap.add_argument("--verbose", "-v", action="store_true",
+                    help="stream per-phase / per-platform progress to stderr (the stdout ledger "
+                         "is unchanged) — useful for watching a long run")
     args = ap.parse_args()
     config = profile_loader.load(args.profile or paths.get_profile())
     if args.plan:
@@ -526,4 +560,4 @@ if __name__ == "__main__":
         print_plan(config)
     else:
         run_scan(config, args.half, args.full_sweep, use_headless=not args.no_headless,
-                 run_shortlist_sweep=not args.no_sweep)
+                 run_shortlist_sweep=not args.no_sweep, verbose=args.verbose)
