@@ -302,12 +302,18 @@ the draft-time retrieval source; the deletion story names both stores.
 
 ### 11.2 Build model + per-step effort — Claude Opus 4.8
 
-Build on `claude-opus-4-8`. Default effort **`high`**; tier it:
+Build on `claude-opus-4-8`. Default effort **`high`**; tier it. *(Retiered after the 3a.0
+gate: the gate resolved the design ambiguity that originally put 3a.4/3a.5 at `xhigh` —
+they are now precise specs, and careful execution of a precise spec is `high` work. The
+`xhigh` premium is reserved for genuine unknowns, via the auto-escalation rule below and
+the live acceptance.)*
 
 | Steps | Effort | Why |
 |-------|--------|-----|
 | 3a.1–3a.2 (package extraction, profile split), 3a.9–3a.10 (docs) | `medium` | mechanical, well-patterned |
 | 3a.3 (composer), 3a.6 (setup guide), 3a.8 (CI) | `high` | real design surface, bounded by spec |
-| 3a.4 (write-contract + reconciliation), 3a.5 (voice/KB procedure), 3a.7 (live acceptance) | `xhigh` | firewall/boundary correctness + the voice-fidelity + end-to-end test |
+| 3a.4 (write-contract + reconciliation), 3a.5 (voice/KB procedure) | `high` + **auto-escalate** | post-gate these are precise specs (§6 reconciliation mechanics; §3/§4 persistence mechanic). **Auto-escalation rule: the moment the step surfaces ANYTHING the amended spec does not cover** — a back-fill idempotency edge, a tokenless-path surprise, a sweep-ordering interaction, Notion 429/permission behavior, a persistence-mechanic gap — **STOP, switch the step to `xhigh`, and only then continue. Never improvise past the spec at `high`.** |
+| 3a.7 (live acceptance) | `xhigh` | live judgment against real postings + the end-to-end firewall/dedup/no-clobber verification — the one step where open-ended thinking is back in play |
 
-Escalate a single step to Fable 5 only if it turns out genuinely hard/ambiguous mid-build.
+Escalate a single step to Fable 5 only if it turns out genuinely hard/ambiguous mid-build
+(i.e. `xhigh` still isn't resolving it).
