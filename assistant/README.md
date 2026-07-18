@@ -22,8 +22,9 @@ instructions by `core/compose_assistant.py`:
 | `06-verification.md` | Re-verify fetch-first; the wall/paste fallback; dead → `Stale/Expired` |
 | `07-voice-delivery-discipline.md` | Copy-blocks, first-draft voice, AI-tells, salary-ask, closing gate |
 
-Not composed: this `README.md` (setup guide, for the human running the binding — see
-**Setup & binding** below).
+Not composed (they don't match the `NN-*.md` glob): this `README.md`, `SETUP.md` (the binding
+walkthrough), and `DRY-RUN.md` (the voice + KB persistence-round-trip script). Those are for the
+human running the setup and the acceptance dry-run, not for the Project's instructions.
 
 ## How binding works
 
