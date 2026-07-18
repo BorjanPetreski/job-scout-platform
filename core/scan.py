@@ -22,6 +22,11 @@ What gets auto-logged to seen.jsonl by a scan (everything else is Claude's call)
                           post-shortlist retirements (ARCHITECTURE.md §6)
   unverified_blocked      no JD obtainable AND liveness unverifiable — confirmed dead end
                           (SysMap rule; suppressed on future scans, reason updated if later resolved)
+  applied (back-fill)     scan-start reconciliation (3a.4, D8): a role the Application Companion
+                          recorded as applied (Tracker row) is READ from the Tracker and its
+                          matching seen.jsonl record flipped shortlisted→applied, so it dedups
+                          this run and leaves the sweep's scope. Token-gated, idempotent,
+                          READ-ONLY on the Tracker (firewall intact); no fetch/filter/score change.
 """
 
 from __future__ import annotations
@@ -249,6 +254,13 @@ def print_plan(cfg: dict) -> None:
 def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool = True,
              run_shortlist_sweep: bool = True) -> dict:
     validate_config(cfg)
+    # ---- scan-start reconciliation (3a.4, D8): READ the Applications Tracker and back-fill
+    # matching seen.jsonl records to `applied` BEFORE dedup + the sweep, so a companion-recorded
+    # application dedups this run and exits the sweep's scope. Token-gated + idempotent; the
+    # Tracker firewall holds (read-only); board fetch/filter/score untouched. Runs before
+    # load_seen so the reload reflects the back-filled statuses.
+    import notion_sync
+    reconcile = notion_sync.reconcile_applied_from_tracker(cfg)
     seen = dedup.load_seen()
     keywords = [k.lower() for k in (cfg["keywords"]["core"] + cfg["keywords"]["expanded"])]
     caps = cfg.get("caps", {})
@@ -450,7 +462,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         "platforms_covered": [r["platform"] for r in results if not r["source_down"]],
         "sources_down": sources_down,
         "new": len(survivors), "dropped": dropped, "link_dead": link_dead,
-        "sweep": sweep_counts,
+        "sweep": sweep_counts, "reconcile": reconcile,
         "half": half, "full_sweep": full_sweep,
     }
     runs["recompute"]["sessions_since"] = runs["recompute"].get("sessions_since", 0) + 1
@@ -473,6 +485,14 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
           f"{sweep_counts['checked']} rechecked, {sweep_counts['stale']} went stale, "
           f"{sweep_counts['unverifiable']} unverifiable"
           + (f" ({sweep_counts['escalated']} escalated — check manually)" if sweep_counts["escalated"] else ""))
+    if reconcile.get("tokenless"):
+        print("tracker reconcile: skipped — no NOTION_TOKEN (applied-role dedup back-fill not run)")
+    elif reconcile.get("skipped"):
+        print(f"tracker reconcile: skipped — {reconcile['skipped']}")
+    else:
+        print(f"tracker reconcile: {reconcile['tracker_rows']} tracker rows, "
+              f"{reconcile['backfilled']} back-filled applied, {reconcile['already']} already, "
+              f"{reconcile['unmatched']} unmatched")
     dq = {f: sum(1 for c in survivors if f in (c.get("flags") or []))
           for f in ("non_english_jd", "start_date_passed", "missing_company",
                     "applied_variant_saturation")}
