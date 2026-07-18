@@ -201,6 +201,19 @@ capable weekly deep sweep. **Phase 2 ships the schema field + this design only**
 model-at-launch selection belongs with the scheduler (also deferred, §8/D12), so no model
 wiring exists yet; `run.effort` is recorded and validated but does not change run behavior.
 
+## 7b. LLM-provider seam (design-now, implement-later) — Borjan 2026-07-18
+
+A future **provider-adapter** boundary so the engine calls an abstract LLM interface, with adapters
+per provider — the same design-now/implement-later discipline as the storage-adapter (§8) and the
+`secrets.py` seam. Motivation is **cost/pricing**, not defensibility (a model-agnostic wrapper is
+*less* defensible, not more): its highest-value form is **BYO-key** — the user brings their own API
+key so their token usage is on their bill, and the product charges for the software/orchestration
+(a direct answer to the COGS-caps-valuation problem in BUSINESS_NOTES). **Claude stays the tuned
+default:** the judgment/voice/drafting quality is tuned to it and the companion lives on
+Claude-native rails (Projects, MCP, Agent SDK), so other providers are an *option*, not
+guaranteed-parity — expect per-provider prompt handling + quality guardrails. Tier it: hosted-Claude
+= managed COGS; BYO-key = a pro tier with COGS shifted. Seam only for now; no adapter is built.
+
 ## 8. What deliberately does NOT change
 
 - The three-lane model (Code local / Code cloud / chat-native Appendix-A fallback) and

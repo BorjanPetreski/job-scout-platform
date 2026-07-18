@@ -78,3 +78,10 @@ B2B/white-label side and via the career-long-companion LTV extension, not consum
 - **Career-long companion as the retention/LTV play** — lean into it deliberately; it's the moat.
 - **Watch COGS-per-user** as a first-class metric from the first paying user — it's what turns
   "nice product" into "positive-margin business," the whole ballgame for any sale.
+- **BYO-key / AI-provider-agnostic (Borjan, 2026-07-18).** Let users bring their own LLM API key so
+  *their* usage is on *their* bill — you charge for the software/orchestration, not tokens. The
+  strongest lever against the COGS-caps-valuation problem. Caveats: it does **not** add
+  defensibility (a model-agnostic wrapper is *less* defensible); quality is tuned to Claude and the
+  companion lives on Claude-native rails, so keep **Claude the tuned default** and treat other
+  providers as an option, not parity. Implement via the provider-adapter seam (ARCHITECTURE §7b);
+  tier it (hosted-Claude = managed COGS; BYO-key = pro tier). Design the seam early, build later.
