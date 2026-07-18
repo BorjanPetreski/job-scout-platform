@@ -15,21 +15,40 @@ never reads this repo.
 python3 core/compose_assistant.py --profile <id>
 ```
 
-This writes `profiles/<id>/assistant/project-instructions.md` — the generic package + a PII-free
-snapshot of the profile's config (floor, eligibility, location/timezone, Notion `data_source_id`s)
-stamped with a compose date + source-config hash. Re-run it after **any** `profile.yaml` change to
-the floor, eligibility, location, or Notion IDs (the Project can't read the repo, so a stale
-paste drifts silently).
+This writes **two** files into `profiles/<id>/assistant/`, both PII-free (config + doctrine only,
+no CV):
+
+- **`project-instructions.md`** — the full doctrine + a config snapshot. It's ~30k chars, **too
+  long for the Project custom-instructions field** (which caps around ~4k), so it goes into
+  Project *knowledge* (step 3b).
+- **`project-bootstrap.md`** — a compact (~3k-char) version that fits the custom-instructions
+  field. It carries the must-never-get-wrong rules (identity, snapshot, consent/retention, hard
+  boundaries, the pinned Notion vocabulary) and tells the companion to read the full file.
+
+Re-run it after **any** `profile.yaml` change to the floor, eligibility, location, or Notion IDs
+(the Project can't read the repo, so a stale paste drifts silently).
 
 ## 2. Create the Claude Project
 
 On claude.ai, create a new **Project** for this person's job search (e.g. "Job Applications —
 <name>").
 
-## 3. Paste the instructions
+## 3. Bind the doctrine — TWO placements (don't skip either)
 
-Open `profiles/<id>/assistant/project-instructions.md`, copy the whole file, and paste it into
-the Project's **custom instructions**. (This is config + doctrine only — no CV, no PII.)
+The custom-instructions field is small; the doctrine is large. So it's split:
+
+**3a. Custom instructions ← the bootstrap.** Open `profiles/<id>/assistant/project-bootstrap.md`,
+copy the whole file, and paste it into the Project's **custom instructions** field.
+
+**3b. Project knowledge ← the full instructions.** Upload
+`profiles/<id>/assistant/project-instructions.md` as a file into the Project's **knowledge**
+(alongside the user's materials in step 4). The bootstrap tells the companion to read this file at
+the start of every session.
+
+> Why both: if you paste only the full file into custom instructions it gets **silently truncated**
+> at ~4k chars — the companion then can't see consent/retention, the apply loop, or the write
+> contract. If you upload only the full file to knowledge without the bootstrap, the companion has
+> no standing identity/boundaries. Both placements are required.
 
 ## 4. Upload the user's materials (per the data manifest)
 

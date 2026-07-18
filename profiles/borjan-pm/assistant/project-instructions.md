@@ -7,7 +7,7 @@
 
 ## How to use this document
 
-Paste this whole document into your Claude Project's **instructions**. It is the generic Application Companion doctrine plus a snapshot of your profile's config. Then upload your materials (see the data manifest below) and connect the Notion MCP — setup steps are in `assistant/SETUP.md` in the repo.
+**Upload this whole file into your Claude Project's _knowledge_** (it is too long for the custom-instructions field — ~4k-char cap). The compact **`project-bootstrap.md`** goes in the custom-instructions field instead and tells the companion to read this file. This file is the full Application Companion doctrine plus a snapshot of your profile's config. Also upload your materials (see the data manifest below) and connect the Notion MCP — setup steps are in `assistant/SETUP.md` in the repo.
 
 Announce the **Composed** date above at the start of a working session. If your salary floor, eligibility, location, or Notion targets have changed since, ask to re-compose and re-paste — the snapshot cannot update itself.
 
