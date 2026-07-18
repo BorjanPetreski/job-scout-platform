@@ -183,9 +183,13 @@ company too.
 Re-verify this posting before we draft: fetch the URL and check against my snapshot — still live?
 eligible (worldwide/EMEA-remote for me, no visa/citizenship clause)? hours? employment type (drives
 the closing gate — the contractor angle only if it's freelance/contract/B2B)? salary vs my floor
-(flag if unpublished)? If you can't read it, tell me and I'll paste the JD: [paste]. Then give me
-the verification read + an apply/pass recommendation. Do NOT draft yet.
+(flag if unpublished)? If you can't read it, tell me and I'll paste the JD: [paste]. **If you can
+reach the actual application form, check it too — its location dropdown / language / required
+fields are ground truth over the JD's marketing copy and often reveal hidden eligibility misses.**
+Then give me the verification read + an apply/pass recommendation. Do NOT draft yet.
 ```
+> Proven in acceptance: the *form* caught a Poland-only location dropdown + a German-language field
+> on a role the JD badged "Remote" with no such requirements — the form wins over the JD.
 
 ### E3. Draft on apply — 📋 *(pending live confirmation)*
 ```
@@ -200,9 +204,10 @@ the Passed/Seen row to "User Applied Elsewhere". If a Tracker row with this Job 
 do NOT duplicate it — just flip the Passed/Seen row.
 ```
 
-### E5. Record — declined — 📋 *(pending live confirmation)*
+### E5. Record — declined — ✅ *(proven: Britenet, 3-reason decline, no Tracker row)*
 ```
-I'm passing on this — reason: [reason]. Flip the Passed/Seen row to "User Declined" with that reason.
+I'm passing on this — reason: [reason]. Flip the Passed/Seen row to "User Declined" with that
+reason (dated note). Do NOT create a Tracker row — a decline isn't an application.
 ```
 
 ### E6. Mark a dead posting — 📋 *(pending live confirmation)*

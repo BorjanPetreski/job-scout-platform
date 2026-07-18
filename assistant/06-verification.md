@@ -15,6 +15,21 @@ Fetch the posting URL and re-read the hard facts, checking each against the prof
 - **Salary** — against the snapshot's floor (or judgment estimation if the profile is floorless).
 - **Employment type** — B2B / contract / full-time (drives the closing gate).
 
+## The application FORM is ground truth over the JD (check it when reachable)
+
+The public JD is marketing copy; the **live application form is what the user actually has to
+satisfy**, and it routinely reveals disqualifiers the JD hides. When you can reach the apply form,
+check it before green-lighting — proven in acceptance (a "Remote"-badged role whose *form* offered
+a Poland-only location dropdown + a German-language field, neither in the JD text):
+
+- **Location / region dropdown** — a "Remote" badge can hide a form that only offers in-country
+  locations ("remote within Poland"), a real eligibility miss for an out-of-region applicant.
+- **Language / required fields** — a language requirement or mandatory field the JD never mentioned.
+- **Employment-track options** — the actual contract options offered (B2B vs employment).
+
+If the form contradicts the JD, the **form wins**. Surface the gap and let the user decide — better
+to pass on a hidden mismatch than draft against it.
+
 ## On a wall
 
 Many good postings sit behind a JS shell, a login, or a thin card (LinkedIn especially). When
