@@ -1,7 +1,7 @@
 {
  "recompute": {
   "last": "2026-07-14",
-  "sessions_since": 0,
+  "sessions_since": 1,
   "due_at_sessions": 5
  },
  "2026-07-11": {
@@ -195,6 +195,59 @@
     "live": 0,
     "unverifiable": 0,
     "escalated": 0
+   },
+   "half": null,
+   "full_sweep": false
+  }
+ },
+ "2026-07-18": {
+  "AM": {
+   "ran_at": "2026-07-18T07:44:28+00:00",
+   "platforms_covered": [
+    "Himalayas",
+    "Remotive",
+    "JustJoin.it",
+    "Greenhouse (ATS boards)",
+    "Lever (ATS boards)",
+    "Workable (ATS boards)",
+    "We Work Remotely",
+    "Jobgether",
+    "Dynamite Jobs",
+    "Arc.dev",
+    "Remote Rocketship (worldwide)",
+    "Working Nomads",
+    "Landing.jobs",
+    "NoDesk",
+    "Remote OK",
+    "Pinpoint HQ (ATS boards)",
+    "Deel",
+    "Crossover",
+    "LinkedIn (tripwire)"
+   ],
+   "sources_down": [
+    "Remote Rocketship (Europe)",
+    "Welcome to the Jungle",
+    "JustRemote"
+   ],
+   "new": 78,
+   "dropped": 0,
+   "link_dead": 2,
+   "sweep": {
+    "scope": 16,
+    "checked": 16,
+    "deferred": 0,
+    "stale": 1,
+    "live": 15,
+    "unverifiable": 0,
+    "escalated": 0
+   },
+   "reconcile": {
+    "tokenless": false,
+    "tracker_rows": 23,
+    "backfilled": 8,
+    "already": 15,
+    "unmatched": 0,
+    "skipped": null
    },
    "half": null,
    "full_sweep": false
