@@ -84,6 +84,51 @@ X via headless") so the honest-failure signal survives — never silently paper 
 respect per-host politeness so retries don't read as scraping and trip more bot-walls. Done greedily
 it hides the very signals the health loop needs; done conservatively it's a strict win.
 
+### Layer 2-runtime — in-app runtime healing (Borjan, 2026-07-18)
+
+The distinction from Layer 2: Layer 2 is a *dev-side* Claude review that repairs the **shipped
+catalog** (fix lands in the next release). **Layer 2-runtime** is the **app healing itself at
+run time** — when the app embeds the LLM (Phase 4+), a confirmed degradation triggers an in-app
+Claude call that diagnoses the break and produces a repair applied to the **user's own instance**,
+so the user gets improved results **immediately, without waiting for an app update.** Doable, and a
+direct mitigation of the board-rot maintenance-treadmill risk in BUSINESS_NOTES. Design constraints
+(these are what make it safe rather than dangerous):
+
+- **Fetch-layer only.** Runtime repairs may touch selectors / HARVEST_SPEC / URL pattern /
+  endpoint / fetch-mode — *never* filters, scoring, eligibility, or judgment. A runtime change to
+  what the user *sees as a match* could harm them unseen; getting data off a board can't.
+- **Validate-before-adopt.** Run the repaired fetch, check the output is sane (structured,
+  plausible count, passes shape checks); adopt the per-user override **only if it validates**,
+  else fall back to honest "source down." An unvalidated auto-repair (silently-wrong) is worse
+  than honest-failure — never adopt one.
+- **Per-user override, reported.** The repair is a local/instance override (the Phase-4
+  client-side store), not a repo edit; the app tells the user "auto-repaired X."
+- **Bounded COGS.** Fire only on confirmed degradation, rate-limited and cached — never
+  re-diagnose the same break every scan. Pairs naturally with BYO-key (§ ARCHITECTURE 7b).
+- **Telemetry loop + precedence (the "gets overwritten by better code" model).** Opt-in, good
+  runtime repairs flow back so the dev-side Layer 2 folds *vetted* fixes into the shipped catalog
+  (all users benefit). Precedence: shipped catalog is the base; a runtime override supersedes it
+  for freshness; **a newer shipped fix for that board supersedes/expires the override** — so
+  vetted code wins on update and a stale/bad override never persists.
+
+Near-term (the scheduled health build) ships Layer 1/1.5/2; **Layer 2-runtime lands with the app
+(Phase 4+)** since it needs the embedded LLM.
+
+### Known current degradations — health-build seed (2026-07-18)
+
+The first target list for the health build (from borjan-pm's 2026-07-18 PM run, residential IP —
+so genuine, not just cloud-IP bot-blocking):
+
+- **Source down:** Remote Rocketship (worldwide), Welcome to the Jungle, JustRemote — 0 raw +
+  `source_down`; candidates for `DOWN_STREAK` if it persists. Likely endpoint/bot-wall changes.
+- **Degraded:** Remotive — anonymous API is a stub (~41 jobs, params ignored; category HTML masks
+  companies). A Tier-1 board running at a fraction of its value; needs a fetcher fix or reroute.
+- **Latent coverage (opportunity, not a fault):** Greenhouse / Lever / Workable / Pinpoint ATS
+  boards fetch nothing because the profile's `ats_boards` token lists are empty — populate with
+  real company tokens for high-quality direct-ATS coverage.
+- **NOT degradations (working as designed):** the stream-gated skips (ai-jobs.net, Dribbble,
+  ProBlogger, icrunchdata) — a PM profile correctly does not fetch ai-ml/design/content boards.
+
 ### The hook — reuse the recompute counter
 
 `runs.json` already carries `recompute.sessions_since` / `due_at_sessions` that prints "⚠ tier
