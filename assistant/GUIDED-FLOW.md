@@ -57,10 +57,17 @@ Provision my Notion databases under [parent page], validate my profile, and run 
 
 ## Stage B — Scanning & tracking  ·  Phase 1 · `job-scout-run`
 
-### B1. Run a scan (attended) — ✅
+### B1. Run a scan (attended, full scored) — ✅
 ```
-Run my job scan for [profile]. Score the candidates, push the shortlist to my Notion, and give me the ledger.
+Run a full job scan for [profile] using the job-scout-run skill. Pull state first, run the full
+rotation with --verbose, then do the judgment pass: score and archetype-tag every candidate against
+my filters and filter_notes, shortlist everything at/above my surface threshold, and log each
+decision to seen.jsonl. Push the shortlist to my Notion Passed/Seen Log as "New — Unreviewed" with
+role notes in the page body, run the shortlist sweep + the Tracker reconciliation, append the
+digest line, then push state. Give me the coverage ledger plus the shortlisted roles.
 ```
+> Runs in the repo-aware Claude session (laptop lane), NOT the companion Project — the scanner and
+> the companion are separate contexts bridged only by Notion.
 
 ### B2. Run a scan (unattended / scheduled) — ✅
 ```
