@@ -19,6 +19,11 @@ happen every session — the parts that quietly rot if left to memory.
    `python3 core/validate.py` green, and no unintended change to what `borjan-pm` resolves/scans.
 4. **No PII in the repo** — no CV body facts, emails, phone numbers, or addresses (the 3a.8
    no-PII denylist enforces the binding files; keep it true everywhere).
+5. **Capture build-method lessons (the meta-layer).** Assess whether this session taught something
+   reusable about *how to build apps* — a pattern, discipline, or pitfall that is **product-agnostic**
+   (not job-scout-specific). If it's valuable, fold it into `docs/BUILD_AND_FLIP_PLAYBOOK.md` (the
+   generic framework). The transferable asset across apps is the **method**, not this product — so
+   don't let a good lesson evaporate. Skip only if nothing generic was actually learned; don't force it.
 
 ## Standing rules worth remembering
 - **Human-readable docs step** ends every phase's build (PROJECT_PLAN §4) — refresh
