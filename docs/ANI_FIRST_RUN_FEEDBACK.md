@@ -68,7 +68,11 @@ recomposed. The list below is the record of what was proven-by-failure in the li
 - **"How do you want to proceed" = explicit options** that map to pinned Notion statuses (apply / decline /
   stale / skip), so the choice is a tap that writes the right status — not free prose.
 
-## 3. App / UX — 🗺️ roadmap (product build, no engine change yet; → PROJECT_PLAN Phase 5/6)
+## 3. App / UX — 🗺️ roadmap (seeded into PROJECT_PLAN **Phase 4** scope §6 — the app + client-side store)
+
+**When:** Phase 4 (the tappable FE app), which is gated on Phase 3 (companion) shipping. These are UI
+controls — they cannot exist on today's claude.ai-Project substrate, which has no custom screens. The
+companion-side *doctrine* for them already shipped (assistant/ modules, 2026-07-19).
 
 Simple, tappable interface aimed at Gen-Z/Alpha (minimal typing):
 - **Sliders:** English level (Claude-effort style), sentence complexity, formality (professional↔informal).

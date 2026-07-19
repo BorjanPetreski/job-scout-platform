@@ -291,6 +291,17 @@ Scope (high-level; gets its own spec when Phase 3 ships):
    retroactive + future), so Phase 4 wires UI triggers to proven prompts instead of
    re-inventing them. Each entry is a versioned asset; the button label is the Action, the
    background call is the Prompt.
+6. **Tappable-UX spec from Ani's first companion run (Borjan, 2026-07-19)** — concrete
+   requirements for the item-2 screens, aimed at minimal typing (Gen-Z/Alpha), captured in
+   [ANI_FIRST_RUN_FEEDBACK.md §3](ANI_FIRST_RUN_FEEDBACK.md): **sliders** for English-level /
+   sentence-complexity / formality (reused at the voice-meter and each tuning step to
+   re-generate); **tap-to-edit KB** — confirm/remove/extend a skill, a self-assessed skill-level
+   slider the assistant pre-sets, assistant-suggested related skills; a **salary field** (number
+   + net/gross + monthly/hourly + $/€) with gross↔net via country estimates (an LLM/API ping —
+   already demonstrated in Cowork); **proceed-as-buttons** that write the tracker status directly.
+   The companion-side doctrine for these already shipped (assistant/ modules, 2026-07-19); Phase 4
+   is where they become actual controls. *The app doesn't exist yet — these build when Phase 4 does,
+   which is gated on Phase 3 (companion) shipping.*
 
 **Design constraint imposed now (so Phases 1–3 stay compatible):** every setup and run
 operation must be scriptable/headless — no step may exist only as a human-readable
