@@ -24,6 +24,14 @@ happen every session — the parts that quietly rot if left to memory.
    (not job-scout-specific). If it's valuable, fold it into `docs/BUILD_AND_FLIP_PLAYBOOK.md` (the
    generic framework). The transferable asset across apps is the **method**, not this product — so
    don't let a good lesson evaporate. Skip only if nothing generic was actually learned; don't force it.
+6. **Seed unbuildable ideas into the plan of record (never lose feedback).** Anything raised this
+   session — user feedback, an idea, a gap you found — that **can't be built now** (needs a later
+   phase, the app, an integration that doesn't exist yet) must be **seeded into `docs/PROJECT_PLAN.md`**
+   (the right phase's scope, or the §3x parked table) before wrapping — not left only in a side doc or
+   in chat. A side-doc capture (e.g. a feedback file) is fine as the detail, but the plan of record must
+   *point* to it under a phase so it actually gets built. If it's an engine follow-up that's buildable
+   but out of this session's scope, seed it too (parked table or the relevant PHASE plan). The test:
+   *could this feedback silently die if no one re-reads this chat? If yes, it isn't seeded yet.*
 
 ## Standing rules worth remembering
 - **Human-readable docs step** ends every phase's build (PROJECT_PLAN §4) — refresh

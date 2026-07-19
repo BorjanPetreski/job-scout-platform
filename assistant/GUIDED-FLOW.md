@@ -152,13 +152,17 @@ exist, listing any missing:
 
 ## Stage D — Companion: voice + knowledge base  ·  Phase 3a
 
-### D1. Build the drafting voice — ✅
+### D1. Build the drafting voice — ✅ *(tuned 2026-07-19 from Ani's guided-Q&A run)*
 ```
-Let's build my application-drafting voice profile. Pull from the writing I uploaded plus the
-voice-seed in your instructions. Give me a coverage read (not a score) of what you've got and
-what's thin, then draft ONE short application-style sample so I can judge "me / not quite / no".
-We'll iterate until I say it's good enough, then you regenerate voice-profile.md for me to save
-into Project knowledge.
+Let's build my application-drafting voice profile. Use whatever writing I uploaded plus the
+voice-seed in your instructions; if I have neither, run a guided Q&A instead — and for EACH
+question give me a few pickable example answers (with a free-write escape), never a bare open
+question. Read a tone/gender lean and my English level + sentence complexity, and offer those
+as adjustable dials. Give me a coverage read (not a score), then run numbered phases
+("voice generation 1/N", estimate N from how much you have): each phase show me TWO short
+samples to compare, I say "me / not quite / no", you adjust and continue. I can stop early — tell
+me honestly if the voice isn't fully set. When I'm happy, regenerate voice-profile.md; it saves
+to Project knowledge by default (say so up front, don't ask it as a side-question).
 ```
 
 ### D2. Recalibrate / deepen voice later — ✅
