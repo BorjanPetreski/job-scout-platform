@@ -54,6 +54,14 @@ search:
 compensation:
   fte_fraction: 0.5
 
+# Hard eligibility — Ani in Skopje can't take a Poland-hybrid desk or a full-time-hours role.
+# These declared requirements (work_model: [remote]; employment_type.accept part_time) are
+# enforced MECHANICALLY as drops, not left to the judgment layer — the first live run leaked
+# 168 hybrid + 36 full-time-on-B2B roles into her shortlist because they were only flagged.
+hard_filters:
+  work_arrangement: drop
+  employment_mismatch: drop
+
 # Profile-learned lessons the judgment layer reads on every scan (from the first live
 # run, 2026-07-16 — these are ANI's lessons; a different profile earns its own):
 filter_notes: |
