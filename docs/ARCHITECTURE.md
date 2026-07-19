@@ -168,10 +168,12 @@ a row after it reaches the Tracker. The companion binds to a profile via the PII
 (`core/compose_assistant.py` → `project-bootstrap.md` + `project-instructions.md`,
 PROFILE_CONFIG_SPEC §9).
 
-> **Known hygiene gap (post-3a.7, tracked):** the chat "I applied" flow creates the Tracker row
-> but does not flip the matching Passed/Seen row out of `New — Unreviewed`, and the reconciliation
-> is read-only on Notion — so an applied role can linger as `New — Unreviewed` in the queue until
-> the companion (or a future fix) closes it. Fix options logged for a follow-up.
+**Applied-lingering close (tasks #8/#11).** An applied role must not linger in `New — Unreviewed`.
+Two guarded flips (New — Unreviewed → `User Applied Elsewhere`, never clobbering a resolved row)
+close it: the chat "I applied" flow (`sync_applied`) flips the row immediately, and scan-start
+reconciliation flips any matched-but-still-`New` shortlist row as the catch-all net (covers a
+companion apply whose own flip was missed, and back-heals pre-fix lingerers). Both write the
+Passed/Seen Log — the scanner's own target — so the Tracker firewall is untouched.
 
 ## 6. Shortlist liveness sweep (new in Phase 1)
 
