@@ -127,6 +127,37 @@ import writeback  # noqa: E402
 for spath in sorted((paths.REPO_ROOT / "suggestions").rglob("*.yaml")):
     errors.extend(writeback.validate_suggestion_file(spath))
 
+# 8 — assistant/ companion package (Phase 3a, 3a.8): structure lints; per-profile binding is
+#     compose-clean (committed output == a fresh compose, date aside); binding files pass the
+#     no-PII denylist; data-manifest parses (non-empty).
+import compose_assistant  # noqa: E402
+
+apkg = paths.REPO_ROOT / "assistant"
+for req in ("README.md", "SETUP.md", "DRY-RUN.md"):
+    check((apkg / req).exists(), f"assistant/: missing {req}")
+mods = sorted(apkg.glob("[0-9][0-9]-*.md"))
+check(len(mods) >= 5, f"assistant/: expected numbered doctrine modules, found {len(mods)}")
+
+_BINDING_FILES = ("project-instructions.md", "project-bootstrap.md", "voice-seed.md", "data-manifest.md")
+for pid in profile_ids:
+    adir = paths.PROFILES_DIR / pid / "assistant"
+    if not adir.is_dir():
+        continue
+    try:
+        r = compose_assistant.compose(pid, check=True)
+        check(not r["changed"],
+              f"{pid}: assistant binding out of date — run `compose_assistant.py --profile {pid}` and commit")
+    except SystemExit as exc:
+        errors.append(f"{pid}: compose_assistant failed: {exc}")
+    for bf in _BINDING_FILES:
+        p = adir / bf
+        if not p.exists():
+            continue
+        text = p.read_text(encoding="utf-8")
+        check(text.strip() != "", f"{pid}/assistant/{bf}: empty")
+        for hit in compose_assistant.pii_hits(text):
+            errors.append(f"{pid}/assistant/{bf}: no-PII denylist hit — {hit}")
+
 if errors:
     print("PLATFORM VALIDATION FAILED:")
     for e in errors:
