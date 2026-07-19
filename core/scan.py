@@ -189,6 +189,13 @@ def hard_filter(cand: dict, hf: dict) -> tuple[str | None, list[str]]:
     """Returns (drop_reason, flags). Drop only on the machine-certain patterns."""
     hay = " ".join(str(cand.get(k) or "") for k in ("title", "loc", "salary", "jd_text"))
     flags = []
+    # Title-scoped hard-drops (role_hard_drop_terms, task #12): a no-go domain naming itself in
+    # the TITLE is a mechanical drop. Matched against the title alone — a body mention stays a
+    # judgment flag (below), never a silent drop.
+    title = str(cand.get("title") or "")
+    for name, pat in (hf.get("auto_drop_title_patterns") or {}).items():
+        if re.search(pat, title):
+            return f"auto-drop: {name}", flags
     for name, pat in (hf.get("auto_drop_patterns") or {}).items():
         if re.search(pat, hay):
             return f"auto-drop: {name}", flags
@@ -217,6 +224,8 @@ def print_plan(cfg: dict) -> None:
     print(f"keywords expanded: {', '.join(cfg['keywords']['expanded'])}")
     hf = cfg["hard_filters"]
     print(f"auto-drop filters: {', '.join(hf['auto_drop_patterns'])}")
+    if hf.get("auto_drop_title_patterns"):
+        print(f"auto-drop (title-only) filters: {', '.join(hf['auto_drop_title_patterns'])}")
     print(f"flag filters: {', '.join(hf['flag_patterns'])}")
     det = hf.get("eu_country_list_detector")
     if det:

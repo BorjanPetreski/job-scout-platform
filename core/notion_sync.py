@@ -209,6 +209,31 @@ def _current_reason(page_id: str) -> str | None:
     return sel.get("name")
 
 
+def flip_passed_seen_to_applied(ps_ds_id: str, url: str) -> str:
+    """Close the applied-lingering gap (tasks #8/#11): when a role is applied to, its
+    Applications-Tracker row is created but the ORIGINATING shortlist row would otherwise sit in
+    `📥 New — Unreviewed` forever (nothing flips it). Flip it → `User Applied Elsewhere`.
+
+    This writes the PASSED/SEEN LOG — the scanner's OWN write target — NOT the Tracker, so the
+    firewall (never write the Tracker) is untouched. Read-before-write guard, identical to
+    apply_sweep_update: only a row STILL `New — Unreviewed` is flipped, so a companion/user-
+    resolved reason is never clobbered and a re-run is a no-op (idempotent).
+
+    Returns one of: 'flipped' | 'missing' (no row for this URL) | f'skip:{current!r}' (already
+    resolved) | f'error:{code}'."""
+    page_id = find_page_by_url(ps_ds_id, url)
+    if not page_id:
+        return "missing"
+    current = _current_reason(page_id)
+    if current != "New — Unreviewed":
+        return f"skip:{current!r}"
+    r = _req("PATCH", f"{API}/pages/{page_id}",
+             json={"properties": {"Reason Passed": {"select": {"name": "User Applied Elsewhere"}}}})
+    if r.status_code != 200:
+        return f"error:{r.status_code}"
+    return "flipped"
+
+
 def apply_sweep_update(ds_id: str, rec: dict, cfg: dict) -> bool:
     """Flip an existing row per the record's notion_update: Reason Passed and/or a
     dated sweep note appended to Notes. Falls back to create if the row never synced.
@@ -378,6 +403,11 @@ def sync_applied(url: str, dry_run: bool = False) -> None:
     page_id = typed_create_page(ds_id, build_tracker_properties(rec, cfg))
     dedup.update(url, {"synced_to_notion": True})
     print(f"Tracker row created: {page_id}")
+    # #8/#11: flip the originating shortlist row out of `New — Unreviewed` so the applied role
+    # doesn't linger in the queue. Guarded (only if still New) → never clobbers a resolved row.
+    ps_ds = (cfg["notion"].get("passed_seen") or {}).get("data_source_id")
+    if ps_ds:
+        print(f"Passed/Seen shortlist row: {flip_passed_seen_to_applied(ps_ds, url)}")
 
 
 def reconcile_applied_from_tracker(cfg: dict) -> dict:
@@ -386,22 +416,29 @@ def reconcile_applied_from_tracker(cfg: dict) -> dict:
     recorded as applied (Tracker row created on claude.ai) dedups on the next scan AND leaves
     the shortlist sweep's scope (which is `shortlisted`-only) the same run.
 
+    It ALSO heals the applied-lingering gap (tasks #8/#11): for each matched Tracker row it
+    flips the originating Passed/Seen shortlist row out of `New — Unreviewed` →
+    `User Applied Elsewhere` (via `flip_passed_seen_to_applied`), so an applied role stops
+    sitting in the `📥 New — Unreviewed` queue. This is the catch-all net — it covers a
+    companion apply whose own flip was missed AND back-heals rows applied before this fix,
+    regardless of which apply path created the Tracker row.
+
     This is the ONE additive scanner-side reconciliation step. It is:
       * READ-ONLY on the Tracker — the firewall (the scanner never WRITES the Tracker) is
-        intact; the new access is a query, nothing more;
+        intact; the Tracker access is a query, nothing more. The flip writes the PASSED/SEEN
+        LOG — the scanner's OWN write target — not the Tracker;
       * token-gated — no `NOTION_TOKEN` → honest skip, reported in the ledger, no behavior
         change; dry-run profiles skip too (no Tracker);
-      * idempotent — a record already `applied` is left alone (no redundant append), so
-        re-running the scan does not grow `seen.jsonl`;
-      * inert to the write path — `sync_scan` only pushes non-applied statuses, so a
-        back-filled `applied` record triggers no Notion write and never re-touches its
-        companion-owned Passed/Seen row.
+      * idempotent — a record already `applied` is left alone in `seen.jsonl` (no redundant
+        append), and the flip is read-before-write guarded (only a row STILL `New — Unreviewed`
+        is touched), so re-running the scan neither grows `seen.jsonl` nor re-writes Notion.
 
     Never fetches boards, filters, scores, or writes shortlist rows.
-    Returns counters for the ledger: {tokenless, tracker_rows, backfilled, already, unmatched}.
+    Returns counters for the ledger:
+    {tokenless, tracker_rows, backfilled, already, unmatched, passed_seen_flipped}.
     """
     result = {"tokenless": False, "tracker_rows": 0, "backfilled": 0, "already": 0,
-              "unmatched": 0, "skipped": None}
+              "unmatched": 0, "passed_seen_flipped": 0, "skipped": None}
     if cfg["notion"].get("dry_run"):
         result["skipped"] = "dry-run profile"
         return result
@@ -432,6 +469,7 @@ def reconcile_applied_from_tracker(cfg: dict) -> dict:
             break
         cursor = data.get("next_cursor")
     result["tracker_rows"] = len(urls)
+    ps_ds = (cfg["notion"].get("passed_seen") or {}).get("data_source_id")
 
     seen = dedup.load_seen()
     for u in urls:
@@ -440,12 +478,15 @@ def reconcile_applied_from_tracker(cfg: dict) -> dict:
             result["unmatched"] += 1          # Manual-Entry role the scanner never saw — nothing to reconcile
             continue
         if rec.get("status") == "applied":
-            result["already"] += 1            # idempotent: already reconciled
-            continue
-        note = ((rec.get("notes") or "") + " | reconciled applied from Applications Tracker "
-                "(companion/chat apply)").strip(" |")
-        dedup.update(u, {"status": "applied", "reason": "User Applied Elsewhere", "notes": note})
-        result["backfilled"] += 1
+            result["already"] += 1            # idempotent: already reconciled locally
+        else:
+            note = ((rec.get("notes") or "") + " | reconciled applied from Applications Tracker "
+                    "(companion/chat apply)").strip(" |")
+            dedup.update(u, {"status": "applied", "reason": "User Applied Elsewhere", "notes": note})
+            result["backfilled"] += 1
+        # #8/#11 heal: flip the lingering shortlist row (guarded — no-op if already resolved).
+        if ps_ds and flip_passed_seen_to_applied(ps_ds, u) == "flipped":
+            result["passed_seen_flipped"] += 1
     return result
 
 

@@ -400,7 +400,21 @@ def _compile_hard_filters(merged: dict, defaults: dict) -> dict:
     for term in hf.get("role_exclusion_terms") or []:
         flags[f"excl_{_slugify(term)}"] = lib["role_exclusion_template"].format(terms=re.escape(term.lower()))
 
-    compiled = {"auto_drop_patterns": auto, "flag_patterns": flags,
+    # role_hard_drop_terms (Phase 3a, task #12): a HARD no-go domain (Borjan's gambling/betting
+    # exclusion). Two effects from one term: a TITLE-scoped mechanical auto-drop (the posting is
+    # dropped before shortlisting when the domain names itself in the title — the "PM (lottery)"
+    # case) AND the ordinary body flag (a passing mention in the JD body stays a judgment call, so
+    # a fintech role serving betting clients isn't silently discarded). Title-scoped on purpose:
+    # a whole-haystack mechanical drop would false-drop those body mentions with no human review.
+    auto_title: dict[str, str] = {}
+    for term in hf.get("role_hard_drop_terms") or []:
+        slug = _slugify(term)
+        pat = lib["role_exclusion_template"].format(terms=re.escape(term.lower()))
+        auto_title[f"harddrop_{slug}"] = pat   # title match → mechanical drop
+        flags[f"excl_{slug}"] = pat            # body match → judgment flag
+
+    compiled = {"auto_drop_patterns": auto, "auto_drop_title_patterns": auto_title,
+                "flag_patterns": flags,
                 "salary_floor": salary.normalize_floor(merged.get("compensation") or {}, defaults)}
     if hf.get("closed_location_list", "drop_if_absent") == "drop_if_absent":
         cll = lib.get("closed_location_list", {})
@@ -409,7 +423,7 @@ def _compile_hard_filters(merged: dict, defaults: dict) -> dict:
             "open_ended_markers": list(cll.get("open_ended_markers", [])),
             "must_include": list(cand["location_match_terms"]),
         }
-    for name, pat in list(auto.items()) + list(flags.items()):
+    for name, pat in list(auto.items()) + list(auto_title.items()) + list(flags.items()):
         try:
             re.compile(pat)
         except re.error as exc:
