@@ -36,6 +36,10 @@ search:                                 # [T] usually template-supplied
   subvariant_secondary: str, optional (Phase 2, D15) — keyword/archetype sets unioned across
                                           the two at setup; PRIMARY drives comp band + stream tiers
   work_model: [str], required, subset of [remote, hybrid, on_site]
+  languages: [str], optional (default [en]) — languages the user can apply in; subset of
+             [en, pl, de, es, fr, it, nl, pt]. A posting whose dominant language is known and
+             NOT in this set is flagged non_target_language (dropped when hard_filters
+             .language_mismatch: drop). Multi-value (e.g. [de, en]) keeps both, drops the rest.
   keywords:
     core: [str], required, non-empty     # local TITLE-MATCH substrings, lowercase-insensitive
     expanded: [str], required (may be []) # promote/demote dataset
@@ -95,6 +99,10 @@ hard_filters:                           # [T] typed toggles; regex machinery is 
                     flag = annotate employment_off_target only (current behavior); drop =
                     mechanically Filter Out (e.g. a full-time-only posting when part_time is
                     targeted, even on a B2B/contract vehicle)
+  language_mismatch: str, optional, one of [flag, drop] (default flag) — how a
+                    non_target_language posting (dominant language not in search.languages) is
+                    handled. flag = annotate only; drop = mechanically Filter Out (a local-hire
+                    / apply-wall signal — e.g. Polish-only JD for an English applicant)
   timezone_window:
     latest_end_local: str, optional "HH:MM" — work required after this local time -> drop
 

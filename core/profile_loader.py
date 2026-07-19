@@ -41,6 +41,8 @@ _TOP_KEYS = {"schema_version", "id", "template", "dry_run", "candidate", "search
 _SENIORITY_BANDS = {"intern", "junior", "mid", "senior", "staff", "principal", "lead", "manager"}
 _EMPLOYMENT_TYPES = {"full_time", "part_time", "contract", "b2b", "freelance", "internship", "any"}
 _EFFORT_TIERS = {"fast", "mid", "high"}
+# Languages the scanner can detect (core/scan.py _LANG_STOPWORDS) — search.languages subset of these.
+_LANG_CODES = {"en", "pl", "de", "es", "fr", "it", "nl", "pt"}
 # employment_type token -> candidate.eligibility.employment_models counterpart (§3.1).
 # contract (fixed-term) and internship have no eligibility counterpart (mapped to None).
 _EMPLOYMENT_TO_ELIGIBILITY = {"full_time": "full_time", "part_time": "part_time",
@@ -290,11 +292,20 @@ def _validate(merged: dict, profile_id: str, catalog: dict, defaults: dict) -> l
                          # NEW (D-remote / D8): opt-in enforcement of search.work_model and
                          # search.employment_type. Default off/flag keeps current behavior.
                          ("work_arrangement", {"off", "flag", "drop"}),
-                         ("employment_mismatch", {"flag", "drop"})):
+                         ("employment_mismatch", {"flag", "drop"}),
+                         ("language_mismatch", {"flag", "drop"})):
         if key in hf and hf[key] not in allowed:
             e.append(f"hard_filters.{key} must be one of {sorted(allowed)}, got {hf[key]!r}")
     if hf.get("employment_mismatch") and not (merged.get("search") or {}).get("employment_type"):
         e.append("hard_filters.employment_mismatch needs search.employment_type to be set")
+    langs = (merged.get("search") or {}).get("languages")
+    if langs is not None:
+        if not (isinstance(langs, list) and langs and all(isinstance(x, str) for x in langs)):
+            e.append("search.languages must be a non-empty list of language codes (e.g. [en, de])")
+        else:
+            bad = [x for x in langs if x not in _LANG_CODES]
+            if bad:
+                e.append(f"search.languages unknown {sorted(set(bad))} (allowed {sorted(_LANG_CODES)})")
     tw = (hf.get("timezone_window") or {}).get("latest_end_local")
     if tw is not None and not re.fullmatch(r"\d{2}:\d{2}", str(tw)):
         e.append(f'hard_filters.timezone_window.latest_end_local must be "HH:MM", got {tw!r}')
@@ -428,6 +439,8 @@ def _compile_hard_filters(merged: dict, defaults: dict) -> dict:
         compiled["work_arrangement"] = hf["work_arrangement"]
     if hf.get("employment_mismatch", "flag") != "flag":
         compiled["employment_mismatch"] = hf["employment_mismatch"]
+    if hf.get("language_mismatch", "flag") != "flag":
+        compiled["language_mismatch"] = hf["language_mismatch"]
     if hf.get("closed_location_list", "drop_if_absent") == "drop_if_absent":
         cll = lib.get("closed_location_list", {})
         compiled["eu_country_list_detector"] = {  # legacy key name — engine compat
