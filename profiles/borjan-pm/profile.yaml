@@ -31,9 +31,17 @@ search:
 compensation:
   gross_net_ratio: 0.83     # net = gross x ratio (MK B2B approximation; user-tunable)
 
+hard_filters:
+  # Borjan's stated hard no-go: gambling/betting/casino/lottery domain (3a.7 acceptance —
+  # a "PM Senior (lottery)" role shortlisted before this was encoded). Hard auto-drop.
+  role_exclusion_terms: [lottery, betting, casino, gambling, igaming, sportsbook]
+
 # Profile-learned filter lessons the judgment layer reads on every scan (these are
 # BORJAN's lessons; a different profile earns its own):
 filter_notes: |
+  - Gambling/betting/casino/lottery domain is a HARD no-go (3a.7). The excl_* flags
+    (role_exclusion_terms) fire on these — treat any as an immediate drop, no exceptions.
+    (Mechanical auto_drop wiring is a pending small code change; until then this is the rule.)
   - EU-citizenship clauses drop even though B2B bypasses visa/payroll needs (Cyclad
     lesson): an explicit EU-citizenship clause is an agency/legal restriction, common
     on JustJoin.it. Drop even when everything else fits.
