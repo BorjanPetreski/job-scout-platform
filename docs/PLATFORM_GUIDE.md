@@ -67,7 +67,7 @@ The road there is staged so every phase ships something genuinely usable on its 
 | 4 | **Companion app** — screens instead of conversation, wrapping the same engine via the Claude Agent SDK | after 2/3 |
 | 5 | The laptop + mobile platform (accounts, hosted scanning) | vision |
 
-## 4. What has been built (Phases 0–2)
+## 4. What has been built (Phases 0–3a)
 
 ### Phase 0 — the plan (2026-07-13)
 
@@ -142,6 +142,37 @@ Phase 2 turned "one engine, one profile" into "anyone can onboard":
   after the JustJoin fix — **8 genuinely matching mid-level remote Java roles in her
   Notion inbox**. Throughout all of Phase 2, `borjan-pm` (the production profile) was
   verified behaviorally identical at every step.
+
+### Phase 3a — the application companion (2026-07-18)
+
+The scanner ends at a shortlist; **the companion picks it up and helps you actually apply.** 3a
+built the two assets that are genuinely *yours* and grow with use:
+
+- **Your voice** — learned from things you've actually written (or guided questions if you have
+  none), calibrated by *you* judging blind samples until it "sounds like me." Drafts read like
+  you, not like an AI.
+- **Your knowledge base** — your real experience and honest answers. When it can't answer, it
+  says so, you fill the gap, and it stores the tightened answer — so the base compounds.
+
+The companion runs in a **claude.ai Project / Claude Desktop** with your Notion connected. It reads
+your `📥 New — Unreviewed` shortlist, re-verifies each posting (fetching the *actual application
+form* when it can — that's ground truth over the marketing JD), drafts in your voice from the
+knowledge base, and records the outcome to Notion. A small **composer** (`compose_assistant.py`)
+binds a profile to its Project with a **PII-free** snapshot — your CV never enters the repo.
+
+**How the two halves stay in sync without fighting:** Notion is the only bridge. The scanner owns
+creating shortlist rows and staleness; the companion owns moving them *out* of the queue (→
+`User Applied Elsewhere` / `User Declined`) and creating the `Applied` Tracker row. On its next run
+the scanner reads the Tracker and quietly dedups anything you've applied to — so a role never
+comes back twice. The scanner never writes the Tracker (the firewall), and never gets a change to
+what it fetches or scores.
+
+**The live proof (Borjan's own supervised run, 2026-07-18):** he built his voice + KB (which
+survived a fresh conversation intact), then worked two real roles — the companion **caught one he'd
+already applied to** (no wasted re-apply) and, on another, opened the application form and **found
+disqualifiers the JD had hidden** (a Poland-only location field, a German-language requirement) plus
+his own gambling no-go — steering him away from a bad fit. That's the companion earning its keep on
+day one.
 
 ## 5. How it works — a scan's life in plain language
 

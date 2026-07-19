@@ -55,6 +55,30 @@ PACKAGE_DIR = paths.REPO_ROOT / "assistant"
 _MODULE_GLOB = "[0-9][0-9]-*.md"
 _DATE_RE = re.compile(r"(\*\*Composed:\*\* )\d{4}-\d{2}-\d{2}")
 
+# No-PII denylist (3a.8): the companion binding files (composed output + voice-seed + manifest)
+# must never carry PII into the repo. This is a STRUCTURAL denylist — emails, phone numbers,
+# postal/street addresses — NOT a content check for "CV-body facts": voice-seed legitimately
+# carries URLs + full sentences, so the 2.7 writeback PII guard is not reusable here; CV-body
+# leakage stays a human-review concern (the composer is PII-free by construction — it never reads
+# the CV). Patterns are tuned to not trip on the files' legitimate content (Notion UUIDs, dates,
+# config hashes, "+10–15%", profile links).
+_PII_PATTERNS = {
+    "email": re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"),
+    "phone": re.compile(r"(?:\+\d[\d\s()./-]{7,}\d)|(?:\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b)"),
+    "street_address": re.compile(
+        r"\b\d{1,5}\s+\w+(?:\s+\w+){0,3}\s+"
+        r"(?:Street|Avenue|Boulevard|Lane|Drive)\b", re.I),
+}
+
+
+def pii_hits(text: str) -> list[str]:
+    """Return denylist PII matches in text (empty = clean). See _PII_PATTERNS."""
+    out: list[str] = []
+    for name, pat in _PII_PATTERNS.items():
+        for m in pat.finditer(text):
+            out.append(f"{name}: {m.group(0).strip()!r}")
+    return out
+
 
 def _generic_modules() -> list[tuple[str, str]]:
     """Ordered (name, text) for the composable generic package modules."""

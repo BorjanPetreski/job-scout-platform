@@ -37,6 +37,7 @@ job-scout-platform/
 │   ├── provision_notion.py    # Phase 2: provision/adopt Tracker/Passed-Seen/Runs (idempotent, D19);
 │   │                          #   instruct→verify-by-probe (D17); writes output.notion into the profile
 │   ├── secrets.py             # Phase 2: secret-storage SEAM (D18) — resolve token by key, env fallback
+│   ├── compose_assistant.py   # Phase 3a: PII-free composer → project-bootstrap.md + project-instructions.md
 │   ├── writeback.py           # Phase 2: opt-in generic-only staged suggestions (D6), PII-guarded
 │   ├── data/                  # Phase 2: seniority_lexicon.yaml (D21 base title→band lexicon)
 │   ├── notion_sync.py         # one-way push, profile-parameterized targets
@@ -143,18 +144,34 @@ Per profile, provisioned per PROFILE_CONFIG_SPEC.md §7:
 
 - **Passed/Seen Log** — the scanner's only write target. Scanner writes
   `New — Unreviewed` shortlist rows (+ role notes in page body) and drop records; the
-  sweep (§6) may flip `New — Unreviewed` → `Stale/Expired`. The assistant flips
-  `New — Unreviewed` → `User Declined`/`Applied`-adjacent reasons as the user works the
-  queue.
+  sweep (§6) may flip `New — Unreviewed` → `Stale/Expired`. The companion flips
+  `New — Unreviewed` → **`User Applied Elsewhere`** (on apply) or **`User Declined`** (on
+  pass) — exact pinned select values only (`provision_notion.REASON_OPTIONS` /
+  `notion_sync.VALID_REASONS`; never a free-text variant).
 - **Applications Tracker** — **never a scanner write target** (invariant preserved
-  verbatim from v2.7.0). Writers: the assistant's "applied" flow and the interactive
+  verbatim from v2.7.0). Writers: the companion's "applied" flow and the interactive
   "I applied" chat flow. Statuses: Applied/Screening/Interview/Offer/Rejected/Withdrawn.
 - **Runs page** — scanner digest lines, newest first.
+
+**Scan-start reconciliation (Phase 3a, 3a.4 — the one additive scanner-side step).** With a
+token, `core/scan.py` READS the Applications Tracker at scan start and back-fills matching
+`seen.jsonl` records to `applied` (the D8 cross-process dedup handoff) — so a companion-recorded
+application dedups on the next scan and leaves the sweep's scope the same run. READ-ONLY on the
+Tracker (the firewall holds), token-gated, idempotent. Paired with a **read-before-write sweep
+guard** in `notion_sync.apply_sweep_update`: the sweep flips only a row still `New — Unreviewed`,
+never clobbering a companion-resolved `User Declined`/`User Applied Elsewhere` row.
 
 Ownership rule that keeps the two apps from fighting: **the scanner owns row creation
 and staleness; the human-driven flows own status progression.** The scanner never
 un-declines, never re-shortlists a declined row (dedup suppresses it), and never touches
-a row after it reaches the Tracker.
+a row after it reaches the Tracker. The companion binds to a profile via the PII-free composer
+(`core/compose_assistant.py` → `project-bootstrap.md` + `project-instructions.md`,
+PROFILE_CONFIG_SPEC §9).
+
+> **Known hygiene gap (post-3a.7, tracked):** the chat "I applied" flow creates the Tracker row
+> but does not flip the matching Passed/Seen row out of `New — Unreviewed`, and the reconciliation
+> is read-only on Notion — so an applied role can linger as `New — Unreviewed` in the queue until
+> the companion (or a future fix) closes it. Fix options logged for a follow-up.
 
 ## 6. Shortlist liveness sweep (new in Phase 1)
 
