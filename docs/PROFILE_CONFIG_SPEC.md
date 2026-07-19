@@ -262,7 +262,33 @@ write the resulting IDs into the profile. Platform select options are patched la
 before first write (mechanism exists today). Existing databases can be adopted instead —
 the provisioner then only verifies schema compatibility and reports gaps.
 
-## 8. Migration note for `borjan-pm`
+## 8. Companion binding (Phase 3a, `core/compose_assistant.py`)
+
+The Application Companion (Phase 3a) runs on a claude.ai Project / Claude Desktop with the Notion
+MCP; it can't read the repo, so a **PII-free composer** binds a profile to it. `compose_assistant.py`
+emits, per profile, into `profiles/<id>/assistant/`:
+
+- **`project-instructions.md`** — the full companion doctrine (the generic `assistant/[0-9][0-9]-*.md`
+  modules) + a **config-only snapshot** (salary floor, eligibility/employment models, location +
+  timezone, Notion `data_source_id`s) + the profile's `voice-seed`/`data-manifest`. Uploaded to
+  **Project knowledge** (it's ~30k chars — too long for the custom-instructions field).
+- **`project-bootstrap.md`** — a compact (~3k) subset that fits the **custom-instructions field**
+  (~4k cap): identity, the snapshot, consent/retention, hard boundaries, the pinned Notion write
+  vocabulary, and a pointer to read the full file. Both stamped with a compose date + source-config
+  hash; idempotent (re-compose is a no-op unless the profile/config/package changed).
+
+Author-supplied, per-profile, **optional** (checked into the repo — no PII beyond public links):
+
+- **`profiles/<id>/assistant/voice-seed.md`** — authored voice guidance (source-doc priority,
+  person-specific corrections, links). Absent ⇒ the composer emits the guided-Q&A voice path.
+- **`profiles/<id>/assistant/data-manifest.md`** — what the user uploads to the Project + each
+  item's retention class (domain kept / voice-only shredded). Absent ⇒ a generic checklist.
+
+The user's CV, voice profile, and knowledge base are **built and held inside the Project**, never
+composed from the repo (data principle). CI (3a.8) checks the committed bindings are compose-clean
+and that all binding files pass a no-PII denylist (emails / phones / postal addresses).
+
+## 9. Migration note for `borjan-pm`
 
 Phase 1 derives all three artifacts from the live system as a **mechanical extraction
 with a diffable audit trail**: catalog = platform entries minus PM URLs; template =
