@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "changed=$( { git diff --name-only origin/main 2>/dev/null; git status --porcelain --no-renames 2>/dev/null | cut -c4-; } | sort -u ); if printf '%s\\n' \"$changed\" | grep -qE '^(core|skills)/' && ! printf '%s\\n' \"$changed\" | grep -qx 'assistant/GUIDED-FLOW.md'; then printf '%s' '{\"systemMessage\":\"Fold-in check (standing rule): this branch changed core/ or skills/ but not assistant/GUIDED-FLOW.md. If a step was dogfooded/proven this session, fold its prompt into assistant/GUIDED-FLOW.md (mark it proven, in its own small PR) before wrapping.\"}'; fi; exit 0",
+            "statusMessage": "fold-in check"
+          }
+        ]
+      }
+    ]
+  }
+}
