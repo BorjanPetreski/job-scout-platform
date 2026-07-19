@@ -83,6 +83,18 @@ hard_filters:                           # [T] typed toggles; regex machinery is 
   role_hard_drop_terms: [str], optional — no-go domain: TITLE match mechanically auto-drops,
                         JD-body-only match still flags (excl_*) for judgment (task #12)
   closed_location_list: str, optional, one of [drop_if_absent, off] (default drop_if_absent)
+  work_arrangement: str, optional, one of [off, flag, drop] (default off) — enforce
+                    search.work_model against the posting's stated arrangement (structured loc
+                    tag like "City (hybrid)" wins, else loc+JD keywords). off = no check (a
+                    remote-declaring profile is byte-identical until it opts in); flag =
+                    annotate work_arrangement_mismatch only; drop = mechanically Filter Out a
+                    hybrid/on-site posting when work_model is remote-only (hard eligibility —
+                    the same class as us_only; you can't work a hybrid desk remotely)
+  employment_mismatch: str, optional, one of [flag, drop] (default flag) — how an
+                    employment_type.accept mismatch is handled (needs search.employment_type).
+                    flag = annotate employment_off_target only (current behavior); drop =
+                    mechanically Filter Out (e.g. a full-time-only posting when part_time is
+                    targeted, even on a B2B/contract vehicle)
   timezone_window:
     latest_end_local: str, optional "HH:MM" — work required after this local time -> drop
 

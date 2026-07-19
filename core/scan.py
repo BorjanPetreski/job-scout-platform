@@ -185,6 +185,32 @@ def detect_employment(text: str) -> set[str]:
     return {tok for tok, pat in _EMPLOYMENT_MARKERS.items() if re.search(pat, t)}
 
 
+# Work-arrangement (D-remote): remote / hybrid / on_site as a posting states it. The
+# platform's structured location tag ("Kraków (hybrid)", "Warszawa (remote)" on JustJoin.it)
+# is authoritative when present — it is a curated field, not incidental body prose; a bare
+# "remote" in a JD menu/footer must not override a "(hybrid)" loc tag. Falls back to loc+JD
+# keywords only when the loc carries no explicit tag. Vocab matches search.work_model
+# (remote/hybrid/on_site). Conservative: no signal = unstated, never a machine drop on its own.
+_ARRANGEMENT_MARKERS = {
+    "remote": r"\b(fully[\s-]?remote|remote[\s-]?first|100%\s*remote|remote)\b",
+    "hybrid": r"\bhybrid\b",
+    "on_site": (r"\b(on[\s-]?site|in[\s-]?office|from the office|stationary)\b"
+                r"|\b\d+\s*days?\b[^.]{0,20}\b(office|on[\s-]?site|onsite)\b"),
+}
+_LOC_ARR_TAG = re.compile(r"\((remote|hybrid|on[\s-]?site|onsite|stationary)\)")
+
+
+def detect_work_arrangement(loc: str, jd: str) -> set[str]:
+    """Return the arrangement(s) a posting states, subset of {remote, hybrid, on_site}.
+    A structured loc tag wins outright; otherwise scan loc+JD for the markers."""
+    tag = _LOC_ARR_TAG.search((loc or "").lower())
+    if tag:
+        t = tag.group(1).replace("-", "").replace(" ", "")
+        return {{"onsite": "on_site", "stationary": "on_site"}.get(t, t)}
+    hay = f"{(loc or '').lower()} {(jd or '').lower()}"
+    return {name for name, pat in _ARRANGEMENT_MARKERS.items() if re.search(pat, hay)}
+
+
 def hard_filter(cand: dict, hf: dict) -> tuple[str | None, list[str]]:
     """Returns (drop_reason, flags). Drop only on the machine-certain patterns."""
     hay = " ".join(str(cand.get(k) or "") for k in ("title", "loc", "salary", "jd_text"))
@@ -423,12 +449,24 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     employment_type = search_cfg.get("employment_type")           # None unless profile sets it
     et_accept = set((employment_type or {}).get("accept") or [])
     seniority_lexicon = cfg.get("seniority_lexicon", {})
+    hf_cfg = cfg.get("hard_filters", {})
+    work_model = set(search_cfg.get("work_model") or [])           # required field, e.g. {remote}
+    wa_mode = hf_cfg.get("work_arrangement", "off")               # off (default) | flag | drop
     for c in survivors:
         flags = set(c.get("flags") or [])
         if not dedup.norm_company(c.get("company", "")):
             flags.add("missing_company")            # scan-side data-quality note (lesson 6)
         jd = c.get("jd_text") or ""
         lang_flag, lang_note = language_flag(jd)     # Polish-only JD/ATS (lesson 1)
+        if not lang_flag:
+            # Title-level fallback: a JD-less/light dedup twin (empty jd_text) never reaches
+            # language_flag's 50-word floor, so a Polish-market title ("bankowość", "z praktyką")
+            # would slip through unflagged. Diacritics/markers in the TITLE still signal it.
+            title_l = (c.get("title") or "").lower()
+            title_words = re.findall(r"[^\W\d_]+", title_l, flags=re.UNICODE)
+            if any(ch in _PL_DIACRITICS for ch in title_l) or any(w in _PL_MARKERS for w in title_words):
+                lang_flag = "non_english_jd"
+                lang_note = "title contains Polish (Polish-market posting; JD unavailable to confirm)"
         if lang_flag:
             flags.add(lang_flag)
             c["language_note"] = lang_note
@@ -464,9 +502,60 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
             detected = detect_employment(" ".join(str(c.get(k) or "") for k in ("title", "jd_text")))
             if detected:
                 c["employment_detected"] = sorted(detected)
-                if not (detected & et_accept):
+                off_target = not (detected & et_accept)
+                # Part-time seeker guard: an explicitly FULL-TIME posting is off-target even when
+                # a contract/b2b model co-occurs. "Full-time B2B" is full-time HOURS on a B2B
+                # contract — time-commitment and contract-vehicle are orthogonal, so the accept
+                # match on 'contract'/'b2b' must NOT mask the full-time disqualifier (the JustJoin.it
+                # leak: 36 full-time roles reached Ani's part-time shortlist this way). Only when
+                # part-time isn't ALSO offered.
+                if "part_time" in et_accept and "full_time" in detected and "part_time" not in detected:
+                    off_target = True
+                if off_target:
                     flags.add("employment_off_target")
+        # Work-arrangement signal (D-remote) — only when the profile opts in (wa_mode != off).
+        # search.work_model is required, but enforcing it is opt-in so profiles that share the
+        # remote default (e.g. borjan-pm) are byte-identical until they turn this on. Mismatch =
+        # a stated arrangement, none of which the profile accepts (hybrid/on-site vs remote-only)
+        # and remote is NOT also offered.
+        if work_model and wa_mode != "off":
+            arr = detect_work_arrangement(c.get("loc", ""), jd)
+            if arr:
+                c["work_arrangement_detected"] = sorted(arr)
+                if not (arr & work_model):
+                    flags.add("work_arrangement_mismatch")
         c["flags"] = sorted(flags)
+
+    # ---- opt-in hard-eligibility enforcement (D-remote / D8 drop mode). A profile MAY declare
+    # that a machine-certain, impossible-to-satisfy mismatch is a mechanical DROP rather than a
+    # judgment flag — the same class as us_only/closed_location_list (you cannot work a Kraków
+    # hybrid desk remotely from Skopje). Off by default: with wa_mode=off and em_mode=flag nothing
+    # is dropped here, so profiles that don't opt in are byte-identical. Dropped rows go to
+    # seen.jsonl as "Filtered Out" (recoverable/auditable), never reaching the shortlist. This is
+    # the deliberate flag→drop conversion the doctrine reserves for hard eligibility (CLAUDE.md).
+    em_mode = hf_cfg.get("employment_mismatch", "flag")           # flag (default) | drop
+    if wa_mode == "drop" or em_mode == "drop":
+        kept = []
+        for c in survivors:
+            fset = set(c.get("flags") or [])
+            reason = None
+            if wa_mode == "drop" and "work_arrangement_mismatch" in fset:
+                reason = (f"work arrangement {c.get('work_arrangement_detected') or '?'} off-target "
+                          f"(work_model requires {sorted(work_model)})")
+            elif em_mode == "drop" and "employment_off_target" in fset:
+                reason = (f"employment {c.get('employment_detected') or '?'} off-target "
+                          f"(accepts {sorted(et_accept)})")
+            if reason:
+                dedup.append({"company": c["company"], "role": c["title"], "locdom": c.get("loc", ""),
+                              "url": c["url"], "platform": c["platform"], "status": "dropped",
+                              "reason": "Filtered Out", "fit": "N/A", "archetype": "",
+                              "keyword_source": c["title"], "notes": reason})
+                dropped += 1
+                continue
+            kept.append(c)
+        _log(f"hard-eligibility drop: {len(survivors) - len(kept)} off-target "
+             f"(work_arrangement={wa_mode}, employment_mismatch={em_mode})")
+        survivors = kept
 
     # ---- shortlist liveness sweep (4.0, step 8 — ARCHITECTURE.md §6)
     sweep_counts = {"scope": 0, "checked": 0, "stale": 0, "unverifiable": 0,

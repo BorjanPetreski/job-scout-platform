@@ -49,6 +49,21 @@ is *born sellable* (clean diligence, real retention hooks, low COGS) instead of 
   against real data. Dogfooding surfaces the gaps specs miss (e.g. field-size limits, data hygiene).
 - **Lessons become rules:** generic lessons → the engine/docs; user-specific → the profile;
   environment frictions → the changelog.
+- **A declared hard constraint must be ENFORCED, not just documented (2026-07-19 lesson):** a
+  requirement that lives only as config metadata or a prose `filter_note` leaks silently — the
+  machine keeps surfacing violations because nothing reads the constraint. "Scripts flag, judgment
+  decides" is right for *ambiguous* signals, but for a **machine-certain, impossible-to-satisfy**
+  eligibility miss (Ani in Skopje can't work a Poland-hybrid desk), flag-only relies on a judgment
+  layer that will eventually miss — enforce it mechanically as a drop, gated + opt-in so production
+  stays byte-identical. Corollary: watch for **conflated dimensions** that hide a disqualifier —
+  "Full-time B2B" merged time-commitment (full-time HOURS, reject) with contract-vehicle (B2B, accept);
+  the accept-match masked the reject until the two were separated.
+- **Companion UX for non-technical / young users (2026-07-19 lesson):** an open-ended question
+  ("describe your voice quirks") stalls a real user. Ship **selectable options with the assistant's own
+  proposed answers** (tap to accept/adjust, free-write as escape), **numbered + skippable phases** with
+  honest "not fully set" warnings, **defaults that don't ask** where there's only one sane answer (save
+  location), and **always the actionable artifact** (a clickable link, a status button) — never make the
+  user type what a tap could do.
 
 ### 5. AI-native architecture
 - **Two-layer split:** cheap mechanical scripts *flag*; the capable model *decides* ("scripts flag,

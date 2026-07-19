@@ -286,9 +286,15 @@ def _validate(merged: dict, profile_id: str, catalog: dict, defaults: dict) -> l
     for key, allowed in (("travel", {"none", "occasional_ok", "any"}),
                          ("clearance", {"drop", "allow"}),
                          ("grind_culture", {"drop", "allow"}),
-                         ("closed_location_list", {"drop_if_absent", "off"})):
+                         ("closed_location_list", {"drop_if_absent", "off"}),
+                         # NEW (D-remote / D8): opt-in enforcement of search.work_model and
+                         # search.employment_type. Default off/flag keeps current behavior.
+                         ("work_arrangement", {"off", "flag", "drop"}),
+                         ("employment_mismatch", {"flag", "drop"})):
         if key in hf and hf[key] not in allowed:
             e.append(f"hard_filters.{key} must be one of {sorted(allowed)}, got {hf[key]!r}")
+    if hf.get("employment_mismatch") and not (merged.get("search") or {}).get("employment_type"):
+        e.append("hard_filters.employment_mismatch needs search.employment_type to be set")
     tw = (hf.get("timezone_window") or {}).get("latest_end_local")
     if tw is not None and not re.fullmatch(r"\d{2}:\d{2}", str(tw)):
         e.append(f'hard_filters.timezone_window.latest_end_local must be "HH:MM", got {tw!r}')
@@ -416,6 +422,12 @@ def _compile_hard_filters(merged: dict, defaults: dict) -> dict:
     compiled = {"auto_drop_patterns": auto, "auto_drop_title_patterns": auto_title,
                 "flag_patterns": flags,
                 "salary_floor": salary.normalize_floor(merged.get("compensation") or {}, defaults)}
+    # Opt-in enforcement modes (D-remote / D8). Only carried through when NON-default so a
+    # profile that doesn't set them (borjan-pm) yields a byte-identical compiled hard_filters.
+    if hf.get("work_arrangement", "off") != "off":
+        compiled["work_arrangement"] = hf["work_arrangement"]
+    if hf.get("employment_mismatch", "flag") != "flag":
+        compiled["employment_mismatch"] = hf["employment_mismatch"]
     if hf.get("closed_location_list", "drop_if_absent") == "drop_if_absent":
         cll = lib.get("closed_location_list", {})
         compiled["eu_country_list_detector"] = {  # legacy key name — engine compat
