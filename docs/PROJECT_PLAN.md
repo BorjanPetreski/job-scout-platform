@@ -317,6 +317,48 @@ Standing rule carried from Phase 1: nothing in Phases 1–4 may assume single-te
 that is expensive to unwind — hence profile-namespaced state, per-profile targets, and the
 storage-adapter boundary from the start.
 
+#### Design decision — hosted scanning splits **ingestion** from **matching** (2026-07-19)
+
+**Problem.** Today each profile's scan does its own board fetches. Hosted scanning runs many
+profiles per cycle, so the naïve approach — N profiles each fetching independently — is
+**O(boards × tenants)** requests and hammers the same hosts N times over, inviting per-host
+soft-blocks / rate-limits. Borjan raised this and proposed "one heavy run that carries all
+profiles and separates results later."
+
+**Decision.** Adopt the *intent* of that proposal, but as a **layer split, not a monolith** — a
+single co-mingled multi-profile run risks cross-tenant leakage (state, scoring, Notion targets,
+eventual PII), which the whole architecture is built to prevent. Instead:
+
+- **Ingestion (shared, once per cycle):** a polite, **per-host rate-limited** crawler pulls each
+  board's listings once into a **shared postings corpus with a TTL**. One well-behaved crawler per
+  domain — the structural fix for soft-blocks (not just throttling).
+- **Matching (per-tenant, cheap, trivially parallel):** each profile's run becomes a local pass
+  over the corpus — keyword → freshness → dedup → hard-filter → score → shortlist → sync to *its
+  own* Notion. No network, no shared-host contention, isolation fully preserved.
+
+Fetch cost drops from **O(boards × tenants)** to **O(boards)**.
+
+**Why the codebase already leans this way (seams to reuse):**
+- The listing fetch is already **broad-pull + local keyword filter** (`scan.py` triage:
+  fetch board → `_keyword_match` on titles locally) — the expensive network step is largely
+  profile-agnostic already.
+- `catalog/platforms.yaml` is already the **shared ingest definition**; per-profile `tiers`/
+  selection is the tenant-specific part — clean seam.
+- `jd_cache/` already exists per profile → promote to a **shared, URL-keyed, TTL'd JD store** so
+  two tenants shortlisting the same posting fetch the full JD once (the other per-URL net cost).
+- `sweep.py` is already rate-limited — same discipline, applied to ingestion.
+
+**Pieces to add (Phase 5 build):** shared postings corpus (store + TTL); shared URL-keyed JD
+cache; per-host crawler pool (token bucket per domain, concurrency cap, backoff); crawl scope =
+**union of active tenants' catalog resolutions**.
+
+**Tradeoffs accepted:** freshness becomes TTL-bounded, not real-time (fine for postings — set
+per-board TTL); a shared corpus store to operate (small — public text); tenants keep independent
+cadence/keywords/tiers, reading the corpus at their scheduled time instead of hitting the network.
+
+**Status:** decision captured; **build in Phase 5**. Not needed earlier — for the handful of
+profiles in Phases 3–4, staggering run starts is sufficient.
+
 ### Phase 6 — GTM / launch (marketing & sales prep)
 
 **After the product is built, a dedicated go-to-market phase** (Borjan, 2026-07-18: "phase
