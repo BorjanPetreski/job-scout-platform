@@ -490,11 +490,91 @@ def reconcile_applied_from_tracker(cfg: dict) -> dict:
     return result
 
 
+# Passed/Seen resolution → local status (task #13). A row the user/companion resolved in Notion
+# must stop looking `shortlisted` locally. `New — Unreviewed` / `Unverified/Blocked` are NOT
+# resolutions (still live / pending) → skipped.
+_RESOLVED_LOCAL_STATUS = {
+    "User Applied Elsewhere": "applied",
+    "User Declined": "passed",
+    "Filtered Out": "dropped",
+    "Duplicate Listing": "dropped",
+    "Stale/Expired": "dropped",
+}
+
+
+def reconcile_resolutions_from_passed_seen(cfg: dict) -> dict:
+    """Read-back the mirror of #8/#11 (task #13). The scanner writes Passed/Seen rows and marks
+    the local record `shortlisted`; when the user/companion later resolves that row in Notion
+    (`User Declined`/`Filtered Out`/`Stale/Expired`/…), local `seen.jsonl` never learns and the
+    record drifts — it keeps looking live (stale counts, and the sweep keeps re-checking it).
+
+    This READS the Passed/Seen Log and updates any still-`shortlisted` local record whose live
+    Notion reason is a resolution, mapping it to the matching local status (`_RESOLVED_LOCAL_STATUS`).
+    Read-only on Notion (writes only local `seen.jsonl`); token-gated; idempotent (a record already
+    at the resolved status is left alone). Never touches the Tracker.
+
+    Returns: {tokenless, ps_rows, resolved, already, unmatched, skipped}.
+    """
+    result = {"tokenless": False, "ps_rows": 0, "resolved": 0, "already": 0,
+              "unmatched": 0, "skipped": None}
+    if cfg["notion"].get("dry_run"):
+        result["skipped"] = "dry-run profile"
+        return result
+    ds_id = (cfg["notion"].get("passed_seen") or {}).get("data_source_id")
+    if not ds_id:
+        result["skipped"] = "no passed_seen data_source_id"
+        return result
+    if not os.environ.get("NOTION_TOKEN"):
+        result["tokenless"] = True
+        return result
+
+    rows: list[tuple[str, str]] = []   # (url, reason)
+    cursor = None
+    while True:
+        body: dict = {"page_size": 100}
+        if cursor:
+            body["start_cursor"] = cursor
+        r = _req("POST", f"{API}/data_sources/{ds_id}/query", json=body)
+        if r.status_code != 200:
+            result["skipped"] = f"passed_seen query {r.status_code}"
+            return result
+        data = r.json()
+        for row in data.get("results", []):
+            props = row.get("properties", {})
+            u = (props.get("Job URL", {}) or {}).get("url")
+            reason = ((props.get("Reason Passed", {}) or {}).get("select") or {}).get("name")
+            if u and reason:
+                rows.append((u, reason))
+        if not data.get("has_more"):
+            break
+        cursor = data.get("next_cursor")
+    result["ps_rows"] = len(rows)
+
+    seen = dedup.load_seen()
+    for u, reason in rows:
+        target = _RESOLVED_LOCAL_STATUS.get(reason)
+        if not target:
+            continue                          # New — Unreviewed / Unverified/Blocked — still live
+        rec = seen["by_url"].get(dedup.norm_url(u))
+        if rec is None:
+            result["unmatched"] += 1
+            continue
+        if rec.get("status") != "shortlisted":
+            result["already"] += 1            # already resolved locally (or never live) — idempotent
+            continue
+        note = ((rec.get("notes") or "") + f" | reconciled '{reason}' from Passed/Seen Log "
+                "(user/companion-resolved)").strip(" |")
+        dedup.update(u, {"status": target, "reason": reason, "notes": note})
+        result["resolved"] += 1
+    return result
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--applied", metavar="URL", help="interactive applied flow (Tracker write)")
     ap.add_argument("--reconcile", action="store_true",
-                    help="scan-start dedup handoff: back-fill seen.jsonl 'applied' from the Tracker")
+                    help="scan-start dedup handoff: back-fill seen.jsonl 'applied' from the Tracker "
+                         "+ read Passed/Seen resolutions back into local state (#13)")
     ap.add_argument("--digest", metavar="LINE", help="digest line for the Runs page")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--profile", default=None)
@@ -504,6 +584,9 @@ if __name__ == "__main__":
     if args.applied:
         sync_applied(args.applied, dry_run=args.dry_run)
     elif args.reconcile:
-        print(json.dumps(reconcile_applied_from_tracker(_cfg()), ensure_ascii=False))
+        _c = _cfg()
+        print(json.dumps({"tracker": reconcile_applied_from_tracker(_c),
+                          "resolutions": reconcile_resolutions_from_passed_seen(_c)},
+                         ensure_ascii=False))
     else:
         sync_scan(dry_run=args.dry_run, digest_line=args.digest)
