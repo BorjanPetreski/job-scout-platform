@@ -350,7 +350,10 @@ Fetch cost drops from **O(boards × tenants)** to **O(boards)**.
 
 **Pieces to add (Phase 5 build):** shared postings corpus (store + TTL); shared URL-keyed JD
 cache; per-host crawler pool (token bucket per domain, concurrency cap, backoff); crawl scope =
-**union of active tenants' catalog resolutions**.
+**union of active tenants' catalog resolutions**; **per-run isolated scratch/temp dirs** — in the
+2026-07-19 two-profile parallel test the concurrent subagents shared one scratchpad root and a
+scratch log was silently overwritten mid-run (recovered from git-tracked profile state, no data
+harm, but a hosted many-runs-in-parallel setup must give each run its own scratch namespace).
 
 **Tradeoffs accepted:** freshness becomes TTL-bounded, not real-time (fine for postings — set
 per-board TTL); a shared corpus store to operate (small — public text); tenants keep independent

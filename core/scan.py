@@ -286,6 +286,12 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     else:
         _log(f"  reconcile: {reconcile['tracker_rows']} tracker rows, "
              f"{reconcile['backfilled']} back-filled, {reconcile['already']} already")
+    # #13: read Passed/Seen resolutions back into local state (Notion-resolved rows stop looking
+    # `shortlisted` locally). Read-only on Notion, token-gated, idempotent.
+    resolutions = notion_sync.reconcile_resolutions_from_passed_seen(cfg)
+    if not resolutions.get("tokenless") and not resolutions.get("skipped"):
+        _log(f"  resolutions: {resolutions['resolved']} resolved from Passed/Seen "
+             f"(of {resolutions['ps_rows']} rows, {resolutions['already']} already)")
     seen = dedup.load_seen()
     keywords = [k.lower() for k in (cfg["keywords"]["core"] + cfg["keywords"]["expanded"])]
     caps = cfg.get("caps", {})
