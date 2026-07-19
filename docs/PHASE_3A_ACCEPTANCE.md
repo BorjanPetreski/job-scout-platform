@@ -94,6 +94,30 @@ Confirm in the ledger / output:
 `seen.jsonl`; a later sweep leaves the companion-resolved rows untouched; the scanner is otherwise
 unchanged; and no CV/PII landed in the repo.
 
+### The one box that needs a *first real apply* (companion-created NEW Tracker row)
+
+3a.7 proved back-fill against a Tracker row that already existed (OSF). The remaining box is the
+companion **freshly creating** a Tracker row on your first real apply, and the next scan picking
+*that* row up. It is now **proven offline** end-to-end (back-fill + the #8/#11 Passed/Seen flip +
+dedup handoff + idempotency + the read-before-write guard) by:
+
+```
+python3 sims/reconcile_new_tracker_box.py        # exit 0 = box proven (no token, no network)
+```
+
+To **confirm it live**, on your first real application:
+
+1. Let the companion apply + create the `Applied` Tracker row as usual (Part 3 step 4).
+2. Before the next scan, note the role sits in `📥 New — Unreviewed` (Passed/Seen) **and** now has
+   an `Applied` Tracker row.
+3. Run `python3 core/notion_sync.py --profile borjan-pm --reconcile` with your token set.
+4. Confirm the ledger shows **`backfilled: 1`** and **`passed_seen_flipped: 1`** for that role, its
+   `seen.jsonl` record is now `applied`, and its Passed/Seen row reads **`User Applied Elsewhere`**
+   (no longer lingering in `📥 New — Unreviewed`).
+5. Run a normal scan — the role must **not** re-shortlist.
+
+That closes the last end-to-end box.
+
 ## Part 5 — Portability proof (ani-backend-java)
 
 Spin up a second Project with `profiles/ani-backend-java/assistant/project-instructions.md`,
