@@ -82,3 +82,27 @@ The guided-Q&A path DID build a non-Borjan voice and a coherent KB from scratch 
 The gaps above are UX/doctrine polish, not a package-is-Borjan-shaped failure. The apply loop surfaced the
 scanner leak, now fixed. Remaining Part-C proof: voice+KB survive a fresh conversation (save round-trip) and the
 apply loop runs clean on the de-leaked shortlist.
+
+---
+
+## 5. Enforcement-coverage audit + balance — 🔜 next session (Borjan, 2026-07-19)
+
+**Scope beyond the two params already fixed.** Audit EVERY constraint a profile declares
+(current: `regions_acceptable`, `target_seniority` strict, `citizenship`, `timezone_window`,
+salary floor, `tool_lockin`, work_model, employment_type, …) AND plan for params a user may add
+at onboarding that the app doesn't ship — the scanner should machine-drop the straightforward
+ones. Close every "declared but only flagged / not enforced" gap.
+
+**Balance — do NOT overconstrain (critical).** Hard drops can silently zero the results.
+- **Diagnose Borjan's last scan: it returned 0 new — find WHICH param(s) dropped everything and
+  why.** (This session earlier noted borjan's parallel run was 0 for "legitimate" reasons —
+  re-verify that's true and not a leak-in-reverse / over-drop.)
+- **Add drop-telemetry + a user nudge:** track per-param drop counts each run; when one param
+  drops a large share (e.g. 280 of 300 found), surface it — "parameter_x dropped 280/300; consider
+  relaxing this hard drop." Never let a single hard filter annihilate the funnel silently.
+
+**Language rule — generalize (don't hardcode Polish/English).** Current fix flags/drops "Polish".
+Reframe as: drop a posting whose **main language is not among the user's set languages**. The user
+sets a language list (e.g. primary German, secondary English) — keep postings in ANY of those,
+drop the rest. English is just Borjan's default, not the rule. Detection must be language-agnostic
+(the `_PL_MARKERS`/`_EN_SIGNAL` approach must generalize to a configurable per-profile language set).
