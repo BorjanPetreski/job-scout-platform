@@ -33,15 +33,17 @@ compensation:
 
 hard_filters:
   # Borjan's stated hard no-go: gambling/betting/casino/lottery domain (3a.7 acceptance —
-  # a "PM Senior (lottery)" role shortlisted before this was encoded). Hard auto-drop.
-  role_exclusion_terms: [lottery, betting, casino, gambling, igaming, sportsbook]
+  # a "PM Senior (lottery)" role shortlisted before this was encoded). role_hard_drop_terms
+  # (task #12): a TITLE match is a mechanical auto-drop; a JD-body-only mention still surfaces
+  # as an excl_* flag for the judgment layer (a role serving betting clients isn't silently cut).
+  role_hard_drop_terms: [lottery, betting, casino, gambling, igaming, sportsbook]
 
 # Profile-learned filter lessons the judgment layer reads on every scan (these are
 # BORJAN's lessons; a different profile earns its own):
 filter_notes: |
-  - Gambling/betting/casino/lottery domain is a HARD no-go (3a.7). The excl_* flags
-    (role_exclusion_terms) fire on these — treat any as an immediate drop, no exceptions.
-    (Mechanical auto_drop wiring is a pending small code change; until then this is the rule.)
+  - Gambling/betting/casino/lottery domain is a HARD no-go (3a.7). A title match now
+    mechanically auto-drops (role_hard_drop_terms, task #12); a body-only mention still
+    surfaces as an excl_* flag — treat any such flag as an immediate drop, no exceptions.
   - EU-citizenship clauses drop even though B2B bypasses visa/payroll needs (Cyclad
     lesson): an explicit EU-citizenship clause is an agency/legal restriction, common
     on JustJoin.it. Drop even when everything else fits.

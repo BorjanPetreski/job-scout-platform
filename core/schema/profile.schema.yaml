@@ -80,6 +80,8 @@ hard_filters:                           # [T] typed toggles; regex machinery is 
   grind_culture: str, optional, one of [drop, allow] (default drop)
   tool_lockin_drop: [str], optional — primary-skill lock-in tools that disqualify
   role_exclusion_terms: [str], optional — flagged (not auto-dropped); judgment decides
+  role_hard_drop_terms: [str], optional — no-go domain: TITLE match mechanically auto-drops,
+                        JD-body-only match still flags (excl_*) for judgment (task #12)
   closed_location_list: str, optional, one of [drop_if_absent, off] (default drop_if_absent)
   timezone_window:
     latest_end_local: str, optional "HH:MM" — work required after this local time -> drop
