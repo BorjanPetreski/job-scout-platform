@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "changed=$( { git diff --name-only origin/main 2>/dev/null; git status --porcelain --no-renames 2>/dev/null | cut -c4-; } | sort -u ); if printf '%s\\n' \"$changed\" | grep -qE '^(core|skills)/' && ! printf '%s\\n' \"$changed\" | grep -qx 'assistant/GUIDED-FLOW.md'; then printf '%s' '{\"systemMessage\":\"Wrap-up check (standing rules): this branch changed core/ or skills/ but not assistant/GUIDED-FLOW.md. (1) If a step was dogfooded/proven this session, fold its prompt into assistant/GUIDED-FLOW.md (mark it proven). (2) Assess whether a reusable BUILD-METHOD lesson emerged (product-agnostic) \u2014 if so, fold it into docs/BUILD_AND_FLIP_PLAYBOOK.md. Do either in its own small PR before wrapping. See CLAUDE.md Definition-of-Done.\"}'; fi; exit 0",
+            "statusMessage": "wrap-up check"
+          }
+        ]
+      }
+    ]
+  }
+}

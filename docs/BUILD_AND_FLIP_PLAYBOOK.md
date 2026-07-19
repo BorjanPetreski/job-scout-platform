@@ -37,6 +37,12 @@ is *born sellable* (clean diligence, real retention hooks, low COGS) instead of 
   storage boundary so it can move client-side later.
 - **Honest-failure:** the system degrades *visibly*, never silently-wrong (honest ledgers,
   source-down reporting, "insufficient data" beats a guess).
+- **Enforce standing rules — don't just write them (2026-07-19 lesson):** a discipline that lives
+  only as prose in a doc rots, because it depends on whoever's driving remembering to open that
+  doc. Encode each standing rule as **harness enforcement** — a hook (fires the reminder
+  mechanically) **plus** a `CLAUDE.md` Definition-of-Done (keeps it in-session context). The hook
+  can only *remind*, not judge — acting is still a call — but the *trigger* stops riding on memory.
+  (Here: the fold-in-proven-prompts rule was being missed until it became a Stop hook + DoD item.)
 
 ### 4. Build for a real first user (dogfood)
 - Onboard an actual user (here: Borjan, then Ani) and run a **supervised live acceptance (UAT)**
@@ -132,6 +138,12 @@ loop in `HEALTH_MONITORING.md` (Layer-1 signal emitter + Layer-2 diagnose/repair
 - The **Fable-5 adversarial review-gate prompt**, the **effort-tiering table**, the **no-PII
   denylist**, the **prime-directive byte-identical proof**, feature-branch-per-phase + small PRs +
   a single required CI check. All lift as-is.
+- The **offline mocked-boundary simulation** (`sims/`) — prove an integration box that can't be
+  live-tested (an external-service round-trip, a cross-process handoff) with a self-asserting
+  harness that drives the *real* logic against a *mocked* boundary. Reusable pattern; swap the
+  boundary. Turns an un-testable "confirm on first real use" box into a repeatable green check.
+- The **standing-rule enforcement pair** (a Stop hook + a `CLAUDE.md` Definition-of-Done) — lift
+  the shape for any discipline that must survive a forgetful session (see §3).
 
 ### What does NOT transfer (product-specific — leave it)
 `core/fetch_boards.py`, `render.py`, `check_links.py`, `linkedin_tripwire.py`, `salary.py`,
