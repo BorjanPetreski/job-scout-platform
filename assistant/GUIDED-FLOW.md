@@ -103,6 +103,22 @@ Draft a [cover letter / hiring-manager email] for [role/url] in my voice. Here's
 ```
 python3 core/notion_sync.py --profile [profile] --reconcile
 ```
+> Now emits `{tracker, resolutions}`: back-fills `applied` from the Tracker (#8/#11) AND reads
+> Passed/Seen resolutions (Declined/Filtered/Stale) back into local state (#13), so a
+> Notion-resolved row stops looking `shortlisted` locally. Read-only on Notion, idempotent.
+
+### B9. Run several profiles in parallel (operator, staggered) — ✅ *(dogfooded 2026-07-19: borjan-pm + ani-backend-java concurrently, clean isolation, validate green)*
+```
+Run a full scored scan for [profile-1] and [profile-2] concurrently — one subagent per profile,
+each running the job-scout-run skill end-to-end for its OWN profile only (pull state → scan
+--verbose → judgment score/tag → push shortlist to that profile's Notion → sweep + reconcile).
+Stagger the scan starts by ~60s to be polite to shared job boards. Each subagent touches only its
+own profiles/<id>/state and Notion. When both finish, run python3 core/validate.py and report, per
+profile: shortlist count + fit scores, the tracker/resolutions reconcile counters, and any
+rate-limited/403 host. Do NOT commit state — leave the run artifacts in the working tree.
+```
+> Operator lane (repo-aware Claude session), not the companion Project. Profiles never share state,
+> so parallel is isolation-safe; at scale give each concurrent run its own scratch dir (Phase 5).
 
 ---
 
