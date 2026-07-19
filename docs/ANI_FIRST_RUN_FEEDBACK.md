@@ -40,10 +40,13 @@ live posting anyway (form is ground truth).
 
 ---
 
-## 2. Companion doctrine — 🔜 next PR (fold into `assistant/` + recompose bindings)
+## 2. Companion doctrine — ✅ FOLDED 2026-07-19 (generic `assistant/` modules + recomposed bindings)
 
-These are proven-by-failure in the live run. They belong in the generic `assistant/` modules (voice/KB/apply
-doctrine) so every profile inherits them, then recompose each profile binding.
+Folded into `02-voice-acquisition.md` (selectable options + worked examples, explicit tone/gender dial,
+sentence-complexity/English-level dials, numbered+skippable phased generation with N estimated from input
+richness, two-samples-per-phase, save-by-default), `03-knowledge-base.md` (save-by-default), and
+`04-apply-loop.md` (always-clickable-link, proceed-as-explicit-options → Notion status). Both bindings
+recomposed. The list below is the record of what was proven-by-failure in the live run.
 
 - **Voice Q&A needs worked examples + selectable options.** "English-as-non-native quirks" meant nothing
   without examples. Every guided question should ship 2–4 concrete example answers the user can pick, with
