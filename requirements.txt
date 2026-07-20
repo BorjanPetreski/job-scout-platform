@@ -1,0 +1,8 @@
+# Third-party dependencies for core/ — see docs/LAPTOP_LANE.md (persistent machine setup)
+# and skills/job-scout-run/SKILL.md ("Setup, once per machine") for the full picture,
+# including Chromium (playwright install chromium — skip on managed environments that
+# pre-install it, see PLAYWRIGHT_BROWSERS_PATH).
+requests~=2.33
+pyyaml~=6.0
+selectolax~=0.4
+playwright~=1.48

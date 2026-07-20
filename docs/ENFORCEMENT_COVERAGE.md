@@ -67,4 +67,33 @@ When a user declares a new hard constraint the app doesn't ship a control for:
   **80 candidates, 1 mechanical drop** — the 0 was the *judgment layer* declining all 80 for legitimate
   reasons (US-only / PL-hybrid / Polish-only / auth-walled). The funnel was healthy; the market was thin.
   The telemetry above now makes that distinction visible on every run (mechanical drops vs. thin market).
-</content>
+
+## Finding + fix (2026-07-20) — JD extraction hides real content
+
+**Root cause found and fixed.** While manually judging that night's captured candidates, found
+that JustJoin.it JDs were coming through as ~700KB of raw CSS/framework text with the real job
+description (Requirements/Responsibilities) sitting ~240,000+ characters in — past what any
+text-based detector reads from the truncated 1500-char `jd_text` field. Confirmed empirically:
+**15/25 (60%) of Ani's fully-fetched JJIT candidates and 9/19 (47%) of borjan-pm's were actually
+Polish-language postings** that `language_flag()` never saw.
+
+**Root cause: not the extraction design, a missing dependency.** `core/fetch_boards.py`'s
+`_visible_text()` uses `selectolax` (a proper DOM parser) to strip `<script>`/`<style>`/etc.
+*entirely*, including their content — that path is correct. But it silently falls back to a naive
+regex tag-stripper (`re.sub(r"<[^>]+>", " ", html)`) on ANY exception importing/using selectolax
+— and that regex only removes tag *markers*, not the *content* of `<style>`/`<script>` blocks, so
+inline CSS/JS text leaks straight into "visible" text. In the session that ran the overnight scan,
+`selectolax` wasn't installed, so every JustJoin.it fetch silently took the degraded path and fed
+garbage to every downstream text detector (language, salary, stack-keyword) — with no visible
+signal that anything had degraded. A genuine violation of the platform's honest-failure doctrine.
+
+**Fixed:** `_visible_text()`'s fallback now strips `<script>`/`<style>` block *content* first
+(`_SCRIPT_STYLE_BLOCK` regex) before stripping tags, so a missing/broken selectolax degrades
+gracefully (loses DOM-aware nav/footer/header stripping — a minor quality loss) instead of leaking
+raw CSS/JS as JD text. It also prints a `[fetch_boards] _visible_text: selectolax unavailable`
+warning to stderr so the degradation is never silent again. `selectolax` was also installed in this
+session (it's already documented as a setup dependency in `LAPTOP_LANE.md`/the run skill — this
+session simply hadn't run that step). Unit-verified both paths (with and without selectolax) now
+produce identical clean output. **Not re-run:** the shortlists already pushed to Notion that night
+were hand-corrected via manual full-cache reads (see the 2026-07-20 PROGRESS row) — this fix
+prevents the corruption for every future run, it doesn't need to rewrite that night's data.
