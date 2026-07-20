@@ -524,10 +524,18 @@ def fetch_html_listing(p: dict, cfg: dict, headless: bool = False) -> dict:
                 rendered = render.render(u)
                 if rendered:
                     reached_200 = True
-                    # only a *heal* when headless was an ESCALATION (direct was tried and
-                    # didn't produce) — not when headless is the board's configured first choice
-                    if not headless and not direct_ok:
+                    # a heal claim requires the escalation to ACTUALLY recover candidates — a
+                    # render that comes back empty/blocked (e.g. a bot-wall page that still
+                    # returns a body) proved reachability, not recovery, and must not be reported
+                    # as a heal (2026-07-20 QA finding: Remote Rocketship healed=[recovered] but
+                    # still harvested 0 — a false "heal" claim the honest-failure floor forbids).
+                    escalation = not headless and not direct_ok
+                    harvested_from_render = (slug in HARVEST_SPECS
+                                             and bool(_harvest_links(rendered, slug, p["name"])))
+                    if escalation and harvested_from_render:
                         healed.append(f"recovered via headless: {u}")
+                    elif escalation:
+                        notes.append(f"escalated to headless for {u}, still 0 harvested")
                     html = rendered
                 elif not html:
                     notes.append(f"headless render empty for {u}")
