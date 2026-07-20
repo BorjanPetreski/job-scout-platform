@@ -21,5 +21,31 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python3 core/*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git fetch*)",
+      "Bash(git pull*)",
+      "Bash(git show*)",
+      "Bash(ls*)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(grep *)",
+      "Bash(jq *)",
+      "Bash(mkdir -p profiles/*)",
+      "Read(./**)",
+      "Grep",
+      "Glob",
+      "Edit(./profiles/**/state/**)",
+      "Write(./profiles/**/state/**)",
+      "WebFetch",
+      "WebSearch"
+    ]
   }
 }
