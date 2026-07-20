@@ -10,8 +10,8 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.7.0"
-  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time). 4.6.0: generalized non-target-language detection (configurable search.languages, multi-language) + opt-in language_mismatch drop; per-param drop telemetry + over-constraint nudge (a hard filter can't silently zero results). Profile-gated, borjan-pm resolved-config byte-identical. 4.6.1: fixed a silent JD-text-extraction degradation (missing selectolax fed raw CSS/JS to every text detector) + added requirements.txt + a SessionStart hook so cloud/web sessions install deps automatically. 4.7.0: new stated_language_requirement flag — an English JD that STATES a non-target-language proficiency requirement ('Polish C1', 'apply in Polish'), distinct from non_target_language which reads the JD's own language; flag-only, additive, borjan-pm config byte-identical."
+  version: "4.8.0"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time). 4.6.0: generalized non-target-language detection (configurable search.languages, multi-language) + opt-in language_mismatch drop; per-param drop telemetry + over-constraint nudge (a hard filter can't silently zero results). Profile-gated, borjan-pm resolved-config byte-identical. 4.6.1: fixed a silent JD-text-extraction degradation (missing selectolax fed raw CSS/JS to every text detector) + added requirements.txt + a SessionStart hook so cloud/web sessions install deps automatically. 4.7.0: new stated_language_requirement flag — an English JD that STATES a non-target-language proficiency requirement ('Polish C1', 'apply in Polish'), distinct from non_target_language which reads the JD's own language; flag-only, additive, borjan-pm config byte-identical. 4.8.0: Platform Health & Self-Healing — per-platform health telemetry in runs.json (raw yield + http_ok) feeds core/health.py (Layer 1), which mechanically flags board rot incl. the silent selector break (200-parses-0); a health-review-due counter cues the Layer-2 diagnose-and-repair review; in-scan self-healing (retry-with-backoff, direct→headless escalation) recovers transient failures and always reports the heal. Additive; borjan-pm resolved config + what the scan resolves/scans unchanged."
   created_by: Borjan
   organization: 2Coders Studio
   last_updated: "2026-07-20"
@@ -208,6 +208,23 @@ automatically — it's a data session with the user.
 **Keyword promote/demote:** candidates record the title variant ON the posting — that
 is the promote/demote dataset. The user triggers reviews; surface data +
 recommendation, they decide. Expanded-set hits score identically to core hits.
+
+**Platform health review (HEALTH_MONITORING.md):** `scan.py` records per-platform
+health telemetry every run (raw yield + whether the board actually answered) and counts
+sessions, printing `⚠ platform health review due` when the review is due. That line is
+your cue — run `python3 core/health.py [--profile <id>]`. It reads the telemetry and
+flags boards mechanically (SELECTOR_SUSPECT = reached HTTP 200 but parsed 0 rows despite
+a rich history — the silent break `sources down` can't see; also DOWN_STREAK,
+YIELD_COLLAPSE, NEVER_PRODUCED, SYSTEMIC). For each flagged board, **fetch a live sample
+and diagnose** — selector drift, moved endpoint, renamed slug, new bot-wall — then apply
+the fix through the **catalog + validator** (HARVEST_SPEC / quirk / `fetch_mode` /
+`active`/`status`), never an ad-hoc scanner edit (prime directive holds). `scripts flag,
+Claude decides`: `health.py` flags, you diagnose and repair. Running it acks the counter.
+In unattended mode do NOT auto-repair — surface the health summary and leave diagnosis
+for a review session. `SYSTEMIC` means a core/network problem, not board rot; don't chase
+individual boards. Self-healing (retry-with-backoff, direct→headless escalation) already
+runs in-scan and is always reported on the ledger as `✚ healed[board]: …` — believe it,
+never treat a heal as a board that needs no attention if it keeps recurring.
 
 ---
 

@@ -23,6 +23,20 @@ recompute:
   due_at_sessions: 5
 
 # ---------------------------------------------------------------------------
+# Platform health (HEALTH_MONITORING.md). Layer-1 mechanical thresholds that
+# core/health.py reads off the runs.json telemetry — "scripts flag, Claude
+# decides" applied to board rot. Every value is a signal threshold, never an
+# auto-repair; diagnosis + fixes stay in the Layer-2 Claude review.
+health:
+  due_at_sessions: 6            # print "platform health review due" every N scans (Claude's cue)
+  window: 8                     # trailing runs to baseline each platform against
+  down_streak: 3               # source_down this many runs in a row -> DOWN_STREAK
+  yield_collapse_factor: 0.25  # raw below this * trailing median -> YIELD_COLLAPSE
+  min_baseline: 6              # only flag collapse/selector when trailing median >= this
+  never_produced_min_runs: 4   # active board seen in >= N runs, always 0 -> NEVER_PRODUCED
+  systemic_frac: 0.7           # >= this share of active boards at ~0 in the latest run -> SYSTEMIC
+
+# ---------------------------------------------------------------------------
 # Filter library — regex machinery for the machine FIRST-PASS only. Values that
 # parameterize these (tool lists, location terms, timezone window) come from the
 # profile; core/profile_loader.py decides per profile WHICH entries apply

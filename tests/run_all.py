@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 TARGETS = [
     ("unit: scan detectors", "tests/unit_detectors.py"),
     ("unit: dedup helpers", "tests/unit_dedup.py"),
+    ("unit: health signals", "tests/unit_health.py"),
     ("sim: reconcile new-tracker box", "sims/reconcile_new_tracker_box.py"),
     ("sim: twin-row dedup", "sims/twin_row_dedup.py"),
 ]

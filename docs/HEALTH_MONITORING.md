@@ -4,7 +4,14 @@
 > *reinforces* this, and the doc grows with it. **Scheduled as a full build between Phase 3a and
 > Phase 3b** (Borjan's call — "fully build this before continuing with 3b"). It follows the same
 > pipeline as every build: brainstorm → detailed plan → Fable 5 review gate → Opus 4.8 build.
-> Nothing here is built yet; this is the spec seed the build starts from.
+>
+> **BUILD STATUS (2026-07-20): Layers 1 + 1.5 + the Layer-2 cue are BUILT** (Opus 4.8) — see the
+> build record **[PHASE_3_HEALTH_PLAN.md](PHASE_3_HEALTH_PLAN.md)**. Shipped: per-platform health
+> telemetry in `runs.json` (`platform_stats` with `raw` + `http_ok`), `core/health.py` emitting the
+> five signals below, in-scan self-healing (retry-with-backoff + direct→headless escalation, always
+> reported), the `health_review_due` counter, `job-scout-run` skill wiring, and
+> `tests/unit_health.py`. **Layer 2-runtime** (in-app self-repair) remains a spec for **Phase 4+**
+> (needs the embedded LLM). The rest of this doc is the enduring design/vision it was built from.
 
 ## The problem it solves
 
