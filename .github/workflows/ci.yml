@@ -26,6 +26,12 @@ jobs:
       - name: Platform validation (compilation, catalog, templates, profiles, state, skills)
         run: python3 core/validate.py
 
+      # Behavioral gate (complements the structural validation above): unit-tests the pure
+      # detectors/dedup helpers + runs the acceptance sims (cross-boundary flows vs mocked
+      # Notion). No network, no token — the sims mock the boundary. See tests/README.md.
+      - name: Behavioral tests (detectors, dedup, sims)
+        run: python3 tests/run_all.py
+
       # Parity (borjan-pm resolved config == legacy config.yaml) was the Phase-1
       # acceptance gate; it is retired at cutover (CUTOVER.md 5b). It now diverges BY
       # DESIGN: tiers are living per-profile data and the first post-cutover recompute

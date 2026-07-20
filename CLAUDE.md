@@ -15,8 +15,16 @@ happen every session — the parts that quietly rot if left to memory.
    judgment call, so treat "did I prove a reusable prompt?" as part of done.)*
 2. **Log the work in `docs/PROGRESS.md`** — a session-log row (what changed + why), and flip any
    affected checklist box.
-3. **Keep `borjan-pm` behavior honest.** Engine/config changes must keep the prime directive:
-   `python3 core/validate.py` green, and no unintended change to what `borjan-pm` resolves/scans.
+3. **Keep `borjan-pm` behavior honest + the behavioral gate green.** Engine/config changes must
+   keep the prime directive: `python3 core/validate.py` green (structural), **and**
+   `python3 tests/run_all.py` green (behavioral), and no unintended change to what `borjan-pm`
+   resolves/scans. **Scoped test rule:** when you add or change *behavioral logic in `core/`* — a
+   detector, a dedup/scoring/normalization helper, or a sync/reconcile rule — add or update a
+   committed check in the same PR: a **unit test** (`tests/unit_*.py`) for pure functions, a **sim**
+   (`sims/*.py`) for cross-boundary flows. This is scoped by design — unit-test the pure logic, sim
+   the boundaries, and leave the fragile fetch/render I/O to honest-failure + health monitoring (not
+   unit tests). Don't chase a coverage number; cover the layer where regressions actually bite (see
+   `tests/README.md`).
 4. **No PII in the repo** — no CV body facts, emails, phone numbers, or addresses (the 3a.8
    no-PII denylist enforces the binding files; keep it true everywhere).
 5. **Capture build-method lessons (the meta-layer).** Assess whether this session taught something
