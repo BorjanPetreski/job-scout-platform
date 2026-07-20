@@ -38,6 +38,37 @@ JustRemote + Welcome to the Jungle no longer read as `DOWN_STREAK` (a blocked ou
 `http_ok` telemetry exists — they're `http_ok: true, raw: 0`, i.e. the reached-but-empty shape,
 correctly reclassified. Left open for a live-fetch diagnosis (row below)._
 
+## Low-yield sweep — is a small nonzero count hiding a bug? (2026-07-20)
+
+Borjan asked the right follow-up question after the JustRemote fix: the two bugs found there
+(dropped category + regex mismatch) silently produced 0, which `health.py`'s `NEVER_PRODUCED`
+signal could at least flag. **But what about boards reporting a small, nonzero count forever —
+1, 4, 6 — with no prior higher baseline to "collapse" from?** `YIELD_COLLAPSE`/`SELECTOR_SUSPECT`
+structurally can't catch that shape (see the new "known blind spot" note in
+[HEALTH_MONITORING.md](HEALTH_MONITORING.md)). Manually live-audited every board from that shape
+in the last real scan's ledger:
+
+| Board | Reported | Live audit | Verdict |
+|-------|----------|------------|---------|
+| Arc.dev | 6 | Checked all `/remote-jobs/*` hrefs on the page; only 6 real `/details/` postings exist, everything else is category-tag nav; no pagination/total-count signal found. | **Genuine — no bug.** |
+| Himalayas | 4 | **Bug found**: `?limit=100` is now silently capped at 20 server-side (verified: limit 20/50/100/200 all return exactly 20 jobs; `totalCount` still ~99.7k). The old `offset={page*100}` loop assumed 100/page, so it was skipping 80 real jobs between every request (fetched ranks 0-19, then jumped to 100-119, missing 20-99 — a sparse gap-filled sample, not a true newest-1000 sweep). | **Fixed** — see below. |
+| Dynamite Jobs | 1 | **Bug found**: most job cards render their link as `<h2 href="...">`, not a real `<a>` tag — a non-standard pattern `_harvest_links()`'s `tree.css("a")` structurally can't see. 15 of 16 real postings were invisible to the harvester. | **Fixed** — see below. |
+| Landing.jobs | 1 | Checked all `/at/...` hrefs with and without scroll (4 rounds) — genuinely only 1 real posting for this query either way. | **Genuine — no bug.** |
+| Crossover | 1 | Checked with/without scroll, and every plausible PM-adjacent category (`product-management`, `tpm`, `engineering-management`, `services-leadership`) — each shows at most 1 real `/jobs/{id}/...` link. The catalog's "all" strategy (broad hub fetch + downstream keyword filter, same shape as Himalayas/WWR) is the right design; genuinely low current inventory, not a fetch bug. | **Genuine — no bug.** |
+
+**Two real, generic bugs found and fixed, both verified live end-to-end:**
+
+- **Himalayas** — `core/fetch_boards.py`'s `fetch_himalayas()` pagination corrected to the real
+  20-per-page size (`offset={page*20}` over 50 pages, still a newest-1000 sweep). Recovered
+  **18 keyword matches vs. the buggy 4 (4.5x)** for borjan-pm's PM stream, including much more
+  clearly on-target titles ("Scrum Master / Agile Coach", multiple "Project Manager"/"Program
+  Manager"). This affects **every profile using Himalayas** (Tier 2, broadly active), not just PM.
+- **Dynamite Jobs** — `_harvest_links()`'s anchor selector widened from `tree.css("a")` to
+  `tree.css("[href]")` (any element carrying an href, still filtered by the same per-platform
+  regex, so no new noise). Recovered **16/16 vs. the buggy 1** for the same page. This is a
+  **shared-function fix** — it benefits any board using the generic harvester that has (or ever
+  develops) this same non-`<a>`-href pattern, not just Dynamite Jobs.
+
 ## QA findings (pre-production, cloud-IP test scan — not a real review)
 
 _2026-07-20 — a full live `scan.py --profile borjan-pm` run from this build environment (cloud IP,

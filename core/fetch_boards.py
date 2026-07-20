@@ -233,13 +233,23 @@ def fetch_himalayas(p: dict, cfg: dict) -> dict:
     newest-first). HTML listing 403s on direct fetch now — API replaces it. We take the
     newest pages and pre-filter to the profile's keywords + the catalog's per-stream
     prefilter phrases so a high-volume platform doesn't flood the pipeline with 100k
-    rows; scan.py still applies the real keyword filter."""
+    rows; scan.py still applies the real keyword filter.
+
+    REGRESSED 2026-07-20 (platform-health investigation, borjan-pm raw dropped to 4):
+    `limit` is now silently capped at 20 server-side regardless of the value requested —
+    verified live (limit=20/50/100/200 all return exactly 20 jobs; totalCount still ~99.7k,
+    so only the per-page cap changed). The old `offset={page*100}` loop assumed 100/page,
+    so it was actually SKIPPING 80 real jobs between every request (fetching ranks 0-19,
+    then jumping to 100-119, missing 20-99 entirely) — a sparse, gap-filled sample instead
+    of a true newest-1000 sweep. Fixed to `offset={page*20}` over 50 pages (still 1000
+    newest jobs total, just with the real page size). Verified live: recovers 18 keyword
+    matches vs. the buggy 4 for borjan-pm's PM stream (4.5x)."""
     kw = [k.lower() for k in (cfg.get("keywords", {}).get("core", []) + cfg.get("keywords", {}).get("expanded", []))]
     phrases = [s.lower() for s in (p.get("params") or {}).get("prefilter_phrases", [])]
     cands = []
     try:
-        for page in range(10):
-            d = _get(f"https://himalayas.app/jobs/api?limit=100&offset={page * 100}", timeout=30).json()
+        for page in range(50):
+            d = _get(f"https://himalayas.app/jobs/api?limit=20&offset={page * 20}", timeout=30).json()
             jobs = d.get("jobs", [])
             for j in jobs:
                 hay = (j.get("title", "") + " " + " ".join(j.get("categories") or [])
@@ -475,8 +485,13 @@ def _harvest_links(html: str, platform_slug: str, platform_name: str) -> list[di
     try:
         from selectolax.parser import HTMLParser
 
-        anchors = [(a.attributes.get("href") or "", re.sub(r"\s+", " ", a.text()).strip())
-                   for a in HTMLParser(html).css("a")]
+        # `[href]` — ANY element carrying an href, not just <a> (2026-07-20 finding: Dynamite
+        # Jobs renders most cards as `<h2 href="...">`, not a real anchor; tree.css("a") alone
+        # silently missed 15/16 real postings on that platform). The per-platform regex below
+        # already filters out noise this widening could pick up (stylesheet/base hrefs, etc.)
+        # since those never match a job-posting-shaped pattern.
+        anchors = [(el.attributes.get("href") or "", re.sub(r"\s+", " ", el.text()).strip())
+                   for el in HTMLParser(html).css("[href]")]
     except Exception:
         anchors = [(h, "") for h in re.findall(r'href="([^"]+)"', html)]
     for href, text in anchors:
