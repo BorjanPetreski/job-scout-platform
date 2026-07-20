@@ -1,7 +1,7 @@
 {
  "recompute": {
   "last": "2026-07-14",
-  "sessions_since": 3,
+  "sessions_since": 4,
   "due_at_sessions": 5
  },
  "2026-07-11": {
@@ -360,5 +360,180 @@
    "half": null,
    "full_sweep": false
   }
+ },
+ "2026-07-20": {
+  "PM": {
+   "ran_at": "2026-07-20T19:57:41+00:00",
+   "platforms_covered": [
+    "Himalayas",
+    "Remotive",
+    "JustJoin.it",
+    "Greenhouse (ATS boards)",
+    "Lever (ATS boards)",
+    "Workable (ATS boards)",
+    "We Work Remotely",
+    "Jobgether",
+    "Dynamite Jobs",
+    "Arc.dev",
+    "Remote Rocketship (worldwide)",
+    "Remote Rocketship (Europe)",
+    "Working Nomads",
+    "Landing.jobs",
+    "NoDesk",
+    "Remote OK",
+    "Pinpoint HQ (ATS boards)",
+    "Deel",
+    "Crossover",
+    "LinkedIn (tripwire)"
+   ],
+   "sources_down": [
+    "Welcome to the Jungle",
+    "JustRemote"
+   ],
+   "platform_stats": {
+    "Himalayas": {
+     "raw": 4,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Remotive": {
+     "raw": 42,
+     "source_down": false,
+     "http_ok": true
+    },
+    "JustJoin.it": {
+     "raw": 818,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Greenhouse (ATS boards)": {
+     "raw": 0,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Lever (ATS boards)": {
+     "raw": 0,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Workable (ATS boards)": {
+     "raw": 0,
+     "source_down": false,
+     "http_ok": true
+    },
+    "We Work Remotely": {
+     "raw": 96,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Jobgether": {
+     "raw": 66,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Dynamite Jobs": {
+     "raw": 1,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Arc.dev": {
+     "raw": 6,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Remote Rocketship (worldwide)": {
+     "raw": 29,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Remote Rocketship (Europe)": {
+     "raw": 23,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Working Nomads": {
+     "raw": 36,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Welcome to the Jungle": {
+     "raw": 0,
+     "source_down": true,
+     "http_ok": true
+    },
+    "Landing.jobs": {
+     "raw": 1,
+     "source_down": false,
+     "http_ok": true
+    },
+    "JustRemote": {
+     "raw": 0,
+     "source_down": true,
+     "http_ok": true
+    },
+    "NoDesk": {
+     "raw": 45,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Remote OK": {
+     "raw": 100,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Pinpoint HQ (ATS boards)": {
+     "raw": 0,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Deel": {
+     "raw": 233,
+     "source_down": false,
+     "http_ok": true
+    },
+    "Crossover": {
+     "raw": 1,
+     "source_down": false,
+     "http_ok": true
+    },
+    "LinkedIn (tripwire)": {
+     "raw": 58,
+     "source_down": false,
+     "http_ok": true
+    }
+   },
+   "healed": {},
+   "new": 114,
+   "dropped": 0,
+   "link_dead": 0,
+   "funnel_in": 114,
+   "drop_by_param": {},
+   "drop_nudges": [],
+   "sweep": {
+    "scope": 0,
+    "checked": 0,
+    "deferred": 0,
+    "stale": 0,
+    "live": 0,
+    "unverifiable": 0,
+    "escalated": 0
+   },
+   "reconcile": {
+    "tokenless": false,
+    "tracker_rows": 23,
+    "backfilled": 0,
+    "already": 23,
+    "unmatched": 0,
+    "passed_seen_flipped": 0,
+    "skipped": null
+   },
+   "half": null,
+   "full_sweep": false
+  }
+ },
+ "health_review": {
+  "last": "2026-07-20",
+  "sessions_since": 1,
+  "due_at_sessions": 6
  }
 }
