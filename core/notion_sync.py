@@ -323,9 +323,12 @@ def sync_scan(dry_run: bool = False, digest_line: str | None = None) -> None:
             "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "profile": cfg["profile_id"],
             "instructions": (
-                "No NOTION_TOKEN configured. Push each row below via the Notion MCP: "
-                "create pages with parent data_source_id "
-                f"{ds_id} (Passed/Seen Log) using these exact property values. Rows under "
+                "No NOTION_TOKEN configured. Push each row below via the Notion MCP. For rows under "
+                "'rows': FIRST query the Passed/Seen Log for an existing page with the same Job URL — "
+                "if one exists and its Reason Passed is already resolved (not 'New — Unreviewed'/"
+                "'Unverified/Blocked'), leave it as-is (do NOT create or clobber); if it exists but is "
+                "still live, PATCH it in place; only create a NEW page (parent data_source_id "
+                f"{ds_id}) when NO row for that URL exists. Rows under "
                 "'updates' are EXISTING pages — find each by its Job URL in the same data "
                 "source and PATCH Reason Passed/Notes as given; NEVER create duplicates for "
                 "them and NEVER write anything to the Applications Tracker. After pushing, "
@@ -351,6 +354,26 @@ def sync_scan(dry_run: bool = False, digest_line: str | None = None) -> None:
             print(f"DRY: would create Passed/Seen row {r.get('role')!r} ({r.get('status')})")
             continue
         try:
+            # Idempotent-by-URL (twin-row bug, 2026-07-20): a posting resolved on an earlier scan
+            # can resurface as a fresh unsynced record; a blind create would spawn a SECOND
+            # Passed/Seen row for the same URL (Vazco/TT MS: a `Filtered Out` twin next to the
+            # user's `User Declined`), which then makes reconcile order-dependent. Find first.
+            existing = find_page_by_url(ds_id, r.get("url") or "")
+            if existing:
+                cur = _current_reason(existing)
+                if cur and cur not in ("New — Unreviewed", "Unverified/Blocked"):
+                    # already resolved by the user / a mechanical drop / the companion — the
+                    # existing row is authoritative. Never clobber it, never duplicate it.
+                    print(f"[sync] {r.get('url')}: Passed/Seen row already {cur!r} — skipping create "
+                          f"(no duplicate), marking local synced", file=sys.stderr)
+                else:
+                    # a still-live row exists — refresh it in place instead of duplicating.
+                    pr = _req("PATCH", f"{API}/pages/{existing}", json={"properties": props})
+                    if pr.status_code != 200:
+                        raise RuntimeError(f"in-place refresh failed {pr.status_code}: {pr.text[:200]}")
+                dedup.update(r.get("url") or r.get("key"), {"synced_to_notion": True})
+                ok += 1
+                continue
             body = [r["notes"]] if r.get("status") == "shortlisted" and r.get("notes") else None
             typed_create_page(ds_id, props, body)
             dedup.update(r.get("url") or r.get("key"), {"synced_to_notion": True})
@@ -501,6 +524,18 @@ _RESOLVED_LOCAL_STATUS = {
     "Stale/Expired": "dropped",
 }
 
+# When a single URL carries MORE THAN ONE Passed/Seen row (a mechanical `Filtered Out` twin
+# alongside a user `User Declined` row — the twin-row bug, 2026-07-20), reconcile must not let
+# Notion row ORDER decide the local status. Rank the reasons: an explicit USER resolution
+# (applied > declined) always beats a MECHANICAL one (filtered/duplicate/stale). Still-live
+# reasons (New/Unverified) rank lowest so a resolution always wins over an unresolved twin.
+_REASON_PRIORITY = {
+    "User Applied Elsewhere": 4,
+    "User Declined": 3,
+    "Filtered Out": 2, "Duplicate Listing": 2, "Stale/Expired": 2,
+    "New — Unreviewed": 0, "Unverified/Blocked": 0,
+}
+
 
 def reconcile_resolutions_from_passed_seen(cfg: dict) -> dict:
     """Read-back the mirror of #8/#11 (task #13). The scanner writes Passed/Seen rows and marks
@@ -550,12 +585,23 @@ def reconcile_resolutions_from_passed_seen(cfg: dict) -> dict:
         cursor = data.get("next_cursor")
     result["ps_rows"] = len(rows)
 
-    seen = dedup.load_seen()
+    # Collapse duplicate rows per URL BEFORE applying (twin-row bug): a posting can carry a
+    # mechanical `Filtered Out` twin next to a user `User Declined` row. Iterating raw rows would
+    # let Notion row-ORDER pick the winner (last write wins), so a user's decision could be
+    # clobbered by a machine drop. Rank by `_REASON_PRIORITY` and keep the strongest per URL —
+    # deterministic regardless of order.
+    best: dict[str, str] = {}
     for u, reason in rows:
+        nu = dedup.norm_url(u)
+        if _REASON_PRIORITY.get(reason, 0) > _REASON_PRIORITY.get(best.get(nu, ""), -1):
+            best[nu] = reason
+
+    seen = dedup.load_seen()
+    for nu, reason in best.items():
         target = _RESOLVED_LOCAL_STATUS.get(reason)
         if not target:
-            continue                          # New — Unreviewed / Unverified/Blocked — still live
-        rec = seen["by_url"].get(dedup.norm_url(u))
+            continue                          # winning reason is still-live (New/Unverified) — skip
+        rec = seen["by_url"].get(nu)
         if rec is None:
             result["unmatched"] += 1
             continue
@@ -564,7 +610,7 @@ def reconcile_resolutions_from_passed_seen(cfg: dict) -> dict:
             continue
         note = ((rec.get("notes") or "") + f" | reconciled '{reason}' from Passed/Seen Log "
                 "(user/companion-resolved)").strip(" |")
-        dedup.update(u, {"status": target, "reason": reason, "notes": note})
+        dedup.update(rec.get("url"), {"status": target, "reason": reason, "notes": note})
         result["resolved"] += 1
     return result
 
