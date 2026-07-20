@@ -145,6 +145,73 @@ def language_flag(text: str, target_langs: set[str]) -> tuple[str | None, str]:
     return None, ""
 
 
+# --- Stated-language-requirement detector (2026-07-20, borjan-pm scan lesson). Distinct from
+# language_flag above: that reads the JD's OWN dominant language. This one fires when a JD written
+# IN A TARGET LANGUAGE (English) nonetheless STATES a hard requirement in a NON-target language —
+# "Polish C1", "fluent Polish", "native German", or "application must be submitted in Polish".
+# Four of five of Borjan's 2026-07-20 declines were exactly this shape (Addepto/Finture/TT MS
+# Polish C1/C2/fluency, Vazco apply-in-Polish); detect_language() reads them as 'en' (a target
+# language) so non_target_language never fires, and the local-hire barrier reaches the shortlist
+# where only the judgment layer catches it — by hand, every single time. Conservative: a
+# nice-to-have / "a plus" language mention never flags; only requirement-strength wording next to a
+# non-target language name does. Flag-only (scripts flag, Claude decides) — no mechanical drop.
+_LANG_NAMES = {
+    "polish": "pl", "german": "de", "french": "fr", "spanish": "es", "italian": "it",
+    "dutch": "nl", "portuguese": "pt", "english": "en", "czech": "cs", "slovak": "sk",
+    "slovenian": "sl", "hungarian": "hu", "romanian": "ro", "bulgarian": "bg", "croatian": "hr",
+    "serbian": "sr", "ukrainian": "uk", "russian": "ru", "greek": "el", "turkish": "tr",
+    "swedish": "sv", "norwegian": "no", "danish": "da", "finnish": "fi", "estonian": "et",
+    "latvian": "lv", "lithuanian": "lt",
+}
+# Requirement-strength wording that, in the same window as a language name, marks a real barrier.
+# Deliberately excludes generic level words (b2/advanced alone) that collide with JD boilerplate
+# ("B2B", "advanced tooling") — the C1/C2/fluent/native/proficient/speaking set is unambiguous.
+_LANG_REQ = re.compile(
+    r"(c1|c2|fluent|fluency|fluently|native|proficien\w*|mother[\s-]?tongue|command of|"
+    r"upper[\s-]?intermediate|speaking|must speak|required|mandatory)")
+# Nice-to-have qualifiers — if present in the window, the language is optional, NOT a barrier.
+_LANG_NICE = re.compile(
+    r"(nice to have|a plus|advantage|asset|welcome|optional|beneficial|preferred|desirable|"
+    r"bonus|not required|not mandatory|would be nice|is a plus)")
+# "apply / CV / application … in <lang>" — an apply-wall in a non-target language.
+_APPLY_IN = re.compile(
+    r"(appl(?:y|ication|ications|ying)|cv|resume|résumé|cover\s+letter|correspondence)"
+    r"[^.\n]{0,30}\bin\s+(" + "|".join(_LANG_NAMES) + r")\b")
+
+
+def stated_language_requirement(text: str, target_langs: set[str]) -> tuple[str | None, str]:
+    """Return ('stated_language_requirement', note) when a JD states a hard proficiency requirement
+    in a NON-target language, or requires applying in one. Conservative: an explicit nice-to-have
+    mention is skipped; only requirement-strength wording next to a non-target language name fires.
+    Flag-only — the judgment layer decides."""
+    low = (text or "").lower()
+    if not low:
+        return None, ""
+    # (a) apply-wall: "application must be submitted in Polish", "CV in German".
+    for am in _APPLY_IN.finditer(low):
+        code = _LANG_NAMES.get(am.group(2))
+        if code and code not in target_langs:
+            snip = " ".join(low[max(0, am.start() - 12): am.end() + 12].split())
+            return "stated_language_requirement", (
+                f"JD requires applying in {am.group(2).capitalize()} ('{code}' not in the profile's "
+                f"languages {sorted(target_langs)}) — apply-wall barrier: \"…{snip}…\"")
+    # (b) proficiency requirement next to a non-target language name.
+    for nm, code in _LANG_NAMES.items():
+        if code in target_langs:
+            continue
+        for m in re.finditer(rf"\b{nm}\b", low):
+            win = low[max(0, m.start() - 45): m.end() + 45]
+            if _LANG_NICE.search(win):
+                continue                              # explicitly optional — not a barrier
+            if _LANG_REQ.search(win):
+                snip = " ".join(win.split())
+                return "stated_language_requirement", (
+                    f"JD states a {nm.capitalize()} proficiency requirement ('{code}' not in the "
+                    f"profile's languages {sorted(target_langs)}) — likely a local-hire barrier the "
+                    f"fit score misses: \"…{snip}…\"")
+    return None, ""
+
+
 # --- Stated-start-date-in-the-past detector (4.1, Cyclad lesson: posted months ago,
 # the JD's own start/target date already gone, the platform still shows it live). Only
 # dates in an explicit start/kick-off context count — never a stray date in the body.
@@ -523,6 +590,10 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         if lang_flag:
             flags.add(lang_flag)
             c["language_note"] = lang_note
+        req_flag, req_note = stated_language_requirement(jd, target_langs)  # stated non-target-lang req (2026-07-20)
+        if req_flag:
+            flags.add(req_flag)
+            c["language_requirement_note"] = req_note
         passed, when = start_date_passed(jd, date.today())  # stated start gone (lesson 4)
         if passed:
             flags.add("start_date_passed")

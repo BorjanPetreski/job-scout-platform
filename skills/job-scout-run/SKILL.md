@@ -10,8 +10,8 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.6.1"
-  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time). 4.6.0: generalized non-target-language detection (configurable search.languages, multi-language) + opt-in language_mismatch drop; per-param drop telemetry + over-constraint nudge (a hard filter can't silently zero results). Profile-gated, borjan-pm resolved-config byte-identical. 4.6.1: fixed a silent JD-text-extraction degradation (missing selectolax fed raw CSS/JS to every text detector) + added requirements.txt + a SessionStart hook so cloud/web sessions install deps automatically."
+  version: "4.7.0"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time). 4.6.0: generalized non-target-language detection (configurable search.languages, multi-language) + opt-in language_mismatch drop; per-param drop telemetry + over-constraint nudge (a hard filter can't silently zero results). Profile-gated, borjan-pm resolved-config byte-identical. 4.6.1: fixed a silent JD-text-extraction degradation (missing selectolax fed raw CSS/JS to every text detector) + added requirements.txt + a SessionStart hook so cloud/web sessions install deps automatically. 4.7.0: new stated_language_requirement flag — an English JD that STATES a non-target-language proficiency requirement ('Polish C1', 'apply in Polish'), distinct from non_target_language which reads the JD's own language; flag-only, additive, borjan-pm config byte-identical."
   created_by: Borjan
   organization: 2Coders Studio
   last_updated: "2026-07-20"
@@ -96,6 +96,16 @@ optional, none is judged-from-memory. `<id>` = the active profile.
      NOT in the profile's `search.languages` (default `[en]`; may be multi, e.g. `[de, en]`) —
      a local-hire / apply-wall signal (JustJoin.it Polish-only JD/ATS lesson, generalized). A
      drop when `hard_filters.language_mismatch: drop`; else judge it.
+   - `stated_language_requirement` flag (+ `language_requirement_note`): the JD is written IN a
+     target language (English) but STATES a hard proficiency requirement in a NON-target language
+     ("Polish C1", "fluent Polish", "native German") or requires applying in one ("application in
+     Polish"). Distinct from `non_target_language`, which reads the JD's OWN dominant language — this
+     catches the local-hire barrier buried in an otherwise-English posting (borjan-pm 2026-07-20:
+     Vazco/Finture/TT MS all "Polish C1/C2" inside English JDs). A nice-to-have language mention never
+     fires; only requirement-strength wording does. Flag-only — judge it (usually a hard drop for a
+     single-language applicant). **NB the barrier can also live in the application FORM, not the JD**
+     (Addepto asked Polish fluency at apply time though the JD is English-only) — that is unscannable;
+     surface it at apply time.
    - `start_date_passed` flag (+ `start_date_note`): the JD's own stated start/target
      month is already past — the soft posting-age signal escalated to explicit ⚠️
      (Cyclad "still listed live, start already gone"). Verify freshness before shortlisting.

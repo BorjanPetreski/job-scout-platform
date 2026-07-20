@@ -149,6 +149,18 @@ For any product standing on fragile external sources/APIs: **honest-failure** (r
 never silently-wrong) + `fetch_evidence`-style telemetry + the **scheduled health-review + repair**
 loop in `HEALTH_MONITORING.md` (Layer-1 signal emitter + Layer-2 diagnose/repair on a cadence).
 
+- **Diagnose the input before blaming the logic (pipeline debugging).** When a downstream
+  filter/detector "misses," verify it actually received *real* input before you rebuild it — the
+  defect is often an upstream extract/parse stage silently degraded (a missing *optional* dependency
+  falling back to garbage, a truncation cap grabbing boilerplate). A correct detector fed corrupted
+  text looks broken and invites a pointless rewrite. Two disciplines fall out: (1) a user's
+  "filter X let Y through" report can be *upstream* of filter X — re-run the detector against the
+  genuine source before touching it (2026-07-20: a "Polish filter" miss was really a `selectolax`-
+  degraded extraction feeding 1500 chars of CSS to every text detector; the fix was the input, and a
+  *new* detector then validated cleanly on real data). (2) an optional dependency that silently
+  degrades output is worse than a hard failure — make the fallback *loud* (stderr warning) and pin
+  the dependency so "works on my machine" can't quietly corrupt a scheduled run.
+
 ### F. Process & quality artifacts
 - The **Fable-5 adversarial review-gate prompt**, the **effort-tiering table**, the **no-PII
   denylist**, the **prime-directive byte-identical proof**, feature-branch-per-phase + small PRs +
