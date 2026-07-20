@@ -313,6 +313,20 @@ Scope (high-level; gets its own spec when Phase 3 ships):
    The companion-side doctrine for these already shipped (assistant/ modules, 2026-07-19); Phase 4
    is where they become actual controls. *The app doesn't exist yet — these build when Phase 4 does,
    which is gated on Phase 3 (companion) shipping.*
+7. **Platform settings screen — user-facing health outcomes (Borjan, 2026-07-20).** A screen
+   surfacing *this user's* per-board health: scan count, yield over time, live/off status, last-
+   produced date. When the health check descopes a board (dead/unrecoverable — a persistent
+   DOWN_STREAK/NEVER_PRODUCED that Layer-2 couldn't repair), the board is turned **off for that
+   user's instance and the user is notified with the plain-language reason.** The user can **re-enable
+   a descoped board anyway** — a board may have yielded nothing simply because there were no openings
+   then, not because it's broken — which **restarts that board's health count** (clears the stale
+   streak/baseline). Same precedence as Layer-2-runtime: user override supersedes the auto-descope
+   for their instance; a later shipped fix that repairs the board expires the override; the descope is
+   per-user instance state, never a repo catalog edit. **The health thresholds themselves stay
+   system-wide + immutable — the app exposes the outcome (on/off + analytics + re-enable), never the
+   knobs.** Detail: [HEALTH_MONITORING.md](HEALTH_MONITORING.md) "In-app platform settings"; the
+   engine-side "restart a board's health count" primitive is parked until auto-descope (this item)
+   creates something to restart.
 
 **Design constraint imposed now (so Phases 1–3 stay compatible):** every setup and run
 operation must be scriptable/headless — no step may exist only as a human-readable

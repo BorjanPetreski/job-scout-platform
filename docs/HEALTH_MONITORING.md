@@ -121,6 +121,39 @@ direct mitigation of the board-rot maintenance-treadmill risk in BUSINESS_NOTES.
 Near-term (the scheduled health build) ships Layer 1/1.5/2; **Layer 2-runtime lands with the app
 (Phase 4+)** since it needs the embedded LLM.
 
+### In-app platform settings — user-facing health outcomes (Phase 4) (Borjan, 2026-07-20)
+
+The Layer-1 thresholds (window, down_streak, yield_collapse_factor, min_baseline,
+never_produced_min_runs, systemic_frac, due_at_sessions) are **system-wide + immutable — never
+user-configurable and never profile-overridable.** Detection sensitivity is a platform-engineering
+decision; a user knob there would let someone hide real rot or drown in false alarms. What the app
+exposes to the user is the **outcome layer, not the config layer** — a **Platform settings screen**:
+
+- **Per-board analytics** for *this user's* instance: scan count, yield over time (raw + shortlisted),
+  live/off status, last-produced date, and the health signals seen (the `platform_stats` time-series
+  the client-side store already keeps — § "Phase 4 surfaces the health report as a real status view").
+- **Off + reason.** When the health check descopes a board (deemed dead/unrecoverable — a persistent
+  DOWN_STREAK/NEVER_PRODUCED that Layer-2 diagnosis couldn't repair), the board is turned **off for
+  that user's instance and the user is notified**, with the plain-language reason ("off — unreachable
+  8 scans running; last produced 2026-05-02").
+- **User re-enable / restart — the override.** The user can switch a descoped board **back on** even
+  though the health check turned it off. The motivating case: a board may have yielded nothing simply
+  because there were **no openings at that time**, not because it's broken — the user is entitled to
+  try it again. Re-enabling **restarts that board's health count** (clears the stale streak/baseline so
+  a fresh trial isn't instantly re-flagged by old history) and the trial runs on real data.
+- **Precedence — the same "user override, then vetted code wins" model as Layer 2-runtime.** A
+  user's forced-on/off choice supersedes the auto-descope for their instance; a later shipped fix
+  that actually repairs the board supersedes/expires the override. The descope is a **per-user
+  instance state**, never a repo catalog edit — consistent with the honest-failure floor (nothing
+  auto-edits scanner config) and the Phase-4 client-side store.
+
+**Engine-side counterpart (buildable before the app).** The "restart a board's health count"
+primitive is a pure operation on the telemetry — a per-board restart marker that makes `health.py`
+ignore runs before it. The app's re-enable button eventually calls exactly this. Until the app
+exists, the same effect is reached in a review by flipping the board's catalog `active`/`status`
+through the validator; the restart primitive is parked for when auto-descope (Phase 4) creates
+something to restart.
+
 ### Known current degradations — health-build seed (2026-07-18)
 
 The first target list for the health build (from borjan-pm's 2026-07-18 PM run, residential IP —
