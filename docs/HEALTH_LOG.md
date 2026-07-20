@@ -31,11 +31,12 @@
 
 ## Baseline (build landed)
 
-_2026-07-20 — Platform Health & Self-Healing shipped (PR #52). No live review run yet; the first
-real scan writing `platform_stats` seeds the baseline. Known standing degradations from the
-[HEALTH_MONITORING.md](HEALTH_MONITORING.md) seed to confirm on the first review: JustRemote +
-Welcome to the Jungle (DOWN_STREAK in borjan-pm history), Remotive (DEGRADED stub), and the empty
-ATS token lists (Greenhouse/Lever/Workable/Pinpoint → NEVER_PRODUCED candidates)._
+_2026-07-20 — Platform Health & Self-Healing shipped (PR #52 + #53). **First real review ran the
+same day** (borjan-pm, residential IP, 2026-07-20 PM scan) — see the Review log below. Result: 6
+`NEVER_PRODUCED` findings, no `SELECTOR_SUSPECT`/`DOWN_STREAK`/`YIELD_COLLAPSE`/`SYSTEMIC`. Notably,
+JustRemote + Welcome to the Jungle no longer read as `DOWN_STREAK` (a blocked outage) now that real
+`http_ok` telemetry exists — they're `http_ok: true, raw: 0`, i.e. the reached-but-empty shape,
+correctly reclassified. Left open for a live-fetch diagnosis (row below)._
 
 ## QA findings (pre-production, cloud-IP test scan — not a real review)
 
@@ -62,4 +63,5 @@ doesn't belong in the real baseline) — these are QA notes, not a Layer-2 revie
 
 | Date | Profile | Board | Signal | Live diagnosis | Fix applied | PR |
 |------|---------|-------|--------|----------------|-------------|----|
-| _(none yet — first review pending the first scan with health telemetry)_ | | | | | | |
+| 2026-07-20 | borjan-pm | Greenhouse / Lever / Workable / Pinpoint HQ (ATS boards) | NEVER_PRODUCED | Not a fault — confirmed config gap: profile's `ats_boards` token lists are genuinely empty for all four (`greenhouse: []`, `lever: []`, `workable: []`, `pinpoint: []`), so there's nothing to fetch yet. `http_ok: true`, `raw: 0` for each, consistent with "no boards configured" (the fetcher's own honest note). | None needed yet — latent coverage opportunity, not rot. Populate `ats_boards` with real company tokens when available (per HEALTH_MONITORING.md "Known current degradations"). | — |
+| 2026-07-20 | borjan-pm | Welcome to the Jungle, JustRemote | NEVER_PRODUCED | **Open — worth a live fetch.** First real (residential-IP) telemetry: both now show `http_ok: true, raw: 0` — a clean request that returns nothing, not a blocked/unreachable outage. This is a reclassification from what pre-build telemetry looked like (previously read only as a `sources_down` outage); with `http_ok` now recorded, it's visibly the reached-but-empty shape. Not yet diagnosed live — could be selector drift (their markup changed under `HARVEST_SPEC`) or a bot-wall that still returns a 200 shell page. **Next review: fetch each board's listing URL directly and inspect the HTML** to tell those two apart. | Pending — no catalog change made yet. | — |
