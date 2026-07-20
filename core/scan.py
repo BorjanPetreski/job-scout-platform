@@ -391,7 +391,8 @@ def print_plan(cfg: dict) -> None:
 
 
 def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool = True,
-             run_shortlist_sweep: bool = True, verbose: bool = False) -> dict:
+             run_shortlist_sweep: bool = True, verbose: bool = False,
+             gap_hours: float | None = None) -> dict:
     def _log(msg: str) -> None:
         """Opt-in progress to STDERR (never stdout — the ledger stays machine-parseable).
         Additive observability only; changes nothing the scan fetches/filters/scores/writes."""
@@ -450,6 +451,8 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
                 scan_gap_hours = max(0.0, (datetime.now(timezone.utc) - _last_dt).total_seconds() / 3600)
         except (json.JSONDecodeError, ValueError):
             pass  # malformed/legacy runs.json — fall back to the default above, never crash the scan
+    if gap_hours is not None:  # manual override (--gap-hours) — e.g. a one-off deep catch-up
+        scan_gap_hours = gap_hours
     cfg["scan_gap_hours"] = scan_gap_hours
 
     platforms = [p for p in cfg["platforms"] if p.get("active")]
@@ -852,6 +855,10 @@ if __name__ == "__main__":
     ap.add_argument("--half", choices=["AM", "PM"], default=None,
                     help="degraded/manual half rotation (r2 default is full)")
     ap.add_argument("--full-sweep", action="store_true", help="ignore freshness window")
+    ap.add_argument("--gap-hours", type=float, default=None,
+                     help="override the auto-computed scan gap (hours since last run) that "
+                          "sizes Himalayas' pagination depth — e.g. --gap-hours 168 for a "
+                          "one-off ~1-week deep catch-up. Omit for normal runs.")
     ap.add_argument("--no-headless", action="store_true", help="skip headless escalation")
     ap.add_argument("--no-sweep", action="store_true",
                     help="skip the shortlist liveness sweep (parity/debug only)")
@@ -865,4 +872,5 @@ if __name__ == "__main__":
         print_plan(config)
     else:
         run_scan(config, args.half, args.full_sweep, use_headless=not args.no_headless,
-                 run_shortlist_sweep=not args.no_sweep, verbose=args.verbose)
+                 run_shortlist_sweep=not args.no_sweep, verbose=args.verbose,
+                 gap_hours=args.gap_hours)

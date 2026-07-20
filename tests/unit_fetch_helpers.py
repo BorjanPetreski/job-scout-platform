@@ -32,8 +32,8 @@ def main() -> list[str]:
          "larger gap -> more pages (monotonic)")
 
     # ceiling — a huge gap (multi-day skip) never blows up unbounded -------------------------
-    s.eq(fb.himalayas_pages_for_gap(98), fb.HIMALAYAS_MAX_PAGES,
-         "gap=98h -> capped at the ceiling")
+    s.eq(fb.himalayas_pages_for_gap(200), fb.HIMALAYAS_MAX_PAGES,
+         "gap=200h -> capped at the ceiling")
     s.eq(fb.himalayas_pages_for_gap(10_000), fb.HIMALAYAS_MAX_PAGES,
          "an absurd gap -> still capped, never runaway")
 
