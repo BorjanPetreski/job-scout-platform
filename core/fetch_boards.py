@@ -535,7 +535,19 @@ def fetch_jd(url: str) -> tuple[str, str, str]:
     return "", "", "failed"
 
 
+_SCRIPT_STYLE_BLOCK = re.compile(r"<(script|style)\b[^>]*>.*?</\1\s*>", re.I | re.S)
+
+
 def _visible_text(html: str) -> str:
+    """Strip HTML down to visible body text. selectolax does this properly (DOM-aware,
+    strips script/style/nav/footer/header ENTIRELY incl. their content). The regex
+    fallback (selectolax unavailable — missing package, import failure, etc.) MUST also
+    strip script/style block content first, not just tag markers — a naive `<[^>]+>` ->
+    " " strip leaves inline CSS/JS text sitting in the body as if it were content (found
+    2026-07-20: an environment without selectolax silently fed ~700KB of raw CSS to every
+    downstream text detector — language, salary, stack-keyword — as "JD text", corrupting
+    them all with no visible signal). Honest-failure: the fallback still degrades (loses
+    DOM-aware nav/footer/header stripping) but must never leak script/style CONTENT."""
     try:
         from selectolax.parser import HTMLParser
 
@@ -544,8 +556,11 @@ def _visible_text(html: str) -> str:
             for node in tree.css(tag):
                 node.decompose()
         return re.sub(r"\s+", " ", tree.body.text(separator=" ")).strip() if tree.body else ""
-    except Exception:
-        return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html)).strip()
+    except Exception as exc:
+        print(f"[fetch_boards] _visible_text: selectolax unavailable ({exc}), "
+              "using degraded regex fallback", file=sys.stderr)
+        stripped = _SCRIPT_STYLE_BLOCK.sub(" ", html)
+        return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", stripped)).strip()
 
 
 # ----------------------------------------------------------------- dispatcher
