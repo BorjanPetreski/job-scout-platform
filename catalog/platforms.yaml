@@ -280,6 +280,16 @@ platforms:
     mirrors: []
     expired_markers: ["This job is no longer available"]
     quirks: >-
+      DEGRADED 2026-07-20 (found via the platform-health NEVER_PRODUCED signal, live-diagnosed):
+      both direct and headless fetches return only the marketing/app shell — 0 job or company
+      links — for every query variant tested, including the bare /jobs listing with no filters.
+      No __NEXT_DATA__, no embedded Algolia app-id/search-key, no listing content in the initial
+      HTML; search now appears to run entirely client-side against an endpoint not exposed in the
+      page source. Not a HARVEST_SPEC/selector fix — the listings aren't reachable via a static or
+      snapshot fetch at all right now. Needs either a longer-interaction headless pass (accept the
+      cookie-consent banner, wait for the search XHR) or their internal search API reverse-engineered.
+      Reports source_down (http_ok: true) until resolved; tracked in docs/HEALTH_LOG.md.
+    quirks: >-
       Search pages robots-blocked (row 9); rendered search results are Algolia/consent-gated
       (verified 2026-07-11) — no anonymous enumeration channel. WttJ roles reach us via
       mirrors (Remotive/app.wttj links in history). France-skew. Absorbed Otta.
@@ -315,15 +325,34 @@ platforms:
     url_patterns:
       - "https://justremote.co/remote-{category}-jobs"
     categories:
-      project-management: project-management
+      # 2026-07-20: their nav no longer has a "project-management" category — "manager-exec"
+      # is the current catch-all bucket for PM/PO/exec-track roles (confirmed live: e.g.
+      # "Principal Product Manager", "Product Owner D365 Finance Operations"). Broader than
+      # PM alone (also legal/sales/finance-exec roles), same as Himalayas' pattern — the
+      # existing title-keyword filter in scan.py narrows it down downstream, same as always.
+      project-management: manager-exec
       software-engineering: developer
     mirrors: []
     expired_markers: ["This position is no longer available"]
     quirks: >-
-      DEGRADED 2026-07-11: listings lazy-load on scroll — headless snapshot carries zero
-      postings; no API/page-data channel found. Reports source_down until they change engines.
-      Re-verified still degraded 2026-07-14 (fetch-health audit): headless render again
-      returned 0 candidates. No fix available from this side; re-check next quarter.
+      FIXED 2026-07-20 (was DEGRADED since 2026-07-11). Root cause was NOT lazy-load —
+      that was a misdiagnosis carried across two prior audits (07-11, 07-14, and an initial
+      07-20 scroll_rounds test that also came back empty). The real cause, found by checking
+      https://justremote.co/remote-jobs directly: (1) the site dropped its "project-management"
+      category — the current bucket for PM/PO/exec-track roles is "manager-exec" (categories
+      mapping updated); (2) postings now use a RELATIVE href with no leading slash
+      ("remote-manager-exec-jobs/product-owner-..." instead of the old absolute
+      "/remote-jobs/{category}/{slug}") — the HARVEST_SPEC regex never matched it, so every
+      prior check silently harvested 0 regardless of whether content existed. Plain headless
+      (no scroll needed at all) now yields real candidates (verified live: 17 postings incl.
+      "Principal Product Manager, AI Custom Models" @ Gitlab, "Product Owner, D365 Finance &
+      Operations" @ Nutrafol). Known minor cosmetic issue: company + title concatenate without
+      a separator (e.g. "GitlabCommercial Legal Counsel..." — two adjacent DOM elements, no
+      whitespace text node between them) — doesn't affect dedup (keys off URL) or keyword
+      matching (substring-safe), just display polish; a bespoke per-platform parser would fix
+      it cleanly if ever prioritized. "manager-exec" is broader than PM alone (also legal/
+      sales/finance-exec roles) — same shape as Himalayas' broad-prefetch pattern; the
+      existing title-keyword filter in scan.py narrows it down, same as always.
     notion_platform_name: { tracker: "JustRemote", passed_seen: "JustRemote" }
 
   - id: 14

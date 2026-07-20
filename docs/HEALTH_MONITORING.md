@@ -45,6 +45,40 @@ to look. There is no trend detection, no proactive signal, and — worst — no 
 **silent selector break**: a board returns HTTP 200 with HTML but the parser extracts 0 rows
 because the markup changed (`source_down` is `false`, so it hides).
 
+### Known blind spot (found 2026-07-20, during the first real review's follow-up)
+
+`YIELD_COLLAPSE` and `SELECTOR_SUSPECT` both detect a board getting *worse relative to its own
+trailing history* — they need a known-good baseline to fall from. A board that has been **quietly
+undercounting since before any good baseline was ever recorded** — always "1" or "4" or "6,"
+never higher — is invisible to every current signal: it never reads as zero (`NEVER_PRODUCED`)
+and it never reads as a collapse (nothing to collapse *from*). Two real examples surfaced by a
+manual live audit of every board reporting a small nonzero count in one real scan (see
+[HEALTH_LOG.md](HEALTH_LOG.md) "Low-yield sweep"): Himalayas silently capped its own pagination at
+20/page while the code assumed 100/page (skipping 80 real jobs between every request — a
+4.5x undercount), and Dynamite Jobs rendered most postings as `<h2 href="...">` instead of a real
+`<a>` tag, invisible to the harvester's `<a>`-only selector (a 16x undercount). Both fetched `200`,
+both reported `source_down: false`, both looked completely healthy to every Layer-1 signal.
+
+**Not yet built, worth a future pass:** a signal for "this board's yield has never been anything
+but suspiciously low relative to its tier/expected volume" — independent of trend, since trend is
+exactly what this blind spot lacks. Candidate shape: flag any Tier 1/2 board whose yield has
+*never once* exceeded some small absolute floor across its whole recorded history, prompting an
+occasional live sanity check regardless of whether anything "collapsed." Filed here rather than
+built blind — the right floor value depends on real per-platform volume data this build doesn't
+have yet.
+
+**A related, narrower gap fixed the same day (Himalayas specifically):** a board that
+*deliberately* samples only a slice of a much larger inventory (Himalayas takes the "newest N"
+out of ~100k, by design — see the fetcher's own docstring) has a **coverage window**, not just a
+yield number. A fixed-size window can leave postings genuinely never-fetched (not undercounted —
+never seen at all) once the gap since the last scan exceeds what the window's time-depth covers.
+Found live: the window only reached ~9.8h back while real scan gaps ran 5-98h. Fixed by making
+the window size **adaptive** to the actual elapsed gap (`cfg["scan_gap_hours"]`, computed once
+per run in `scan.py`) rather than a guessed constant — detail in
+[HEALTH_LOG.md](HEALTH_LOG.md)'s Himalayas row. This is a real fix for one board's specific
+"sample a slice of a firehose" shape, not a general Layer-1 signal — the broader "always-low,
+no-baseline" gap above is still unbuilt for boards that don't fit this exact pattern.
+
 ## The design — "scripts flag, Claude decides," applied to health
 
 Same two-layer split as the scan itself.

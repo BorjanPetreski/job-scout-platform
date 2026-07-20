@@ -228,18 +228,55 @@ def fetch_justjoinit(p: dict, cfg: dict) -> dict:
     return _ok(p["name"], cands, f"{pages} cursor pages (category {cid})")
 
 
+# Sitewide posting-rate estimate (verified live 2026-07-20: the newest 1000 jobs spanned ~9.8h
+# → ~100/hour). A rough constant, not a guarantee — it only sizes the safety margin, never a
+# correctness assumption (scan.py's own freshness filter is the real cutoff).
+HIMALAYAS_JOBS_PER_HOUR = 100
+HIMALAYAS_JOBS_PER_PAGE = 20
+HIMALAYAS_MIN_PAGES = 50   # ~1000 jobs / ~10h — floor for a fresh profile with no history
+HIMALAYAS_MAX_PAGES = 300  # ~6000 jobs / ~60h — bounds worst-case fetch time (~5 min)
+
+
+def himalayas_pages_for_gap(gap_hours: float) -> int:
+    """Pure sizing math for fetch_himalayas' pagination (unit-tested in isolation from the
+    HTTP fetch): more elapsed time since the last scan -> more pages, with a 1.5x safety
+    margin and a hard floor/ceiling so a fresh profile still samples enough and a huge gap
+    can't blow up scan time unbounded."""
+    jobs_needed = gap_hours * HIMALAYAS_JOBS_PER_HOUR * 1.5
+    pages = -(-int(jobs_needed) // HIMALAYAS_JOBS_PER_PAGE)  # ceil division
+    return max(HIMALAYAS_MIN_PAGES, min(HIMALAYAS_MAX_PAGES, pages))
+
+
 def fetch_himalayas(p: dict, cfg: dict) -> dict:
     """Public API at /jobs/api (verified 2026-07-11: offset/limit, totalCount ~100k,
     newest-first). HTML listing 403s on direct fetch now — API replaces it. We take the
     newest pages and pre-filter to the profile's keywords + the catalog's per-stream
     prefilter phrases so a high-volume platform doesn't flood the pipeline with 100k
-    rows; scan.py still applies the real keyword filter."""
+    rows; scan.py still applies the real keyword filter.
+
+    REGRESSED 2026-07-20 (platform-health investigation, borjan-pm raw dropped to 4):
+    `limit` is now silently capped at 20 server-side regardless of the value requested —
+    verified live (limit=20/50/100/200 all return exactly 20 jobs; totalCount still ~99.7k,
+    so only the per-page cap changed). The old `offset={page*100}` loop assumed 100/page,
+    so it was actually SKIPPING 80 real jobs between every request (fetching ranks 0-19,
+    then jumping to 100-119, missing 20-99 entirely) — a sparse, gap-filled sample instead
+    of a true newest-1000 sweep. Fixed to `offset={page*20}` (the real page size).
+
+    ADAPTIVE WINDOW (2026-07-20, same investigation): a fixed page count either wastes time
+    on a fresh profile's short gaps or leaves a real blind spot after a multi-day skip — real
+    borjan-pm scan gaps ranged 5-98h, while a fixed 1000-job window only reached ~10h back at
+    the site's observed ~100 jobs/hour rate. `cfg["scan_gap_hours"]` (set once per run in
+    scan.py, read-only peek at runs.json BEFORE this run's own entry is added) sizes the page
+    count to the ACTUAL elapsed gap since the last scan, with a 1.5x safety margin and hard
+    floor/ceiling so a fresh profile still gets a reasonable sample and a huge gap can't blow
+    up scan time unbounded."""
     kw = [k.lower() for k in (cfg.get("keywords", {}).get("core", []) + cfg.get("keywords", {}).get("expanded", []))]
     phrases = [s.lower() for s in (p.get("params") or {}).get("prefilter_phrases", [])]
+    pages = himalayas_pages_for_gap(cfg.get("scan_gap_hours", 24.0))
     cands = []
     try:
-        for page in range(10):
-            d = _get(f"https://himalayas.app/jobs/api?limit=100&offset={page * 100}", timeout=30).json()
+        for page in range(pages):
+            d = _get(f"https://himalayas.app/jobs/api?limit=20&offset={page * 20}", timeout=30).json()
             jobs = d.get("jobs", [])
             for j in jobs:
                 hay = (j.get("title", "") + " " + " ".join(j.get("categories") or [])
@@ -446,7 +483,13 @@ HARVEST_SPECS: dict[str, dict] = {
     "wttj": {"href": r"/en/companies/[^/]+/jobs/[^/]+", "base": "https://www.welcometothejungle.com", "company_idx": 3},
     "nodesk": {"href": r"/remote-jobs/[a-z0-9-]+/?", "base": "https://nodesk.co", "min_hyphens": 3},
     "dynamite": {"href": r"(?:https://dynamitejobs\.com)?/company/[^/]+/remote-job/[\w-]+/?", "base": "https://dynamitejobs.com", "company_idx": 2},
-    "justremote": {"href": r"/remote-jobs/[a-z-]+/[\w-]+", "base": "https://justremote.co"},
+    # 2026-07-20: site redesign — postings now render client-side (headless already handles
+    # that) under a RELATIVE href (no leading slash, no "/remote-jobs/" prefix):
+    # "remote-manager-exec-jobs/product-owner-d365-finance-operations-nutrafol-8ab854..."
+    # instead of the old absolute "/remote-jobs/{category}/{slug}". min_hyphens=2 keeps out
+    # nav noise like "remote-jobs/new" (the "post a job" link, slug "new" has 0 hyphens).
+    "justremote": {"href": r"[a-z]+(?:-[a-z]+)*-jobs/[\w-]+", "base": "https://justremote.co",
+                   "min_hyphens": 2},
     "landing-jobs": {"href": r"(?:https://landing\.jobs)?/at/[^/]+/[\w-]+", "base": "https://landing.jobs", "company_idx": 2},
     "crossover": {"href": r"/jobs/\d+/[\w-]+/[\w-]+", "base": "https://www.crossover.com", "company_idx": 3},
     # Phase 2 niche boards — smoke-tested live 2026-07-17 (SSR HTML, harvestable):
@@ -469,8 +512,13 @@ def _harvest_links(html: str, platform_slug: str, platform_name: str) -> list[di
     try:
         from selectolax.parser import HTMLParser
 
-        anchors = [(a.attributes.get("href") or "", re.sub(r"\s+", " ", a.text()).strip())
-                   for a in HTMLParser(html).css("a")]
+        # `[href]` — ANY element carrying an href, not just <a> (2026-07-20 finding: Dynamite
+        # Jobs renders most cards as `<h2 href="...">`, not a real anchor; tree.css("a") alone
+        # silently missed 15/16 real postings on that platform). The per-platform regex below
+        # already filters out noise this widening could pick up (stylesheet/base hrefs, etc.)
+        # since those never match a job-posting-shaped pattern.
+        anchors = [(el.attributes.get("href") or "", re.sub(r"\s+", " ", el.text()).strip())
+                   for el in HTMLParser(html).css("[href]")]
     except Exception:
         anchors = [(h, "") for h in re.findall(r'href="([^"]+)"', html)]
     for href, text in anchors:
@@ -494,7 +542,7 @@ def _harvest_links(html: str, platform_slug: str, platform_name: str) -> list[di
     return list(cands.values())
 
 
-def fetch_html_listing(p: dict, cfg: dict, headless: bool = False) -> dict:
+def fetch_html_listing(p: dict, cfg: dict, headless: bool = False, scroll_rounds: int = 0) -> dict:
     urls = p.get("urls") or []
     slug = p.get("slug", "")
     if not urls:
@@ -521,7 +569,7 @@ def fetch_html_listing(p: dict, cfg: dict, headless: bool = False) -> dict:
             try:
                 import render
 
-                rendered = render.render(u)
+                rendered = render.render(u, scroll_rounds=scroll_rounds)
                 if rendered:
                     reached_200 = True
                     # a heal claim requires the escalation to ACTUALLY recover candidates — a
@@ -647,6 +695,8 @@ def fetch_platform(p: dict, cfg: dict) -> dict:
     try:
         if slug in HANDLERS:
             return HANDLERS[slug](p, cfg)
+        if p.get("fetch_mode") == "headless_scroll":
+            return fetch_html_listing(p, cfg, headless=True, scroll_rounds=3)
         if p.get("fetch_mode") == "headless":
             return fetch_html_listing(p, cfg, headless=True)
         return fetch_html_listing(p, cfg, headless=False)

@@ -428,6 +428,30 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     today = date.today().isoformat()
     label = "AM" if datetime.now().hour < 12 else "PM"
 
+    # ---- scan-gap hours (2026-07-20 health finding): Himalayas' unfiltered newest-jobs feed
+    # needs to know how far back to page — a fixed page count either wastes time on a fresh
+    # profile's short gaps or leaves a real blind spot after a multi-day skip (found live: real
+    # gaps ranged 5-98h, while a fixed 1000-job window only reached ~10h back at the site's
+    # observed ~100 jobs/hour rate). Computed once here (read-only peek at runs.json BEFORE this
+    # run's own entry is added) and threaded through cfg so fetch_himalayas can size its own
+    # pagination to the ACTUAL elapsed gap instead of guessing a constant.
+    scan_gap_hours = 24.0  # first-ever scan for this profile: reasonable default, not a guess of 0
+    _runs_peek_path = paths.runs_path()
+    if _runs_peek_path.exists():
+        try:
+            _runs_peek = json.loads(_runs_peek_path.read_text(encoding="utf-8"))
+            _last_ran_at = max(
+                (rec["ran_at"] for day, labels in _runs_peek.items()
+                 if day not in ("recompute", "health_review") and isinstance(labels, dict)
+                 for rec in labels.values() if isinstance(rec, dict) and rec.get("ran_at")),
+                default=None)
+            if _last_ran_at:
+                _last_dt = datetime.fromisoformat(_last_ran_at)
+                scan_gap_hours = max(0.0, (datetime.now(timezone.utc) - _last_dt).total_seconds() / 3600)
+        except (json.JSONDecodeError, ValueError):
+            pass  # malformed/legacy runs.json — fall back to the default above, never crash the scan
+    cfg["scan_gap_hours"] = scan_gap_hours
+
     platforms = [p for p in cfg["platforms"] if p.get("active")]
     platforms.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
     if half:  # degraded/manual mode only — the r2 default is the full rotation
