@@ -494,7 +494,7 @@ def _harvest_links(html: str, platform_slug: str, platform_name: str) -> list[di
     return list(cands.values())
 
 
-def fetch_html_listing(p: dict, cfg: dict, headless: bool = False) -> dict:
+def fetch_html_listing(p: dict, cfg: dict, headless: bool = False, scroll_rounds: int = 0) -> dict:
     urls = p.get("urls") or []
     slug = p.get("slug", "")
     if not urls:
@@ -521,7 +521,7 @@ def fetch_html_listing(p: dict, cfg: dict, headless: bool = False) -> dict:
             try:
                 import render
 
-                rendered = render.render(u)
+                rendered = render.render(u, scroll_rounds=scroll_rounds)
                 if rendered:
                     reached_200 = True
                     # a heal claim requires the escalation to ACTUALLY recover candidates — a
@@ -647,6 +647,8 @@ def fetch_platform(p: dict, cfg: dict) -> dict:
     try:
         if slug in HANDLERS:
             return HANDLERS[slug](p, cfg)
+        if p.get("fetch_mode") == "headless_scroll":
+            return fetch_html_listing(p, cfg, headless=True, scroll_rounds=3)
         if p.get("fetch_mode") == "headless":
             return fetch_html_listing(p, cfg, headless=True)
         return fetch_html_listing(p, cfg, headless=False)

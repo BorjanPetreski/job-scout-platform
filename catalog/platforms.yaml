@@ -333,7 +333,14 @@ platforms:
       DEGRADED 2026-07-11: listings lazy-load on scroll — headless snapshot carries zero
       postings; no API/page-data channel found. Reports source_down until they change engines.
       Re-verified still degraded 2026-07-14 (fetch-health audit): headless render again
-      returned 0 candidates. No fix available from this side; re-check next quarter.
+      returned 0 candidates. Re-tested 2026-07-20 (platform-health NEVER_PRODUCED signal) with
+      render.py's new scroll_rounds capability — tried both window.scrollTo and a real
+      mouse.wheel event, several rounds each: content size grows slightly (more nav/footer)
+      but zero real postings surface either way. Deliberately NOT switched to
+      fetch_mode: headless_scroll — it doesn't fix this board and would only add latency.
+      Either this category currently has no live postings, or loading real results needs a
+      "load more"/pagination click (out of scope — render.py stays scroll-only, no click/type).
+      No fix available from this side; re-check next quarter.
     notion_platform_name: { tracker: "JustRemote", passed_seen: "JustRemote" }
 
   - id: 14
