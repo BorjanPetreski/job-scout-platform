@@ -23,21 +23,25 @@ def main() -> list[str]:
     s.eq(dedup.norm_url("https://x.com/p?utm_source=1"), "x.com/p",
          "norm_url: strips tracking query")
 
-    # CHARACTERIZATION (known quirk, 2026-07-20): a trailing slash is stripped BEFORE the query is
-    # removed, so a slash that sits in front of a query survives — '/job/?utm=x' != '/job'. Pinned
-    # so a later norm_url reorder is a DELIBERATE change (update this test + prove borjan-pm keys).
-    s.eq(dedup.norm_url("https://x.com/job/?utm=x"), "x.com/job/",
-         "norm_url: [known quirk] trailing slash + query keeps the slash")
+    # FIXED 2026-07-20 (was a pinned quirk): the trailing slash is now stripped AFTER the query, so
+    # a slash sitting in front of a query no longer survives — '/job/?utm=x' == '/job?utm=x' == '/job'.
+    s.eq(dedup.norm_url("https://x.com/job/?utm=x"), "x.com/job",
+         "norm_url: trailing slash before a query is stripped")
+    s.eq(dedup.norm_url("https://x.com/job/?utm=x"), dedup.norm_url("https://x.com/job?utm=x"),
+         "norm_url: '/job/?x' and '/job?x' key identically")
 
     # norm_company: strip stacked legal suffixes -------------------------------------------------
     s.eq(dedup.norm_company("Foo Group Ltd"), "foo", "norm_company: strips stacked 'Group Ltd'")
     s.eq(dedup.norm_company("Acme, Inc."), "acme", "norm_company: strips 'Inc.'")
     s.eq(dedup.norm_company("Andersen"), "andersen", "norm_company: plain name unchanged")
-    # CHARACTERIZATION (known quirk): the Polish 'Sp. z o.o.' suffix is NOT in LEGAL_SUFFIXES, so
-    # it survives — 'Finture Sp. z o.o.' won't key-match a bare 'Finture'. Pinned as current
-    # behavior; adding the suffix is a deliberate dedup change (borjan-pm keys must be re-proven).
-    s.eq(dedup.norm_company("Finture Sp. z o.o."), "finture sp. z o.o",
-         "norm_company: [known quirk] Polish 'Sp. z o.o.' not stripped")
+    # FIXED 2026-07-20 (was a pinned quirk): the Polish 'Sp. z o.o.' family is now in LEGAL_SUFFIXES,
+    # so 'Finture Sp. z o.o.' key-matches a bare 'Finture' (JustJoin.it postings vary the suffix).
+    s.eq(dedup.norm_company("Finture Sp. z o.o."), "finture",
+         "norm_company: Polish 'Sp. z o.o.' is stripped")
+    s.eq(dedup.norm_company("Finture Sp. z o.o."), dedup.norm_company("Finture"),
+         "norm_company: 'Finture Sp. z o.o.' and 'Finture' key identically")
+    s.eq(dedup.norm_company("Acme Sp. z o.o. Sp. k."), "acme",
+         "norm_company: strips the combined 'Sp. z o.o. Sp. k.'")
 
     # role_family: strip a trailing location/scope qualifier (the country-clone cross-check) ------
     s.eq(dedup.role_family("Delivery Manager - Belgrade"), "delivery manager",
