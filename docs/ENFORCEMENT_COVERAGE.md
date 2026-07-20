@@ -67,7 +67,6 @@ When a user declares a new hard constraint the app doesn't ship a control for:
   **80 candidates, 1 mechanical drop** — the 0 was the *judgment layer* declining all 80 for legitimate
   reasons (US-only / PL-hybrid / Polish-only / auth-walled). The funnel was healthy; the market was thin.
   The telemetry above now makes that distinction visible on every run (mechanical drops vs. thin market).
-</content>
 
 ## Post-merge finding (2026-07-20 overnight judgment pass) — JD extraction hides real content
 
