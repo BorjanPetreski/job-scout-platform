@@ -17,6 +17,7 @@ TARGETS = [
     ("unit: scan detectors", "tests/unit_detectors.py"),
     ("unit: dedup helpers", "tests/unit_dedup.py"),
     ("unit: health signals", "tests/unit_health.py"),
+    ("unit: fetch_boards helpers", "tests/unit_fetch_helpers.py"),
     ("sim: reconcile new-tracker box", "sims/reconcile_new_tracker_box.py"),
     ("sim: twin-row dedup", "sims/twin_row_dedup.py"),
 ]

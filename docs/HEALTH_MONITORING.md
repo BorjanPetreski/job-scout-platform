@@ -67,6 +67,18 @@ occasional live sanity check regardless of whether anything "collapsed." Filed h
 built blind — the right floor value depends on real per-platform volume data this build doesn't
 have yet.
 
+**A related, narrower gap fixed the same day (Himalayas specifically):** a board that
+*deliberately* samples only a slice of a much larger inventory (Himalayas takes the "newest N"
+out of ~100k, by design — see the fetcher's own docstring) has a **coverage window**, not just a
+yield number. A fixed-size window can leave postings genuinely never-fetched (not undercounted —
+never seen at all) once the gap since the last scan exceeds what the window's time-depth covers.
+Found live: the window only reached ~9.8h back while real scan gaps ran 5-98h. Fixed by making
+the window size **adaptive** to the actual elapsed gap (`cfg["scan_gap_hours"]`, computed once
+per run in `scan.py`) rather than a guessed constant — detail in
+[HEALTH_LOG.md](HEALTH_LOG.md)'s Himalayas row. This is a real fix for one board's specific
+"sample a slice of a firehose" shape, not a general Layer-1 signal — the broader "always-low,
+no-baseline" gap above is still unbuilt for boards that don't fit this exact pattern.
+
 ## The design — "scripts flag, Claude decides," applied to health
 
 Same two-layer split as the scan itself.

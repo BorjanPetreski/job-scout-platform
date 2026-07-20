@@ -59,10 +59,26 @@ in the last real scan's ledger:
 **Two real, generic bugs found and fixed, both verified live end-to-end:**
 
 - **Himalayas** — `core/fetch_boards.py`'s `fetch_himalayas()` pagination corrected to the real
-  20-per-page size (`offset={page*20}` over 50 pages, still a newest-1000 sweep). Recovered
-  **18 keyword matches vs. the buggy 4 (4.5x)** for borjan-pm's PM stream, including much more
-  clearly on-target titles ("Scrum Master / Agile Coach", multiple "Project Manager"/"Program
-  Manager"). This affects **every profile using Himalayas** (Tier 2, broadly active), not just PM.
+  20-per-page size (`offset={page*20}`, was assuming 100/page). Recovered **18 keyword matches
+  vs. the buggy 4 (4.5x)** for borjan-pm's PM stream over a fixed newest-1000 window, including
+  much more clearly on-target titles ("Scrum Master / Agile Coach", multiple "Project Manager"/
+  "Program Manager"). This affects **every profile using Himalayas** (Tier 2, broadly active),
+  not just PM. **Follow-up finding (Borjan asked "you crawled all 100k?"):** no — by design, only
+  the newest ~1000. Checked how far back that window actually reaches: **~9.8h** at the site's
+  observed ~100 jobs/hour rate. Real borjan-pm scan gaps ranged **5-98h** — meaning a fixed
+  1000-job window left a genuine blind spot on any gap longer than ~10h (postings never fetched
+  at all, not just undercounted). Checked for server-side category/query filtering on the API
+  first (`category`, `q`, `query`, `search`, `keyword` params all silently ignored — same "extra
+  params dropped" pattern as the `limit` bug; the category HTML page also 403s even via
+  headless) — no filtering available, so the only lever is fetching more of the unfiltered feed.
+  **Made adaptive** instead of guessing a fixed constant: `scan.py` now computes the real elapsed
+  gap since the last scan (read-only peek at `runs.json` before this run's own entry is written)
+  and threads it through as `cfg["scan_gap_hours"]`; `fetch_himalayas()`'s new pure
+  `himalayas_pages_for_gap()` sizes the page count to that actual gap (1.5x safety margin, floor
+  50 pages/~10h for a fresh profile, ceiling 300 pages/~60h so a multi-day skip can't blow up
+  scan time unbounded — verified live: a 9.8h gap now pulls 74 pages / 27 matches, better than
+  the flat-1000 test's 18). Unit-tested (`tests/unit_fetch_helpers.py`, 7 cases: floor, ceiling,
+  monotonic scaling, negative-input safety).
 - **Dynamite Jobs** — `_harvest_links()`'s anchor selector widened from `tree.css("a")` to
   `tree.css("[href]")` (any element carrying an href, still filtered by the same per-platform
   regex, so no new noise). Recovered **16/16 vs. the buggy 1** for the same page. This is a
