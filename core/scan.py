@@ -88,30 +88,61 @@ def _fresh(posted_at, cutoff: datetime) -> bool:
         return True
 
 
-# --- Predominantly-non-English JD detector (4.1, lesson: JustJoin.it PM offers with
-# Polish-only JDs/ATS forms despite international tags — not caught by any keyword or
-# location filter, discovered only at apply time). Conservative: fires only on
-# substantial text carrying almost no distinctive English function words, so an English
-# JD sprinkled with foreign words never trips it (false negatives are the safe side).
-_EN_SIGNAL = frozenset(
-    "the and for with you are our will this that have from your about who what would "
-    "should must team work experience they their been were which while when has".split())
-_PL_MARKERS = frozenset(
-    "się jest oraz dla lub jako że praca doświadczenie umiejętności zespół wymagania "
-    "stanowisko obowiązki mile widziane znajomość firmy poszukujemy".split())
-_PL_DIACRITICS = frozenset("ąćęłńóśźż")
+# --- Non-target-language JD detector (4.1 → 4.6 generalized). Lesson origin: JustJoin.it PM
+# offers with Polish-only JDs/ATS forms despite international tags — not caught by any keyword or
+# location filter, discovered only at apply time. Generalized (Borjan 2026-07-19): the constraint
+# is not "not English", it is "not in the languages the USER can apply in" — a user may set
+# German primary + English secondary, so a German JD is fine and everything else drops. Detection
+# scores the dominant language by function-word frequency against a small known set; the profile's
+# `search.languages` (default ["en"]) is the acceptable set. Conservative: fires only on
+# substantial text whose dominant language is KNOWN and NOT in the target set — an unknown or
+# mixed JD is never flagged (false negatives are the safe side).
+_LANG_STOPWORDS = {
+    "en": frozenset("the and for with you are our will this that have from your about who what "
+                    "would should must team work experience they their been were which while when has".split()),
+    "pl": frozenset("się jest oraz dla lub jako że praca doświadczenie umiejętności zespół wymagania "
+                    "stanowisko obowiązki mile widziane znajomość firmy poszukujemy nasz".split()),
+    "de": frozenset("und der die das mit für sie wir ist auf von den dem ein eine im zu als "
+                    "werden unsere deine erfahrung kenntnisse aufgaben".split()),
+    "es": frozenset("de la que el en los una para con por las del al se su como más "
+                    "experiencia conocimientos equipo trabajo empresa".split()),
+    "fr": frozenset("le la les des une pour avec vous nous est dans que qui sur au aux "
+                    "votre notre expérience compétences équipe entreprise".split()),
+    "it": frozenset("di che il la le per con una del gli nel come più sono nostro "
+                    "esperienza competenze squadra azienda lavoro".split()),
+    "nl": frozenset("de het een van en met voor zijn wij je onze aan door bij ervaring "
+                    "kennis team werk bedrijf".split()),
+    "pt": frozenset("de que os para com uma por das dos como mais são nossa "
+                    "experiência conhecimentos equipa empresa trabalho".split()),
+}
+# Diacritic sets that BOOST a language's score when present (a cheap disambiguator; en has none).
+_LANG_DIACRITICS = {"pl": "ąćęłńóśźż", "de": "äöüß", "fr": "àâçéèêëîïôûùüÿœ",
+                    "es": "áíñóúü¿¡", "it": "àèéìíòóù", "pt": "ãõáâàçéêíóôú"}
 
 
-def language_flag(text: str) -> tuple[str | None, str]:
-    """Return ('non_english_jd', note) when JD text reads as predominantly non-English."""
+def detect_language(text: str) -> str | None:
+    """Best-guess dominant language code from _LANG_STOPWORDS, or None if too little text /
+    no language scores distinctively. Diacritics nudge the score for languages that use them."""
     words = re.findall(r"[^\W\d_]+", (text or "").lower(), flags=re.UNICODE)
     if len(words) < 50:
-        return None, ""  # too little text to judge
-    if sum(1 for w in words if w in _EN_SIGNAL) / len(words) >= 0.025:
-        return None, ""  # reads as English
-    if sum(1 for w in words if w in _PL_MARKERS) >= 3 or any(ch in _PL_DIACRITICS for ch in text):
-        return "non_english_jd", "JD appears predominantly Polish (Polish-only JD/ATS form)"
-    return "non_english_jd", "JD appears predominantly non-English"
+        return None  # too little text to judge
+    n = len(words)
+    scores = {lang: sum(1 for w in words if w in sw) / n for lang, sw in _LANG_STOPWORDS.items()}
+    for lang, diac in _LANG_DIACRITICS.items():
+        if any(ch in diac for ch in text):
+            scores[lang] = scores.get(lang, 0) + 0.01
+    best = max(scores, key=scores.get)
+    return best if scores[best] >= 0.02 else None  # below floor = indistinct, don't guess
+
+
+def language_flag(text: str, target_langs: set[str]) -> tuple[str | None, str]:
+    """Return ('non_target_language', note) when the JD's dominant language is known and not in
+    the user's acceptable `target_langs` set. Unknown/indistinct language never flags."""
+    lang = detect_language(text)
+    if lang and lang not in target_langs:
+        return "non_target_language", (f"JD appears predominantly '{lang}' — not in the profile's "
+                                       f"languages {sorted(target_langs)} (local-hire / apply-wall signal)")
+    return None, ""
 
 
 # --- Stated-start-date-in-the-past detector (4.1, Cyclad lesson: posted months ago,
@@ -349,6 +380,18 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
 
     # ---- triage: keyword filter → freshness → dedup → hard filters
     new_cands, dropped, link_dead = [], 0, 0
+    # Per-param drop telemetry (Borjan balance ask): count drops by the PARAM that caused them and
+    # the funnel size they were measured against, so a single hard filter can't silently zero the
+    # results. `funnel_in` = candidates that passed keyword+freshness+dedup and reached the
+    # mechanical/judgment filters (the honest denominator for "param X dropped N of M").
+    drop_by_param: dict[str, int] = {}
+    funnel_in = 0
+
+    def _drop_param(reason: str) -> str:
+        # "auto-drop: us_only (…)" → "us_only"; "auto-drop: closed_location_list (…)" → that; else raw.
+        m = re.match(r"auto-drop:\s*([a-z0-9_]+)", reason or "")
+        return m.group(1) if m else (reason or "unknown").split(":")[0].strip()
+
     for r in results:
         for c in r["candidates"]:
             kw = _keyword_match(c["title"], keywords)
@@ -361,6 +404,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
             if hit:
                 continue  # silent — both-log dedup, URL-exact first (2.3.0)
             c["keyword_matched"] = kw
+            funnel_in += 1
             reason, flags = hard_filter(c, cfg.get("hard_filters", {}))
             c["flags"] = sorted(set((c.get("flags") or []) + flags))
             if reason:
@@ -369,6 +413,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
                               "reason": "Filtered Out", "fit": "N/A", "archetype": "",
                               "keyword_source": c["title"], "notes": reason})
                 dropped += 1
+                drop_by_param[_drop_param(reason)] = drop_by_param.get(_drop_param(reason), 0) + 1
                 continue
             new_cands.append(c)
 
@@ -420,6 +465,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
                           "keyword_source": c["title"],
                           "notes": f"link check: {v.get('note', '')} (source URL {c.get('source_url') or 'n/a'})"})
             link_dead += 1
+            drop_by_param["stale"] = drop_by_param.get("stale", 0) + 1
             continue
         if v["verdict"] == "unverifiable_direct" and not c.get("jd_text"):
             # nothing to evaluate and no way to verify: confirmed dead end (2.6.0 / SysMap)
@@ -428,6 +474,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
                           "reason": "Unverified/Blocked", "fit": "N/A", "archetype": "",
                           "keyword_source": c["title"], "notes": f"blocked: {v.get('note', '')}"})
             dropped += 1
+            drop_by_param["unverified_blocked"] = drop_by_param.get("unverified_blocked", 0) + 1
             continue
         c["link_status"] = {"live": "✅ live", "unverifiable_direct": "❓ unverified"}[v["verdict"]]
         survivors.append(c)
@@ -452,21 +499,23 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     hf_cfg = cfg.get("hard_filters", {})
     work_model = set(search_cfg.get("work_model") or [])           # required field, e.g. {remote}
     wa_mode = hf_cfg.get("work_arrangement", "off")               # off (default) | flag | drop
+    target_langs = set(search_cfg.get("languages") or ["en"])    # languages the user can apply in
     for c in survivors:
         flags = set(c.get("flags") or [])
         if not dedup.norm_company(c.get("company", "")):
             flags.add("missing_company")            # scan-side data-quality note (lesson 6)
         jd = c.get("jd_text") or ""
-        lang_flag, lang_note = language_flag(jd)     # Polish-only JD/ATS (lesson 1)
+        lang_flag, lang_note = language_flag(jd, target_langs)   # non-target-language JD (lesson 1, generalized)
         if not lang_flag:
-            # Title-level fallback: a JD-less/light dedup twin (empty jd_text) never reaches
-            # language_flag's 50-word floor, so a Polish-market title ("bankowość", "z praktyką")
-            # would slip through unflagged. Diacritics/markers in the TITLE still signal it.
+            # Title-level fallback: a JD-less/light dedup twin (empty jd_text) never reaches the
+            # 50-word floor, so a non-target-market title ("bankowość", "z praktyką") slips through.
+            # A title carrying a NON-target language's diacritics still signals it.
             title_l = (c.get("title") or "").lower()
-            title_words = re.findall(r"[^\W\d_]+", title_l, flags=re.UNICODE)
-            if any(ch in _PL_DIACRITICS for ch in title_l) or any(w in _PL_MARKERS for w in title_words):
-                lang_flag = "non_english_jd"
-                lang_note = "title contains Polish (Polish-market posting; JD unavailable to confirm)"
+            for lg, diac in _LANG_DIACRITICS.items():
+                if lg not in target_langs and any(ch in diac for ch in title_l):
+                    lang_flag = "non_target_language"
+                    lang_note = f"title carries '{lg}' diacritics — likely {lg}-market posting (JD unavailable to confirm)"
+                    break
         if lang_flag:
             flags.add(lang_flag)
             c["language_note"] = lang_note
@@ -534,23 +583,31 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     # seen.jsonl as "Filtered Out" (recoverable/auditable), never reaching the shortlist. This is
     # the deliberate flag→drop conversion the doctrine reserves for hard eligibility (CLAUDE.md).
     em_mode = hf_cfg.get("employment_mismatch", "flag")           # flag (default) | drop
-    if wa_mode == "drop" or em_mode == "drop":
+    lm_mode = hf_cfg.get("language_mismatch", "flag")             # flag (default) | drop
+    if wa_mode == "drop" or em_mode == "drop" or lm_mode == "drop":
         kept = []
         for c in survivors:
             fset = set(c.get("flags") or [])
             reason = None
+            param = None
             if wa_mode == "drop" and "work_arrangement_mismatch" in fset:
+                param = "work_arrangement"
                 reason = (f"work arrangement {c.get('work_arrangement_detected') or '?'} off-target "
                           f"(work_model requires {sorted(work_model)})")
             elif em_mode == "drop" and "employment_off_target" in fset:
+                param = "employment_mismatch"
                 reason = (f"employment {c.get('employment_detected') or '?'} off-target "
                           f"(accepts {sorted(et_accept)})")
+            elif lm_mode == "drop" and "non_target_language" in fset:
+                param = "language_mismatch"
+                reason = c.get("language_note") or f"non-target language (accepts {sorted(target_langs)})"
             if reason:
                 dedup.append({"company": c["company"], "role": c["title"], "locdom": c.get("loc", ""),
                               "url": c["url"], "platform": c["platform"], "status": "dropped",
                               "reason": "Filtered Out", "fit": "N/A", "archetype": "",
                               "keyword_source": c["title"], "notes": reason})
                 dropped += 1
+                drop_by_param[param] = drop_by_param.get(param, 0) + 1
                 continue
             kept.append(c)
         _log(f"hard-eligibility drop: {len(survivors) - len(kept)} off-target "
@@ -575,6 +632,19 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
             c["jd_cache"] = f"state/jd_cache/{h}.txt"
             c["jd_text"] = c["jd_text"][:1500]  # candidates JSON stays skimmable; full text in cache
 
+    # ---- over-constraint nudge (Borjan balance ask): if any single param dropped a large share
+    # of the funnel, surface it so a hard filter can't silently zero results. A high share isn't
+    # necessarily wrong (Ani's remote-only legitimately drops ~half — Poland is hybrid-heavy), so
+    # this INFORMS, never auto-relaxes. Threshold: ≥40% of the candidates that reached filtering.
+    drop_nudges = []
+    if funnel_in:
+        for param, n in sorted(drop_by_param.items(), key=lambda kv: -kv[1]):
+            share = n / funnel_in
+            if share >= 0.40:
+                drop_nudges.append(
+                    f"{param} dropped {n}/{funnel_in} ({share:.0%}) — if unexpected, consider "
+                    f"relaxing this hard filter (flag instead of drop)")
+
     out_path = paths.candidates_path()
     out_path.write_text(json.dumps({
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -584,6 +654,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         "sources_down": sources_down, "platform_notes": notes,
         "skipped_platforms": cfg.get("skipped_platforms", {}),
         "shortlist_sweep": sweep_counts,
+        "funnel_in": funnel_in, "drop_by_param": drop_by_param, "drop_nudges": drop_nudges,
     }, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # ---- runs.json ledger + recompute counter
@@ -597,6 +668,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         "platforms_covered": [r["platform"] for r in results if not r["source_down"]],
         "sources_down": sources_down,
         "new": len(survivors), "dropped": dropped, "link_dead": link_dead,
+        "funnel_in": funnel_in, "drop_by_param": drop_by_param, "drop_nudges": drop_nudges,
         "sweep": sweep_counts, "reconcile": reconcile,
         "half": half, "full_sweep": full_sweep,
     }
@@ -607,7 +679,10 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     print(f"## Job Scout scan — {cfg['profile_id']} — {today} {label}"
           + (f" (half={half})" if half else " (full rotation)")
           + (" [full sweep]" if full_sweep else f" [fresh window {window_h}h]"))
-    print(f"{len(survivors)} new candidates / {dropped} auto-dropped / {link_dead} link-dead")
+    print(f"{len(survivors)} new candidates / {dropped} auto-dropped / {link_dead} link-dead"
+          + (f" (of {funnel_in} that reached filtering)" if funnel_in else ""))
+    for nudge in drop_nudges:
+        print(f"  ⚠ over-constraint: {nudge}")
     covered = [r["platform"] for r in results if not r["source_down"]]
     print(f"covered ({len(covered)}): {', '.join(covered)}")
     print(f"sources down: {', '.join(sources_down) if sources_down else 'none'}")

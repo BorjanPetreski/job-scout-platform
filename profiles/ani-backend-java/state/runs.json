@@ -1,7 +1,7 @@
 {
  "recompute": {
   "last": "2026-07-17",
-  "sessions_since": 2,
+  "sessions_since": 3,
   "due_at_sessions": 5
  },
  "2026-07-17": {
@@ -87,6 +87,71 @@
     "live": 1,
     "unverifiable": 1,
     "escalated": 0
+   },
+   "half": null,
+   "full_sweep": false
+  }
+ },
+ "2026-07-19": {
+  "PM": {
+   "ran_at": "2026-07-19T22:10:51+00:00",
+   "platforms_covered": [
+    "Himalayas",
+    "Remotive",
+    "JustJoin.it",
+    "Greenhouse (ATS boards)",
+    "Lever (ATS boards)",
+    "Workable (ATS boards)",
+    "We Work Remotely",
+    "Jobgether",
+    "Working Nomads",
+    "Remote OK",
+    "Pinpoint HQ (ATS boards)",
+    "Deel",
+    "LinkedIn (tripwire)"
+   ],
+   "sources_down": [
+    "Arc.dev",
+    "Remote Rocketship (worldwide)",
+    "Remote Rocketship (Europe)",
+    "NoDesk",
+    "Dynamite Jobs",
+    "Welcome to the Jungle",
+    "Landing.jobs",
+    "JustRemote",
+    "Crossover"
+   ],
+   "new": 111,
+   "dropped": 148,
+   "link_dead": 1,
+   "funnel_in": 260,
+   "drop_by_param": {
+    "us_only": 1,
+    "stale": 1,
+    "employment_mismatch": 3,
+    "work_arrangement": 142,
+    "language_mismatch": 2
+   },
+   "drop_nudges": [
+    "work_arrangement dropped 142/260 (55%) — if unexpected, consider relaxing this hard filter (flag instead of drop)"
+   ],
+   "sweep": {
+    "scope": 0,
+    "checked": 0,
+    "deferred": 0,
+    "stale": 0,
+    "live": 0,
+    "unverifiable": 0,
+    "escalated": 0
+   },
+   "reconcile": {
+    "tokenless": false,
+    "tracker_rows": 0,
+    "backfilled": 0,
+    "already": 0,
+    "unmatched": 0,
+    "passed_seen_flipped": 0,
+    "skipped": null
    },
    "half": null,
    "full_sweep": false

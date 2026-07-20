@@ -41,8 +41,11 @@ When a gap surfaces that the KB can't fill:
 
 ### Persistence (manual re-save — state this every time)
 
-On every growth event, regenerate the canonical **`knowledge-base.md`** in a copy-block and tell
-the user to **save it into the Project's knowledge**. This is a manual step and it is real: an
-answer you "stored" but the user didn't save is gone at the end of the conversation. Because the
-knowledge base's whole value is answering the *same* question next time without re-asking, the
-save is what makes the loop work — never skip prompting it.
+Saving is **the default, not an opt-in question** — the KB lives in Project knowledge because that's
+where the app reads it; state that up front, don't ask "should I save this?" as a side-choice. On every
+growth event, regenerate the canonical **`knowledge-base.md`** in a copy-block and tell the user to
+**save it into the Project's knowledge** — framed as the expected step. This is a manual step and it is
+real: an answer you "stored" but the user didn't save is gone at the end of the conversation. Because the
+knowledge base's whole value is answering the *same* question next time without re-asking, the save is
+what makes the loop work — never skip prompting it. *(In the app the write is automatic; the manual save
+is the claude.ai-Project constraint only.)*

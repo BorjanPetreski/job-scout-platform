@@ -49,8 +49,9 @@ filter_notes: |
     on JustJoin.it. Drop even when everything else fits.
   - Polish-only JD/ATS on JustJoin.it is a hard drop (2026-07-14): PM-tagged offers whose
     JD and application form are Polish-only signal a Poland-local hire I can't complete.
-    The scan raises the non_english_jd flag at full-fetch — treat it as a drop, no manual
-    language-guessing needed.
+    The scan raises the non_target_language flag at full-fetch (languages default [en]) — treat
+    it as a drop, no manual language-guessing needed. (Set hard_filters.language_mismatch: drop
+    to make the engine drop it mechanically instead of via this judgment note.)
   - CloudLinux Scrum Master is a known recurring stale across multiple mirrors — do
     not resurface (it's in seen.jsonl).
   - Requires work after 17:00 CET/EEST -> drop. Snippet-blindness caveat: working-hours

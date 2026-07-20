@@ -61,6 +61,8 @@ compensation:
 hard_filters:
   work_arrangement: drop
   employment_mismatch: drop
+  language_mismatch: drop   # Ani applies in English only (search.languages defaults to [en]);
+                            # a Polish-only JD/ATS is a local-hire wall she can't complete.
 
 # Profile-learned lessons the judgment layer reads on every scan (from the first live
 # run, 2026-07-16 — these are ANI's lessons; a different profile earns its own):

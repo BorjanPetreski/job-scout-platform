@@ -10,8 +10,8 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.5.0"
-  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement (remote/hybrid/on-site) detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time) — profile-gated, borjan-pm byte-identical."
+  version: "4.6.0"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time). 4.6.0: generalized non-target-language detection (configurable search.languages, multi-language) + opt-in language_mismatch drop; per-param drop telemetry + over-constraint nudge (a hard filter can't silently zero results). Profile-gated, borjan-pm resolved-config byte-identical."
   created_by: Borjan
   organization: 2Coders Studio
   last_updated: "2026-07-19"
@@ -92,9 +92,10 @@ optional, none is judged-from-memory. `<id>` = the active profile.
    the computed flags below), `salary_assessment` (clears / below_floor / borderline /
    unparseable — metadata, never a machine drop), `link_status`, `jd_status`. Computed
    annotations added at scan time (4.1 — all ADDITIVE, all "scripts flag, you decide"):
-   - `non_english_jd` flag (+ `language_note`): the full JD reads as predominantly
-     non-English (JustJoin.it Polish-only JD/ATS lesson). On JustJoin.it this is a
-     hard-drop signal per the profile's filter_notes; elsewhere, judge it.
+   - `non_target_language` flag (+ `language_note`): the JD's dominant language is known and
+     NOT in the profile's `search.languages` (default `[en]`; may be multi, e.g. `[de, en]`) —
+     a local-hire / apply-wall signal (JustJoin.it Polish-only JD/ATS lesson, generalized). A
+     drop when `hard_filters.language_mismatch: drop`; else judge it.
    - `start_date_passed` flag (+ `start_date_note`): the JD's own stated start/target
      month is already past — the soft posting-age signal escalated to explicit ⚠️
      (Cyclad "still listed live, start already gone"). Verify freshness before shortlisting.
@@ -124,7 +125,7 @@ optional, none is judged-from-memory. `<id>` = the active profile.
    section below) plus the profile's `filter_notes`. The Spiralyze lesson (3pm-EST
    buried in the full posting) means scripts flag, you decide. **A candidate with ANY `flags[]`
    entry MUST have that flag explicitly resolved** (drop / clear / ❓ NEEDS USER) in its role
-   notes — a hard-eligibility flag (`work_arrangement_mismatch`, `non_english_jd`,
+   notes — a hard-eligibility flag (`work_arrangement_mismatch`, `non_target_language`,
    `employment_off_target`) left unresolved is a bug: never shortlist a flagged candidate without
    stating why the flag doesn't disqualify. Ani's first run leaked hybrid + full-time + Polish
    roles precisely because flagged candidates were shortlisted on fit alone.
@@ -222,7 +223,7 @@ the PROFILE's values. In unattended mode, an ambiguous case resolves conservativ
 | **"Location-fluid" marketing copy** | "Work from anywhere" culture copy ≠ open worldwide. If 2+ live reqs are each tagged to specific countries that exclude the candidate, the company is country-set-restricted regardless of marketing (Moro Tech lesson). |
 | **Regional-payroll mismatch** | Benefits/payroll currency signals a target region that excludes the candidate despite a "worldwide" label (Rapido Solutions lesson: MXN benefits under a worldwide tag). |
 | **Closed location list** | A closed country list under a "remote in <region>" label that does not name any of the profile's `location_match_terms` — drop without further verification (enforced first-pass by the detector). |
-| **Non-English JD / ATS** | `non_english_jd` flag: the JD (and usually the application form) is not in a language the candidate can apply in — a local-hire signal the keyword/location filters miss. On boards where the profile marks it a hard drop (JustJoin.it Polish-only, in borjan-pm's filter_notes), drop; otherwise verify the applicant can actually complete the application. |
+| **Non-target-language JD / ATS** | `non_target_language` flag: the JD (and usually the application form) is in a language NOT in the profile's `search.languages` (default `[en]`; may be multi, e.g. `[de, en]` keeps both) — a local-hire signal the keyword/location filters miss. `hard_filters.language_mismatch: drop` pre-filters these mechanically; otherwise verify the applicant can actually complete the application. |
 | **Target seniority (D7)** | Only when the profile sets `search.target_seniority`. Map the posting's stated level to a band (the scan's `seniority_detected` is the first pass; read the JD's own wording too via the resolved lexicon incl. the template's `seniority_titles` — "medior"→mid, "SDE II"→mid, etc.). **`strict: false` (default) = SOFT:** in-band = full score; well-ABOVE the target band (e.g. `staff` for a `mid` target) = deprioritize **with a one-line note** ("senior-of-target — likely over-levelled"); below-band = flag, judge. **`strict: true` = HARD:** a confidently out-of-band posting is a drop, logged `Filtered Out (seniority: <detected> not in <bands>)`. `seniority_off_target` is the scan's soft hint — never a mechanical drop on its own. |
 | **Employment type (D8)** | Only when `search.employment_type.accept` is set and does NOT contain `any`. The posting's employment type must be in the accept set. Use `employment_detected` as the first pass, but confirm from the JD (the marker may sit only in the body). A posting whose stated type is confidently outside the accept set is a drop, logged `Filtered Out (employment: <detected> not in <accept>)`. **Part-time guard:** for a profile that accepts `part_time`, an explicit FULL-TIME posting is off-target even on a B2B/contract vehicle ("Full-time B2B" = full-time hours) — don't let a `contract` accept-match mask it. Unstated type is NOT a drop — judge it. `employment_mismatch: drop` makes the engine pre-drop these; caveat (D8): a hard employment filter thins sparse boards — the user's informed choice; `any` is the escape. |
 | **Work arrangement (D-remote)** | Only when the profile opts into `hard_filters.work_arrangement` (`flag` or `drop`). The posting's arrangement must satisfy `search.work_model`. The platform's structured loc tag ("Kraków (hybrid)", "Warszawa (remote)" on JustJoin.it) is authoritative; "X days in office / on-site" in the JD is the same signal. Hybrid/on-site for a remote-only profile = a hard eligibility miss (you can't work a Poland-hybrid desk remotely from Skopje) → drop, logged `Filtered Out (work arrangement <detected> vs work_model <remote>)`. "Remote or hybrid" that genuinely offers remote is NOT a mismatch. In `drop` mode the engine pre-filters the loc-tagged cases; in `flag` mode `work_arrangement_mismatch` is yours to resolve. |

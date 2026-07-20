@@ -40,10 +40,13 @@ live posting anyway (form is ground truth).
 
 ---
 
-## 2. Companion doctrine — 🔜 next PR (fold into `assistant/` + recompose bindings)
+## 2. Companion doctrine — ✅ FOLDED 2026-07-19 (generic `assistant/` modules + recomposed bindings)
 
-These are proven-by-failure in the live run. They belong in the generic `assistant/` modules (voice/KB/apply
-doctrine) so every profile inherits them, then recompose each profile binding.
+Folded into `02-voice-acquisition.md` (selectable options + worked examples, explicit tone/gender dial,
+sentence-complexity/English-level dials, numbered+skippable phased generation with N estimated from input
+richness, two-samples-per-phase, save-by-default), `03-knowledge-base.md` (save-by-default), and
+`04-apply-loop.md` (always-clickable-link, proceed-as-explicit-options → Notion status). Both bindings
+recomposed. The list below is the record of what was proven-by-failure in the live run.
 
 - **Voice Q&A needs worked examples + selectable options.** "English-as-non-native quirks" meant nothing
   without examples. Every guided question should ship 2–4 concrete example answers the user can pick, with
@@ -65,7 +68,11 @@ doctrine) so every profile inherits them, then recompose each profile binding.
 - **"How do you want to proceed" = explicit options** that map to pinned Notion statuses (apply / decline /
   stale / skip), so the choice is a tap that writes the right status — not free prose.
 
-## 3. App / UX — 🗺️ roadmap (product build, no engine change yet; → PROJECT_PLAN Phase 5/6)
+## 3. App / UX — 🗺️ roadmap (seeded into PROJECT_PLAN **Phase 4** scope §6 — the app + client-side store)
+
+**When:** Phase 4 (the tappable FE app), which is gated on Phase 3 (companion) shipping. These are UI
+controls — they cannot exist on today's claude.ai-Project substrate, which has no custom screens. The
+companion-side *doctrine* for them already shipped (assistant/ modules, 2026-07-19).
 
 Simple, tappable interface aimed at Gen-Z/Alpha (minimal typing):
 - **Sliders:** English level (Claude-effort style), sentence complexity, formality (professional↔informal).
@@ -82,3 +89,27 @@ The guided-Q&A path DID build a non-Borjan voice and a coherent KB from scratch 
 The gaps above are UX/doctrine polish, not a package-is-Borjan-shaped failure. The apply loop surfaced the
 scanner leak, now fixed. Remaining Part-C proof: voice+KB survive a fresh conversation (save round-trip) and the
 apply loop runs clean on the de-leaked shortlist.
+
+---
+
+## 5. Enforcement-coverage audit + balance — 🔜 next session (Borjan, 2026-07-19)
+
+**Scope beyond the two params already fixed.** Audit EVERY constraint a profile declares
+(current: `regions_acceptable`, `target_seniority` strict, `citizenship`, `timezone_window`,
+salary floor, `tool_lockin`, work_model, employment_type, …) AND plan for params a user may add
+at onboarding that the app doesn't ship — the scanner should machine-drop the straightforward
+ones. Close every "declared but only flagged / not enforced" gap.
+
+**Balance — do NOT overconstrain (critical).** Hard drops can silently zero the results.
+- **Diagnose Borjan's last scan: it returned 0 new — find WHICH param(s) dropped everything and
+  why.** (This session earlier noted borjan's parallel run was 0 for "legitimate" reasons —
+  re-verify that's true and not a leak-in-reverse / over-drop.)
+- **Add drop-telemetry + a user nudge:** track per-param drop counts each run; when one param
+  drops a large share (e.g. 280 of 300 found), surface it — "parameter_x dropped 280/300; consider
+  relaxing this hard drop." Never let a single hard filter annihilate the funnel silently.
+
+**Language rule — generalize (don't hardcode Polish/English).** Current fix flags/drops "Polish".
+Reframe as: drop a posting whose **main language is not among the user's set languages**. The user
+sets a language list (e.g. primary German, secondary English) — keep postings in ANY of those,
+drop the rest. English is just Borjan's default, not the rule. Detection must be language-agnostic
+(the `_PL_MARKERS`/`_EN_SIGNAL` approach must generalize to a configurable per-profile language set).
