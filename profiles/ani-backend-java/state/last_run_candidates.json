@@ -104,37 +104,6 @@
    "jd_cache": "state/jd_cache/0fb6e0f4dd99e858.txt"
   },
   {
-   "title": "Backend Java Developer",
-   "company": "Upvanta sp. z o.o.",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/upvanta-sp-z-o-o--backend-java-developer-warszawa-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T07:00:15.058Z",
-   "salary": "1000-1100 pln (b2b)",
-   "jd_text": "Backend Java Developer - Upvanta sp. z o.o. html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:acti",
-   "keyword_matched": "java developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/99ed90c7eacf6327.txt"
-  },
-  {
    "title": "Java Developer",
    "company": "Jit Team",
    "loc": "Gdynia (remote)",
@@ -164,114 +133,6 @@
     "remote"
    ],
    "jd_cache": "state/jd_cache/c0204ef4360c2350.txt"
-  },
-  {
-   "title": "Senior Java Developer",
-   "company": "Autopay S.A.",
-   "loc": "Sopot (remote)",
-   "url": "https://justjoin.it/job-offer/autopay-s-a--senior-java-developer-sopot-java-6c7876e9",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T08:00:19.394Z",
-   "salary": null,
-   "jd_text": "Senior Java Developer - Autopay S.A. html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.sen",
-   "keyword_matched": "java developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/b3553f6ab085aff6.txt"
-  },
-  {
-   "title": "Senior Java Developer",
-   "company": "RITS",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/rits-senior-java-developer-warszawa-java-d59939f9",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T08:00:23.977Z",
-   "salary": "120-150 pln (b2b)",
-   "jd_text": "Senior Java Developer - RITS html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.sendbird-mo",
-   "keyword_matched": "java developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "company_prior": [
-    {
-     "role": "Mid Java Developer",
-     "locdom": "Warszawa (hybrid)",
-     "status": "passed",
-     "reason": "User Declined"
-    }
-   ],
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/87c04d2b1a80eb93.txt"
-  },
-  {
-   "title": "Mid Java Developer",
-   "company": "Jit Team",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/jit-team-mid-java-developer-warszawa-java-de416350",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T08:00:25.691Z",
-   "salary": "12000-20000 pln (b2b)",
-   "jd_text": "Mid Java Developer - Jit Team html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.sendbird-m",
-   "keyword_matched": "java developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "mid",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/0ed7d11a844fdd56.txt"
   },
   {
    "title": "Senior Java Developer",
@@ -308,108 +169,6 @@
    "jd_cache": "state/jd_cache/7c0c29537651f1fd.txt"
   },
   {
-   "title": "Mid/Senior Fullstack Java Developer",
-   "company": "Clurgo",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/clurgo-mid-senior-fullstack-java-developer-warszawa-java-05396f22",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T08:00:26.741Z",
-   "salary": "120-150 pln (b2b)",
-   "jd_text": "Mid/Senior Fullstack Java Developer - Clurgo html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:act",
-   "keyword_matched": "java developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/470958cd3061de4d.txt"
-  },
-  {
-   "title": "Senior Java Developer",
-   "company": "Antal Sp. z o.o.",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/antal-sp-z-o-o--senior-java-developer-warszawa-java-6ac9af7e",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T08:00:26.817Z",
-   "salary": "150-170 pln (b2b)",
-   "jd_text": "Senior Java Developer - Antal Sp. z o.o. html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,",
-   "keyword_matched": "java developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/b4be711e03d8f8fe.txt"
-  },
-  {
-   "title": "Senior Java Developer",
-   "company": "Jit Team",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/jit-team-senior-java-developer-warszawa-java-47686f06",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T08:00:26.831Z",
-   "salary": "20000-25600 pln (b2b)",
-   "jd_text": "Senior Java Developer - Jit Team html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.sendbir",
-   "keyword_matched": "java developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/23e3426b72bc8078.txt"
-  },
-  {
    "title": "Java Developer | FX & Commodities Trading Platform |",
    "company": "Caspian One",
    "loc": "Poland (Remote) (remote)",
@@ -439,136 +198,6 @@
     "remote"
    ],
    "jd_cache": "state/jd_cache/b37166ad4d68d141.txt"
-  },
-  {
-   "title": "Technical Lead – Platform Engineering (Java/Kotlin)",
-   "company": "Upvanta sp. z o.o.",
-   "loc": "Wrocław (remote)",
-   "url": "https://justjoin.it/job-offer/upvanta-sp-z-o-o--technical-lead---platform-engineering-java-kotlin--wroclaw-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T09:00:17.453Z",
-   "salary": "34000-56000 pln (b2b)",
-   "jd_text": "Technical Lead – Platform Engineering (Java/Kotlin) - Upvanta sp. z o.o. html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal_",
-   "keyword_matched": "platform engineer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "lead",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/a1f28c894a07436e.txt"
-  },
-  {
-   "title": "Senior Java Developer",
-   "company": "Connectis",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/connectis-senior-java-developer-warszawa-java-b4d58259",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T09:00:18.341Z",
-   "salary": "23000-26000 pln (b2b)",
-   "jd_text": "Senior Java Developer - Connectis html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.sendbi",
-   "keyword_matched": "java developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/0f5385da52e1369c.txt"
-  },
-  {
-   "title": "Kotlin Developer (Kotlin Multiplatform)",
-   "company": "Upvanta sp. z o.o.",
-   "loc": "Kraków (remote)",
-   "url": "https://justjoin.it/job-offer/upvanta-sp-z-o-o--kotlin-developer-kotlin-multiplatform--krakow-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T09:00:20.152Z",
-   "salary": "1100-1300 pln (b2b)",
-   "jd_text": "Kotlin Developer (Kotlin Multiplatform) - Upvanta sp. z o.o. html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sen",
-   "keyword_matched": "kotlin developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/288c78fe3d456476.txt"
-  },
-  {
-   "title": "Java Developer – banking sector (f/m/x)",
-   "company": "Sii",
-   "loc": "Katowice (remote)",
-   "url": "https://justjoin.it/job-offer/sii-java-developer---banking-sector-f-m-x--katowice-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T09:00:21.299Z",
-   "salary": null,
-   "jd_text": "Java Developer – banking sector (f/m/x) - Sii html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:ac",
-   "keyword_matched": "java developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/1e48e28b176b2bb7.txt"
   },
   {
    "title": "Senior Java Engineer",
@@ -603,51 +232,6 @@
     "remote"
    ],
    "jd_cache": "state/jd_cache/31e70e8361ee9e91.txt"
-  },
-  {
-   "title": "Java Developer",
-   "company": "SCALO",
-   "loc": "Kraków (remote)",
-   "url": "https://justjoin.it/job-offer/scalo-java-developer-krakow-java-dd4c0d1e",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T10:00:05.386Z",
-   "salary": "20160-21838 pln (b2b)",
-   "jd_text": "Java Developer - SCALO html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.sendbird-modal__f",
-   "keyword_matched": "java developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "company_prior": [
-    {
-     "role": "Senior Java Developer",
-     "locdom": "Kraków (remote)",
-     "status": "dropped",
-     "reason": "Filtered Out"
-    },
-    {
-     "role": "Java Developer",
-     "locdom": "Warszawa (hybrid)",
-     "status": "passed",
-     "reason": "User Declined"
-    }
-   ],
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/c30a59ca6425228b.txt"
   },
   {
    "title": "FullStack Java Developer",
@@ -713,37 +297,6 @@
     "remote"
    ],
    "jd_cache": "state/jd_cache/bcdef1d75188f051.txt"
-  },
-  {
-   "title": "Backend Developer",
-   "company": "FAKTURA.PL",
-   "loc": "Warszawa (remote)",
-   "url": "https://justjoin.it/job-offer/faktura-pl-backend-developer-warszawa-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T10:00:11.910Z",
-   "salary": "12000-18000 pln (b2b)",
-   "jd_text": "Backend Developer - FAKTURA.PL html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.sendbird-",
-   "keyword_matched": "backend developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/4c53b1d4798f5a56.txt"
   },
   {
    "title": "Fullstack Software Engineer (regular)",
@@ -815,74 +368,6 @@
     "remote"
    ],
    "jd_cache": "state/jd_cache/571da9d7cc7c08a4.txt"
-  },
-  {
-   "title": "Senior Backend Developer z j. niemieckim (B2B)",
-   "company": "dmTECH Polska",
-   "loc": "Wrocław (remote)",
-   "url": "https://justjoin.it/job-offer/dmtech-polska-senior-backend-developer-z-j-niemieckim-b2b--wroclaw-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T12:00:21.379Z",
-   "salary": "140-170 pln (b2b)",
-   "jd_text": "Senior Backend Developer z j. niemieckim (B2B) - dmTECH Polska html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .s",
-   "keyword_matched": "backend developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/bcc3d27db5fabfd1.txt"
-  },
-  {
-   "title": "Senior Backend Developer z j. niemieckim (B2B)",
-   "company": "dmTECH Polska",
-   "loc": "Wrocław (remote)",
-   "url": "https://justjoin.it/job-offer/dmtech-polska-senior-backend-developer-z-j-niemieckim-b2b--wroclaw-java-0ecabb77",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T12:00:21.621Z",
-   "salary": "140-170 pln (b2b)",
-   "jd_text": "Senior Backend Developer z j. niemieckim (B2B) - dmTECH Polska html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .s",
-   "keyword_matched": "backend developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/bd25a68c143f783c.txt"
   },
   {
    "title": "(Senior) Java Developer - Freelance",
@@ -1221,42 +706,6 @@
     "status": "unparseable",
     "detail": "no parseable salary; apply estimation heuristics"
    },
-   "work_arrangement_detected": [
-    "remote"
-   ]
-  },
-  {
-   "title": "Java Developer",
-   "company": "SCALO",
-   "loc": "Kraków (remote)",
-   "url": "https://justjoin.it/job-offer/scalo-java-developer-krakow-java-1bf2c5df",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-19T10:00:06.814Z",
-   "salary": "16000-19200 pln (b2b)",
-   "jd_text": null,
-   "keyword_matched": "java developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "read_cap_deferred",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "company_prior": [
-    {
-     "role": "Senior Java Developer",
-     "locdom": "Kraków (remote)",
-     "status": "dropped",
-     "reason": "Filtered Out"
-    },
-    {
-     "role": "Java Developer",
-     "locdom": "Warszawa (hybrid)",
-     "status": "passed",
-     "reason": "User Declined"
-    }
-   ],
    "work_arrangement_detected": [
     "remote"
    ]
@@ -2757,5 +2206,6 @@
  "drop_nudges": [
   "work_arrangement dropped 142/260 (55%) — if unexpected, consider relaxing this hard filter (flag instead of drop)"
  ],
- "dropped_by_office_tag_fix": 6
+ "dropped_by_office_tag_fix": 6,
+ "dropped_manual_polish_reread": 16
 }
