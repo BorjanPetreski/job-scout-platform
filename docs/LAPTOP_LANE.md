@@ -35,8 +35,13 @@ prints cleanly, the lane is ready.
 If deps are missing (fresh machine only):
 
 ```bash
-pip install requests pyyaml selectolax playwright && playwright install chromium
+pip install -r requirements.txt && playwright install chromium
 ```
+
+(Claude Code cloud/web sessions install `requirements.txt` automatically via the
+`SessionStart` hook in `.claude/settings.json` — see `docs/PROGRESS.md` 2026-07-20. A
+missing/broken `selectolax` degrades JD-text extraction silently otherwise — see the
+`_visible_text()` note in `core/fetch_boards.py`.)
 
 ### Notion token
 

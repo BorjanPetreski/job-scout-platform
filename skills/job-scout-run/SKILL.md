@@ -10,11 +10,11 @@ description: >
   Also use for scheduled/unattended runs: prompts like "run the scheduled job scan",
   "unattended scan", "AM scan", or "PM scan" trigger Unattended Mode as defined inside.
 metadata:
-  version: "4.6.0"
-  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time). 4.6.0: generalized non-target-language detection (configurable search.languages, multi-language) + opt-in language_mismatch drop; per-param drop telemetry + over-constraint nudge (a hard filter can't silently zero results). Profile-gated, borjan-pm resolved-config byte-identical."
+  version: "4.6.1"
+  status: "production — core engine live; legacy job-scout-pm frozen as the v3 archive (2026-07-14). Phase 3a additive: scan-start Tracker-read reconciliation (token-gated, read-only, borjan-pm behavior unchanged when tokenless). 4.5.0: work-arrangement detection + opt-in hard-eligibility drops (hybrid-when-remote, full-time-when-part-time). 4.6.0: generalized non-target-language detection (configurable search.languages, multi-language) + opt-in language_mismatch drop; per-param drop telemetry + over-constraint nudge (a hard filter can't silently zero results). Profile-gated, borjan-pm resolved-config byte-identical. 4.6.1: fixed a silent JD-text-extraction degradation (missing selectolax fed raw CSS/JS to every text detector) + added requirements.txt + a SessionStart hook so cloud/web sessions install deps automatically."
   created_by: Borjan
   organization: 2Coders Studio
-  last_updated: "2026-07-19"
+  last_updated: "2026-07-20"
 ---
 
 # Job Scout — generic run skill (one engine, N profiles)
@@ -418,10 +418,14 @@ in the user's Project, not this repo).
 - `profiles/<id>/state/` — seen.jsonl, runs.json, fetch_evidence.jsonl, sweep.json,
   jd_cache/, last_run_candidates.json.
 
-**Setup (once per machine):** Python 3.11+; `pip install requests pyyaml selectolax
-playwright` then `playwright install chromium` (in managed environments with a
-pre-installed Chromium, set `JOB_SCOUT_CHROMIUM=/path/to/chromium` instead — never run
-playwright install there). `NOTION_TOKEN` env var for unattended Notion sync.
+**Setup (once per machine):** Python 3.11+; `pip install -r requirements.txt` then
+`playwright install chromium` (in managed environments with a pre-installed Chromium,
+set `JOB_SCOUT_CHROMIUM=/path/to/chromium` instead — never run playwright install
+there). Claude Code cloud/web sessions do this automatically via the `SessionStart`
+hook (`.claude/settings.json` → `.claude/hooks/session-start.sh`) — a missing
+`selectolax` otherwise degrades JD-text extraction silently (2026-07-20 finding, see
+`core/fetch_boards.py`'s `_visible_text()`). `NOTION_TOKEN` env var for unattended
+Notion sync.
 
 ---
 
