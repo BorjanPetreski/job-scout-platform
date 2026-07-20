@@ -233,8 +233,9 @@ def fetch_justjoinit(p: dict, cfg: dict) -> dict:
 # correctness assumption (scan.py's own freshness filter is the real cutoff).
 HIMALAYAS_JOBS_PER_HOUR = 100
 HIMALAYAS_JOBS_PER_PAGE = 20
-HIMALAYAS_MIN_PAGES = 50   # ~1000 jobs / ~10h — floor for a fresh profile with no history
-HIMALAYAS_MAX_PAGES = 300  # ~6000 jobs / ~60h — bounds worst-case fetch time (~5 min)
+HIMALAYAS_MIN_PAGES = 50    # ~1000 jobs / ~10h — floor for a fresh profile with no history
+HIMALAYAS_MAX_PAGES = 1300  # ~26000 jobs / ~173h (~1 week) — bounds worst-case fetch time (~20 min);
+                             # raised 2026-07-20 for manual --gap-hours catch-up runs (was 300 / ~60h)
 
 
 def himalayas_pages_for_gap(gap_hours: float) -> int:
