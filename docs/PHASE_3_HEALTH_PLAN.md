@@ -42,7 +42,11 @@ sharper every run.
 ### Layer 1 — `core/health.py` (mechanical signals)
 
 Pure `compute_health(runs, active_names, thresholds)` over the telemetry (no I/O — unit-tested).
-Thresholds live in `core/defaults.yaml` under `health:` and resolve per profile.
+Thresholds live in `core/defaults.yaml` under `health:` and are **system-wide + immutable** —
+deliberately not user-configurable and not profile-overridable (detection sensitivity is a
+platform-engineering call; the app exposes the *outcome* — per-board on/off + analytics — never the
+knobs). Current values (Borjan, 2026-07-20): `window 6`, `down_streak 4`, `yield_collapse_factor
+0.15`, `min_baseline 3`, `never_produced_min_runs 4`, `systemic_frac 0.7`, `due_at_sessions 6`.
 
 | Flag | Fires when | Severity |
 |------|-----------|----------|
@@ -69,6 +73,13 @@ alive. **Not** auto-healed: a selector/endpoint that actually changed, activatin
 board, any catalog-structure edit — those are Layer-2 (a wrong auto-edit could silently corrupt
 results).
 
+### Capturing repairs — `HEALTH_LOG.md`
+
+Every Layer-2 review records its findings + the catalog fix it applied in
+**[HEALTH_LOG.md](HEALTH_LOG.md)** (one row per flagged board), so board-rot repair becomes an
+auditable trend instead of tribal knowledge — a board that recurs there is a demotion candidate;
+a signal that keeps mis-firing is a threshold to tune.
+
 ### The hook — `health_review_due` counter
 
 Rides the recompute mechanism: `scan.py` increments a `health_review` counter each run and prints
@@ -80,6 +91,10 @@ wired to run the review and diagnose flagged boards through the catalog + valida
 
 - **Layer 2-runtime** (in-app self-repair on the user's own instance, telemetry-fed precedence) →
   **Phase 4+**; needs the embedded LLM. Spec is in HEALTH_MONITORING.md.
+- **In-app platform settings screen** (per-board analytics, live/off + reason, user re-enable of a
+  descoped board with a health-count restart, descope notification) → **Phase 4** (PROJECT_PLAN §4
+  item 7). Its engine-side "restart a board's health count" primitive is parked until auto-descope
+  exists to create something to restart. Thresholds stay immutable; the app exposes outcomes only.
 - Multi-profile health aggregation (platform-fault vs config-fault) → naturally when multi-profile
   ops arrive; `compute_health` is already per-profile-pure and composable.
 

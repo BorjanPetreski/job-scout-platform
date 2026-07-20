@@ -41,9 +41,11 @@ SEVERITY = {"SYSTEMIC": 0, "SELECTOR_SUSPECT": 1, "DOWN_STREAK": 1,
             "YIELD_COLLAPSE": 2, "NEVER_PRODUCED": 3}
 _SEV_LABEL = {0: "critical", 1: "high", 2: "medium", 3: "low"}
 
+# System-wide + immutable — mirrors core/defaults.yaml `health:` (the fallback when a
+# profile can't load). Not user-configurable by design; see defaults.yaml for the rationale.
 _DEFAULT_TH = {
-    "window": 8, "down_streak": 3, "yield_collapse_factor": 0.25,
-    "min_baseline": 6, "never_produced_min_runs": 4, "systemic_frac": 0.7,
+    "window": 6, "down_streak": 4, "yield_collapse_factor": 0.15,
+    "min_baseline": 3, "never_produced_min_runs": 4, "systemic_frac": 0.7,
 }
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
