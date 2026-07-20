@@ -69,6 +69,13 @@ alive. **Not** auto-healed: a selector/endpoint that actually changed, activatin
 board, any catalog-structure edit — those are Layer-2 (a wrong auto-edit could silently corrupt
 results).
 
+### Capturing repairs — `HEALTH_LOG.md`
+
+Every Layer-2 review records its findings + the catalog fix it applied in
+**[HEALTH_LOG.md](HEALTH_LOG.md)** (one row per flagged board), so board-rot repair becomes an
+auditable trend instead of tribal knowledge — a board that recurs there is a demotion candidate;
+a signal that keeps mis-firing is a threshold to tune.
+
 ### The hook — `health_review_due` counter
 
 Rides the recompute mechanism: `scan.py` increments a `health_review` counter each run and prints
