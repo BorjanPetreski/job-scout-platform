@@ -228,16 +228,20 @@ _ARRANGEMENT_MARKERS = {
     "on_site": (r"\b(on[\s-]?site|in[\s-]?office|from the office|stationary)\b"
                 r"|\b\d+\s*days?\b[^.]{0,20}\b(office|on[\s-]?site|onsite)\b"),
 }
-_LOC_ARR_TAG = re.compile(r"\((remote|hybrid|on[\s-]?site|onsite|stationary)\)")
+_LOC_ARR_TAG = re.compile(r"\((remote|hybrid|on[\s-]?site|onsite|stationary|office)\)")
+_LOC_ARR_TAG_MAP = {"onsite": "on_site", "on-site": "on_site", "on site": "on_site",
+                    "stationary": "on_site", "office": "on_site"}
 
 
 def detect_work_arrangement(loc: str, jd: str) -> set[str]:
     """Return the arrangement(s) a posting states, subset of {remote, hybrid, on_site}.
-    A structured loc tag wins outright; otherwise scan loc+JD for the markers."""
+    A structured loc tag wins outright; otherwise scan loc+JD for the markers.
+    2026-07-19 lesson: JustJoin.it also tags on-site postings "(office)" — a synonym
+    missed on first pass, which let 6 on-site roles leak past a remote-only profile."""
     tag = _LOC_ARR_TAG.search((loc or "").lower())
     if tag:
-        t = tag.group(1).replace("-", "").replace(" ", "")
-        return {{"onsite": "on_site", "stationary": "on_site"}.get(t, t)}
+        t = tag.group(1)
+        return {_LOC_ARR_TAG_MAP.get(t, t)}
     hay = f"{(loc or '').lower()} {(jd or '').lower()}"
     return {name for name, pat in _ARRANGEMENT_MARKERS.items() if re.search(pat, hay)}
 

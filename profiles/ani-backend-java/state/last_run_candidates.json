@@ -104,73 +104,6 @@
    "jd_cache": "state/jd_cache/0fb6e0f4dd99e858.txt"
   },
   {
-   "title": "Backend Developer (K/M)",
-   "company": "Alior Bank SA",
-   "loc": "Warszawa (office)",
-   "url": "https://justjoin.it/job-offer/alior-bank-sa-backend-developer-k-m--warszawa-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T07:00:09.383Z",
-   "salary": null,
-   "jd_text": "Backend Developer (K/M) - Alior Bank SA html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,.",
-   "keyword_matched": "backend developer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "hybrid",
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/4a4545e5440a6412.txt"
-  },
-  {
-   "title": "Senior Backend Developer (K/M)",
-   "company": "Alior Bank SA",
-   "loc": "Kraków (office)",
-   "url": "https://justjoin.it/job-offer/alior-bank-sa-senior-backend-developer-k-m--krakow-java-d66d6404",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T07:00:14.701Z",
-   "salary": null,
-   "jd_text": "Senior Backend Developer (K/M) - Alior Bank SA html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:a",
-   "keyword_matched": "backend developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior",
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "hybrid",
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/908714d02a4870c8.txt"
-  },
-  {
    "title": "Backend Java Developer",
    "company": "Upvanta sp. z o.o.",
    "loc": "Warszawa (remote)",
@@ -952,39 +885,6 @@
    "jd_cache": "state/jd_cache/bd25a68c143f783c.txt"
   },
   {
-   "title": "Full-stack Software Engineer",
-   "company": "H2B Group",
-   "loc": "Gdańsk (office)",
-   "url": "https://justjoin.it/job-offer/h2b-group-full-stack-software-engineer-gdansk-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-18T12:00:21.833Z",
-   "salary": "400-600 eur (b2b)",
-   "jd_text": "Full-stack Software Engineer - H2B Group html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;-webkit-text-size-adjust:100%;}*,*::before,*::after{box-sizing:inherit;}strong,b{font-weight:700;}body{margin:0;color:#1D1B20;font-weight:400;font-size:20px;line-height:32px;letter-spacing:0;font-family:var(--font-inter),sans-serif;text-decoration:none;background-color:#fff;}@media print{body{background-color:#FFFFFF;}}body::backdrop{background-color:#fff;}html,body{margin:0;padding:0;background:#FFFFFF;font-family:var(--font-inter),var(--font-jetbrains-mono),sans-serif;}a{color:inherit;text-decoration:none;}*{box-sizing:border-box;}input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-background-clip:text;}.customScrollbar ::-webkit-scrollbar,.customScrollbar::-webkit-scrollbar{width:6px;height:7px;z-index:2;background-color:#f9f9f9;}.customScrollbar ::-webkit-scrollbar-thumb,.customScrollbar::-webkit-scrollbar-thumb{width:6px;padding:0 4px;border-radius:4px;background-color:rgba(0, 0, 0, 0.6);}.customScrollbar ::-webkit-scrollbar-button,.customScrollbar::-webkit-scrollbar-button{width:0;height:0;display:none;}.sendbird-modal{z-index:1300;}.sendbird-modal__header .sendbird-label{margin-left:32px;}.sendbird-modal__footer{gap:8px;}.sendbird-modal__footer .sendbird-button{border:unset;}.sendbird-modal__footer .sendbird-button:hover,.sendbird-modal__footer .sendbird-button:active,",
-   "keyword_matched": "software engineer",
-   "flags": [],
-   "source_url": null,
-   "jd_status": "fetched_direct",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "employment_detected": [
-    "b2b",
-    "contract",
-    "freelance",
-    "full_time",
-    "internship",
-    "part_time"
-   ],
-   "work_arrangement_detected": [
-    "hybrid",
-    "on_site",
-    "remote"
-   ],
-   "jd_cache": "state/jd_cache/a62868884346599c.txt"
-  },
-  {
    "title": "(Senior) Java Developer - Freelance",
    "company": "Netguru",
    "loc": "Poznań (remote)",
@@ -1257,28 +1157,6 @@
    ]
   },
   {
-   "title": "Senior Backend Developer (K/M)",
-   "company": "Alior Bank SA",
-   "loc": "Kraków (office)",
-   "url": "https://justjoin.it/job-offer/alior-bank-sa-senior-backend-developer-k-m--krakow-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-19T08:00:24.323Z",
-   "salary": null,
-   "jd_text": null,
-   "keyword_matched": "backend developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "read_cap_deferred",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior"
-  },
-  {
    "title": "Senior Java Developer - FIX Protocol",
    "company": "Future Processing",
    "loc": "Gliwice (remote)",
@@ -1454,28 +1332,6 @@
    "work_arrangement_detected": [
     "remote"
    ]
-  },
-  {
-   "title": "Senior Java Developer - Employee-facing Platforms",
-   "company": "emagine Polska",
-   "loc": "Fredericia (office)",
-   "url": "https://justjoin.it/job-offer/emagine-polska-senior-java-developer---employee-facing-platforms-fredericia-java",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-19T12:00:12.397Z",
-   "salary": null,
-   "jd_text": null,
-   "keyword_matched": "java developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "read_cap_deferred",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior"
   },
   {
    "title": "Senior Java Engineer (FX Trading Systems)",
@@ -1767,28 +1623,6 @@
    "work_arrangement_detected": [
     "remote"
    ]
-  },
-  {
-   "title": "Senior Backend Developer (K/M)",
-   "company": "Alior Bank SA",
-   "loc": "Warszawa (office)",
-   "url": "https://justjoin.it/job-offer/alior-bank-sa-senior-backend-developer-k-m--warszawa-java-1e9c0a9e",
-   "platform": "JustJoin.it",
-   "posted_at": "2026-07-19T15:00:13.921Z",
-   "salary": null,
-   "jd_text": null,
-   "keyword_matched": "backend developer",
-   "flags": [
-    "seniority_off_target"
-   ],
-   "source_url": null,
-   "jd_status": "read_cap_deferred",
-   "link_status": "✅ live",
-   "salary_assessment": {
-    "status": "unparseable",
-    "detail": "no parseable salary; apply estimation heuristics"
-   },
-   "seniority_detected": "senior"
   },
   {
    "title": "Architekt IT / Lead Java Developer (AI) (k/m/n)",
@@ -2917,10 +2751,11 @@
   "us_only": 1,
   "stale": 1,
   "employment_mismatch": 3,
-  "work_arrangement": 142,
+  "work_arrangement": 148,
   "language_mismatch": 2
  },
  "drop_nudges": [
   "work_arrangement dropped 142/260 (55%) — if unexpected, consider relaxing this hard filter (flag instead of drop)"
- ]
+ ],
+ "dropped_by_office_tag_fix": 6
 }
