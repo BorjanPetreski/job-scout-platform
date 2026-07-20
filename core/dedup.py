@@ -35,6 +35,9 @@ import paths
 
 LEGAL_SUFFIXES = re.compile(
     r"\b(gmbh|ltd|inc|llc|s\.?a\.?|s\.?r\.?l\.?|d\.?o\.?o\.?|b\.?v\.?|a\.?g\.?|"
+    # Polish forms (JustJoin.it etc.): 'Sp. z o.o.' (LLC) incl. the combined
+    # 'Sp. z o.o. Sp. k.' via the stacked-strip loop, plus 'Sp. k.'/'Sp. j.'.
+    r"sp\.?\s*z\s*o\.?\s*o\.?|sp\.?\s*[kj]\.?|"
     r"corp(oration)?|co|plc|limited|group|holdings?)\.?$",
     re.IGNORECASE,
 )
@@ -54,10 +57,10 @@ def norm_company(company: str) -> str:
 
 
 def norm_url(url: str) -> str:
-    u = (url or "").strip().lower().rstrip("/")
+    u = (url or "").strip().lower()
     u = re.sub(r"^https?://(www\.)?", "", u)
     u = re.sub(r"[?#].*$", "", u)  # tracking params never distinguish postings
-    return u
+    return u.rstrip("/")  # drop the trailing slash AFTER the query, so '/job/?x' == '/job'
 
 
 def make_key(company: str, role: str, locdom: str) -> str:
