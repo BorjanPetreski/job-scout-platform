@@ -446,7 +446,13 @@ HARVEST_SPECS: dict[str, dict] = {
     "wttj": {"href": r"/en/companies/[^/]+/jobs/[^/]+", "base": "https://www.welcometothejungle.com", "company_idx": 3},
     "nodesk": {"href": r"/remote-jobs/[a-z0-9-]+/?", "base": "https://nodesk.co", "min_hyphens": 3},
     "dynamite": {"href": r"(?:https://dynamitejobs\.com)?/company/[^/]+/remote-job/[\w-]+/?", "base": "https://dynamitejobs.com", "company_idx": 2},
-    "justremote": {"href": r"/remote-jobs/[a-z-]+/[\w-]+", "base": "https://justremote.co"},
+    # 2026-07-20: site redesign — postings now render client-side (headless already handles
+    # that) under a RELATIVE href (no leading slash, no "/remote-jobs/" prefix):
+    # "remote-manager-exec-jobs/product-owner-d365-finance-operations-nutrafol-8ab854..."
+    # instead of the old absolute "/remote-jobs/{category}/{slug}". min_hyphens=2 keeps out
+    # nav noise like "remote-jobs/new" (the "post a job" link, slug "new" has 0 hyphens).
+    "justremote": {"href": r"[a-z]+(?:-[a-z]+)*-jobs/[\w-]+", "base": "https://justremote.co",
+                   "min_hyphens": 2},
     "landing-jobs": {"href": r"(?:https://landing\.jobs)?/at/[^/]+/[\w-]+", "base": "https://landing.jobs", "company_idx": 2},
     "crossover": {"href": r"/jobs/\d+/[\w-]+/[\w-]+", "base": "https://www.crossover.com", "company_idx": 3},
     # Phase 2 niche boards — smoke-tested live 2026-07-17 (SSR HTML, harvestable):
