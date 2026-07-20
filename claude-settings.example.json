@@ -23,7 +23,6 @@
       "Grep",
       "Glob",
       "Edit(./profiles/**/state/**)",
-      "Write(./profiles/**/state/**)",
       "WebFetch",
       "WebSearch"
     ]
