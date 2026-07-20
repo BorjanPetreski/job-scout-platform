@@ -68,3 +68,26 @@ When a user declares a new hard constraint the app doesn't ship a control for:
   reasons (US-only / PL-hybrid / Polish-only / auth-walled). The funnel was healthy; the market was thin.
   The telemetry above now makes that distinction visible on every run (mechanical drops vs. thin market).
 </content>
+
+## Post-merge finding (2026-07-20 overnight judgment pass) — JD extraction hides real content
+
+**Severity: high, not yet fixed.** While manually judging tonight's captured candidates, found
+that `core/fetch_boards.py`'s JustJoin.it fetch captures the FULL rendered page (~700KB), and
+the cached/scanned `jd_text` field is only the first 1500 characters of it — which on JustJoin.it
+is **entirely CSS/framework boilerplate**. The real job description (Requirements/Responsibilities/
+Job description) sits ~240,000+ characters into the raw fetch, far past what any text-based
+detector reads. Confirmed empirically: **15/25 (60%) of Ani's fully-fetched JJIT candidates and
+9/19 (47%) of borjan-pm's were actually Polish-language postings** that `language_flag()` never
+saw — it was scoring 1500 chars of CSS, not the real (often Polish) content. Likely also degrades
+stack-keyword/salary-regex signal quality on this platform (a manual keyword search over the
+scanned field found zero stack hits across 25 candidates that, once read properly, were full of
+Spring/Kafka/Docker/K8s mentions).
+
+**Not fixed tonight** — this is a fetch/extraction-layer change (likely `render.py` or
+`fetch_boards.py` needs a real content selector for JustJoin.it's SPA output, not a` `text[:1500]`
+truncation), too large to make safely unattended overnight. **Worked around manually**: read the
+full cached JD past the CSS block for tonight's judgment pass and hand-dropped the confirmed-Polish
+ones (`docs/PROGRESS.md` 2026-07-20 row has the count). **Next session: fix the extraction so
+`jd_text` (or at least the text handed to `language_flag`/keyword detectors) is the real content,
+not framework CSS** — this single fix would likely raise `language_mismatch` detection accuracy
+dramatically for JustJoin.it, the platform's Tier-1 highest-volume source for both profiles.
