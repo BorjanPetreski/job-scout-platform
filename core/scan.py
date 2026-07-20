@@ -448,6 +448,19 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
 
     sources_down = [r["platform"] for r in results if r["source_down"]]
     notes = {r["platform"]: r["note"] for r in results if r["note"]}
+    # Per-platform health telemetry (HEALTH_MONITORING.md Layer 1): raw enumeration count +
+    # whether the board actually answered (http_ok). `http_ok` is what lets health.py tell a
+    # silent selector break (200 + HTML, 0 rows) apart from a plain outage. Recorded per run so
+    # a baseline accrues the moment a board goes active. `healed` surfaces Layer-1.5 recoveries.
+    platform_stats = {
+        r["platform"]: {
+            "raw": len(r.get("candidates") or []),
+            "source_down": bool(r["source_down"]),
+            "http_ok": bool(r.get("http_ok", not r["source_down"])),
+        }
+        for r in results
+    }
+    healed = {r["platform"]: r["healed"] for r in results if r.get("healed")}
 
     # ---- triage: keyword filter → freshness → dedup → hard filters
     new_cands, dropped, link_dead = [], 0, 0
@@ -742,12 +755,20 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         "ran_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "platforms_covered": [r["platform"] for r in results if not r["source_down"]],
         "sources_down": sources_down,
+        "platform_stats": platform_stats,
+        "healed": healed,
         "new": len(survivors), "dropped": dropped, "link_dead": link_dead,
         "funnel_in": funnel_in, "drop_by_param": drop_by_param, "drop_nudges": drop_nudges,
         "sweep": sweep_counts, "reconcile": reconcile,
         "half": half, "full_sweep": full_sweep,
     }
     runs["recompute"]["sessions_since"] = runs["recompute"].get("sessions_since", 0) + 1
+    # health-review counter (HEALTH_MONITORING.md): rides the same mechanism as recompute — the
+    # scan prints "⚠ platform health review due" every N sessions, which is Claude's cue to run
+    # core/health.py and diagnose flagged boards (Layer 2). core/health.py acks it (resets to 0).
+    hr = runs.setdefault("health_review", {"last": today, "sessions_since": 0,
+                                           "due_at_sessions": cfg.get("health", {}).get("due_at_sessions", 6)})
+    hr["sessions_since"] = hr.get("sessions_since", 0) + 1
     runs_path.write_text(json.dumps(runs, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # ---- ledger print (replaces the 20-item chat checklist; partial-labeled-partial)
@@ -761,6 +782,9 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     covered = [r["platform"] for r in results if not r["source_down"]]
     print(f"covered ({len(covered)}): {', '.join(covered)}")
     print(f"sources down: {', '.join(sources_down) if sources_down else 'none'}")
+    # honest-failure floor: a heal is always reported, never a silent paper-over (Layer 1.5)
+    for plat, hlist in healed.items():
+        print(f"  ✚ healed[{plat}]: {'; '.join(hlist)}")
     for name, why in (cfg.get("skipped_platforms") or {}).items():
         print(f"  ⏭ skipped[{name}]: {why}")
     for plat, note in notes.items():
@@ -788,6 +812,9 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     if rc["sessions_since"] >= rc.get("due_at_sessions", 5):
         print(f"⚠ tier recompute due: {rc['sessions_since']} sessions since {rc['last']} "
               "(data session with the user — not automated)")
+    if hr["sessions_since"] >= hr.get("due_at_sessions", 6):
+        print(f"⚠ platform health review due: {hr['sessions_since']} sessions since {hr['last']} "
+              "(run `python3 core/health.py` and diagnose flagged boards)")
     print(f"candidates JSON: {out_path.relative_to(paths.REPO_ROOT)}")
     return {"new": len(survivors), "dropped": dropped, "link_dead": link_dead,
             "sweep": sweep_counts, "sources_down": sources_down}

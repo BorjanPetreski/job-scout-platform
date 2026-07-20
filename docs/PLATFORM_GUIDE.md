@@ -67,7 +67,7 @@ The road there is staged so every phase ships something genuinely usable on its 
 | 4 | **Companion app** — screens instead of conversation, wrapping the same engine via the Claude Agent SDK | after 2/3 |
 | 5 | The laptop + mobile platform (accounts, hosted scanning) | vision |
 
-## 4. What has been built (Phases 0–3a)
+## 4. What has been built (Phases 0–3a + platform health)
 
 ### Phase 0 — the plan (2026-07-13)
 
@@ -173,6 +173,30 @@ already applied to** (no wasted re-apply) and, on another, opened the applicatio
 disqualifiers the JD had hidden** (a Poland-only location field, a German-language requirement) plus
 his own gambling no-go — steering him away from a bad fit. That's the companion earning its keep on
 day one.
+
+### Interstitial — Platform Health & Self-Healing (2026-07-20)
+
+Job boards rot. Over months they change their HTML, move endpoints, rename categories, or add
+bot-walls — and coverage quietly erodes until a whole stream stops producing and nobody notices.
+The engine already **fails honest, never silent** (a board that fails is named in `sources down`,
+never counted as covered), but one failure mode slipped through: a board that returns a normal
+`200 OK` page yet parses to **zero jobs** because its markup changed — it *looks* fine, so it hid.
+
+This build makes the engine **watch its own health**. Every scan now records, per board, how many
+jobs it produced and whether it actually answered — so a **silent selector break** (answered fine,
+parsed nothing, used to parse plenty) becomes visible. A small mechanical tool (`core/health.py`)
+reads that history and flags boards on trend: reached-but-empty, down several runs in a row, yield
+collapsed far below normal, never produced anything, or *everything* at zero at once (which means a
+network problem, not board rot). Same split as the scan itself — **scripts flag, Claude decides**:
+the tool only flags; a human-in-the-loop review diagnoses the real cause and fixes the catalog
+through the validator, never by hand-editing the scanner.
+
+Two things also heal **during** the scan, automatically and bounded: a transient network blip is
+retried, and a board that blocks the plain request is retried through a real browser. Every such
+recovery is **reported** on the ledger (`✚ healed[…]`) — the engine never papers over rot silently.
+A counter nudges "platform health review due" every few sessions, the cue to run the check. (The
+next step — the shipped *app* repairing itself on your own machine, instantly — waits for Phase 4,
+when the app embeds the AI.)
 
 ## 5. How it works — a scan's life in plain language
 

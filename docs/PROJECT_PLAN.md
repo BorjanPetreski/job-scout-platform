@@ -260,6 +260,17 @@ the time-series, Phase 5 extends monitoring to every new integration/connector. 
 standard pipeline (brainstorm → detailed plan → Fable 5 gate → Opus 4.8 build); prime directive
 holds (repairs land in the catalog through CI, never ad-hoc scanner edits).
 
+> **🟡 Near-term build LANDED (2026-07-20): Layers 1 + 1.5 + the Layer-2 cue shipped.**
+> `core/health.py` (pure `compute_health()` → SELECTOR_SUSPECT / DOWN_STREAK / YIELD_COLLAPSE /
+> NEVER_PRODUCED / SYSTEMIC), the per-platform health telemetry it reads (`platform_stats` with
+> `raw` + `http_ok` in `runs.json`, so the silent 200-parses-0 selector break is now visible),
+> in-scan self-healing (retry-with-backoff + direct→headless escalation, always reported as
+> `✚ healed[…]`), the `health_review_due` counter, the `job-scout-run` skill wiring for the
+> Layer-2 diagnose-and-repair review, and a `tests/unit_health.py` behavioral suite. Detailed
+> build record: **[PHASE_3_HEALTH_PLAN.md](PHASE_3_HEALTH_PLAN.md)**. Layer-2-runtime (in-app
+> self-repair on the user's own instance) stays deferred to **Phase 4+** — it needs the embedded
+> LLM. Additive: `borjan-pm` resolved config + what the scan resolves/scans are unchanged.
+
 ### Phase 4 — The app + client-side store
 
 **Goal:** what Phases 2–3 do conversationally, done through screens — for users who will

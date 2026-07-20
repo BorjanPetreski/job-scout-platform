@@ -68,9 +68,32 @@ def _polite(url: str, min_delay: float = 1.0) -> None:
         time.sleep(wait)
 
 
-def _get(url: str, timeout: int = 25, **kw) -> requests.Response:
-    _polite(url)
-    return requests.get(url, headers=HEADERS, timeout=timeout, **kw)
+# Self-healing (HEALTH_MONITORING.md Layer 1.5): retry-with-backoff on *transient*
+# failures only — connection resets, timeouts, and 429/5xx (a busy or flaky server).
+# Bounded and polite (each retry re-enters _polite), so it recovers a blip without
+# reading as scraping. A 4xx other than 429 is NOT transient (the board answered — a
+# real endpoint/auth/selector problem for Layer 2), so we never retry those.
+_TRANSIENT_EXC = (requests.exceptions.ConnectionError, requests.exceptions.Timeout)
+_RETRY_STATUS = {429, 500, 502, 503, 504}
+
+
+def _get(url: str, timeout: int = 25, retries: int = 2, **kw) -> requests.Response:
+    last_exc: Exception | None = None
+    for attempt in range(retries + 1):
+        _polite(url)
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=timeout, **kw)
+        except _TRANSIENT_EXC as exc:
+            last_exc = exc
+            if attempt < retries:
+                time.sleep(2 * (attempt + 1))  # 2s, 4s — bounded backoff
+                continue
+            raise
+        if r.status_code in _RETRY_STATUS and attempt < retries:
+            time.sleep(2 * (attempt + 1))
+            continue
+        return r
+    raise last_exc  # unreachable, but keeps the type checker honest
 
 
 def _cand(title, company, loc, url, platform, posted_at=None, salary=None, jd=None) -> dict:
@@ -86,12 +109,23 @@ def _cand(title, company, loc, url, platform, posted_at=None, salary=None, jd=No
     }
 
 
-def _ok(platform: str, candidates: list[dict], note: str = "") -> dict:
-    return {"platform": platform, "candidates": candidates, "source_down": False, "note": note}
+# `http_ok` — did the board actually answer (HTTP 200 with a real body)? This is the
+# axis health.py needs to separate the SILENT SELECTOR BREAK from a plain outage:
+#   source_down=True,  http_ok=False → couldn't reach it (DOWN_STREAK territory)
+#   source_down=True,  http_ok=True  → reached 200 but parsed 0 rows (SELECTOR_SUSPECT)
+#   source_down=False                → produced candidates / clean API response
+# `healed` — human-readable notes on what Layer-1.5 self-healing recovered this fetch
+# ("recovered via headless", …), so a heal is always REPORTED, never a silent paper-over.
+def _ok(platform: str, candidates: list[dict], note: str = "",
+        http_ok: bool = True, healed: list[str] | None = None) -> dict:
+    return {"platform": platform, "candidates": candidates, "source_down": False,
+            "note": note, "http_ok": http_ok, "healed": healed or []}
 
 
-def _down(platform: str, note: str) -> dict:
-    return {"platform": platform, "candidates": [], "source_down": True, "note": note}
+def _down(platform: str, note: str, http_ok: bool = False,
+          healed: list[str] | None = None) -> dict:
+    return {"platform": platform, "candidates": [], "source_down": True,
+            "note": note, "http_ok": http_ok, "healed": healed or []}
 
 
 def _text_of(html_fragment: str) -> str:
@@ -365,7 +399,9 @@ def fetch_deel(p: dict, cfg: dict) -> dict:
                                p["name"], updated.group(1) if updated else None,
                                comp.group(1) if comp else None))
     if not cands:
-        return _down(p["name"], "careers-page JSON parse yielded 0 jobs (layout drifted?)")
+        # careers page loaded (200) but the embedded-JSON parse found nothing — selector drift
+        return _down(p["name"], "careers-page JSON parse yielded 0 jobs (layout drifted?)",
+                     http_ok=True)
     return _ok(p["name"], cands, "careers-page embedded JSON (Ashby API disabled by Deel)")
 
 
@@ -391,7 +427,8 @@ def fetch_wwr(p: dict, cfg: dict) -> dict:
         cands.append(_cand(role.strip(), company.strip(), region, tag("link"), p["name"],
                            tag("pubDate"), None, _text_of(tag("description"))[:5000] or None))
     if not cands:
-        return _down(p["name"], "RSS parsed to 0 items")
+        # reached the feed (200) but parsed nothing — the silent-break shape, not an outage
+        return _down(p["name"], "RSS parsed to 0 items", http_ok=True)
     return _ok(p["name"], cands, "all-jobs RSS (cross-category inherent)")
 
 
@@ -463,34 +500,50 @@ def fetch_html_listing(p: dict, cfg: dict, headless: bool = False) -> dict:
     if not urls:
         return _down(p["name"], "no listing urls configured")
     all_cands: dict[str, dict] = {}
-    notes = []
+    notes: list[str] = []
+    healed: list[str] = []
+    reached_200 = False  # any URL returned a 200 body (direct or headless) → http_ok
     for u in urls:
         html = ""
+        direct_ok = False
         if not headless:
             try:
                 r = _get(u)
                 if r.status_code == 200:
-                    html = r.text
+                    html, direct_ok, reached_200 = r.text, True, True
                 else:
                     notes.append(f"HTTP {r.status_code} on {u}")
             except Exception as exc:
                 notes.append(f"{type(exc).__name__} on {u}")
         if not html or slug not in HARVEST_SPECS or not _harvest_links(html, slug, p["name"]):
-            # direct failed or produced nothing harvestable → headless render
+            # direct failed or produced nothing harvestable → headless render (Layer-1.5 heal:
+            # escalate direct→headless when a board blocks or JS-gates the plain request)
             try:
                 import render
 
-                html = render.render(u) or html
-                if html:
-                    notes.append(f"headless render used for {u}")
+                rendered = render.render(u)
+                if rendered:
+                    reached_200 = True
+                    # only a *heal* when headless was an ESCALATION (direct was tried and
+                    # didn't produce) — not when headless is the board's configured first choice
+                    if not headless and not direct_ok:
+                        healed.append(f"recovered via headless: {u}")
+                    html = rendered
+                elif not html:
+                    notes.append(f"headless render empty for {u}")
             except Exception as exc:
                 notes.append(f"render {type(exc).__name__} on {u}")
         if html and slug in HARVEST_SPECS:
             for c in _harvest_links(html, slug, p["name"]):
                 all_cands.setdefault(c["url"], c)
+    if healed:
+        notes.append("healed: " + "; ".join(healed))
     if not all_cands:
-        return _down(p["name"], "; ".join(notes) or "no candidates harvested")
-    return _ok(p["name"], list(all_cands.values()), "; ".join(notes))
+        # reached_200 with 0 harvested is the SILENT SELECTOR BREAK (http_ok=True); a pure
+        # connectivity failure (never got a body) is a plain outage (http_ok=False).
+        return _down(p["name"], "; ".join(notes) or "no candidates harvested",
+                     http_ok=reached_200, healed=healed)
+    return _ok(p["name"], list(all_cands.values()), "; ".join(notes), healed=healed)
 
 
 # ----------------------------------------------------------- JD fetch + mirrors
