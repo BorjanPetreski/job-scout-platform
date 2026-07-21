@@ -81,6 +81,21 @@ platforms:
     tier_default: 3
     active: true
     fetch_mode: direct
+    # region_urls: per-region URL variants (2026-07-21, manual platform audit) — resolved
+    # per-profile in profile_loader.region_url_patterns() against search.regions_acceptable,
+    # preferring worldwide when the profile accepts it (broadest; downstream per-posting
+    # filters do the real narrowing — travel/us_only/closed_location_list etc.). A profile
+    # with no regions_acceptable at all falls back to plain url_patterns below, unchanged.
+    # worldwide = the bare /remote-jobs/{category} page (no location prefix) — a materially
+    # BIGGER, separate listing from the emea one, not just a superset view of it (verified
+    # live: project-manager emea=156 vs worldwide=1,648). A category slug with no dedicated
+    # worldwide landing page (agile-delivery-manager) 301s to /search-offers?role=...; `_get`
+    # follows redirects transparently so this needs no special-casing.
+    region_urls:
+      worldwide:
+        - "https://jobgether.com/remote-jobs/{category}"
+      emea:
+        - "https://jobgether.com/remote-jobs/emea/{category}"
     url_patterns:
       - "https://jobgether.com/remote-jobs/emea/{category}"
     categories:
@@ -91,13 +106,24 @@ platforms:
     expired_markers: ["This offer is no longer available"]
     quirks: >-
       Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no
-      retry. FIXED 2026-07-21 (manual platform audit): listing pages paginate at 50/page —
-      borjan-pm's emea/project-manager category alone carries 156 live postings across 4
-      pages, but the generic single-fetch harvester only ever saw page 1 (a 3x undercount for
-      any category exceeding 50; scrum-master/agile-delivery-manager stayed under 50 and were
-      unaffected). Dedicated fetch_jobgether() now discovers the real page count from the
-      listing page's embedded Next.js RSC payload and walks ?page=N to the end. Verified
-      live: raw jumped from 66 -> 169 across the 3 categories.
+      retry. FIXED 2026-07-21 (manual platform audit, 2 rounds): (1) listing pages paginate
+      at 50/page — a single category can carry 1,000+ live postings, but the generic
+      single-fetch harvester only ever saw page 1. Dedicated fetch_jobgether() walks
+      ?page=N until a page stops adding new links (jobgether_should_continue) — NOT by
+      trusting the site's own total/maxPages counters, both proven unreliable live
+      (maxPages undercounts the worldwide listing's real page count, 10 vs a confirmed 33;
+      total was flat-out wrong for scrum-master, reporting 134,141 — a site-side bug, not a
+      real count). Capped at JOBGETHER_MAX_PAGES=40/category (~2000 jobs) — a full
+      borjan-pm Jobgether fetch (3 categories, worldwide) now takes ~75-80s, up from
+      near-instant at the old single-page-per-category volume; worth knowing if scan
+      wall-clock time starts to matter. (2) Switched borjan-pm (and any profile whose
+      search.regions_acceptable includes worldwide) from the EMEA-only listing to the
+      worldwide one via the new region_urls mechanism (see above) — the two are NOT nested
+      supersets, they're separately-served listings (verified live: project-manager
+      emea=156 vs worldwide=1,648). Verified live end-to-end: borjan-pm raw 66 -> 3,530
+      across the 3 categories, sampled titles genuinely on-topic ("Senior Project Manager",
+      "Principal Project Manager - Microsoft", etc.) — downstream keyword/region filters
+      (already proven on Himalayas/WWR's broad-fetch pattern) do the real narrowing.
     notion_platform_name: { tracker: "Jobgether", passed_seen: "Jobgether" }
 
   - id: 3

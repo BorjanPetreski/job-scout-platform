@@ -638,23 +638,23 @@ def fetch_html_listing(p: dict, cfg: dict, headless: bool = False, scroll_rounds
     return _ok(p["name"], list(all_cands.values()), "; ".join(notes), healed=healed)
 
 
-# Jobgether embeds a Next.js RSC payload on every listing page carrying the real
-# total/limit/maxPages for that query, e.g. `"total":[0,156],"skip":[0,0],"limit":[0,50],
-# "page":[0,1],"maxPages":[0,4]` (HTML-entity-escaped in the raw response: &quot; not ").
-_JOBGETHER_PAGE_RE = re.compile(
-    r'&quot;total&quot;:\[0,(\d+)\],&quot;skip&quot;:\[0,\d+\],'
-    r'&quot;limit&quot;:\[0,(\d+)\],&quot;page&quot;:\[0,\d+\],&quot;maxPages&quot;:\[0,(\d+)\]'
-)
-JOBGETHER_MAX_PAGES = 20  # safety ceiling; observed maxPages in practice is single digits
+JOBGETHER_MAX_PAGES = 40  # safety ceiling (2000 jobs/category @ 50/page) — see jobgether_should_continue
 
 
-def jobgether_max_pages(html: str) -> int | None:
-    """Pure extraction of the real page count from a Jobgether listing page's embedded RSC
-    payload (unit-tested in isolation from the HTTP fetch, same split as
-    himalayas_pages_for_gap). Returns None if the payload shape isn't found (site change) —
-    the caller then falls back to a single-page harvest rather than guessing."""
-    m = _JOBGETHER_PAGE_RE.search(html)
-    return min(int(m.group(3)), JOBGETHER_MAX_PAGES) if m else None
+def jobgether_should_continue(harvested_this_page: int, new_this_page: int, page: int) -> bool:
+    """Pure stop-rule for Jobgether pagination (unit-tested in isolation from the HTTP
+    fetch, same split as himalayas_pages_for_gap): keep going only while a page still
+    returns SOME content and at least one link not already collected.
+
+    Deliberately ignores Jobgether's own embedded total/maxPages counters (2026-07-21
+    manual platform audit) — both proved independently unreliable: `maxPages` undercounts
+    a large worldwide listing's real page count (claimed 10, real content ran non-
+    overlapping through page 33 for `project-manager`, confirmed empty at 34), and `total`
+    is flat-out wrong for some category slugs (a `scrum-master` fetch reported 134,141
+    total jobs against ~50 real links per page — clearly a site-side bug, not a real
+    count). Real page content — did this page have anything, and was any of it new — is
+    the only signal that held up under manual live verification."""
+    return page < JOBGETHER_MAX_PAGES and harvested_this_page > 0 and new_this_page > 0
 
 
 def fetch_jobgether(p: dict, cfg: dict) -> dict:
@@ -662,13 +662,13 @@ def fetch_jobgether(p: dict, cfg: dict) -> dict:
     ever fetches page 1 — invisible whenever a category's real inventory exceeds 50.
 
     Found 2026-07-21 (manual platform audit): borjan-pm's `emea/project-manager` category
-    reports 156 live postings across 4 pages; page 1 alone surfaces ~50 (a 3x undercount for
-    that category, though `scrum-master`/`agile-delivery-manager` stayed under 50 and were
-    unaffected). Each listing page's HTML embeds a Next.js RSC payload with the query's real
-    total/limit/maxPages; page 1 discovers the page count, then `?page=N` walks the rest
-    (verified live: pages 2-4 returned distinct, non-overlapping links summing to exactly the
-    reported total of 156). Falls back to a single-page harvest if the payload shape isn't
-    found (site change) — degrades honestly like fetch_html_listing, never crashes.
+    alone carries 156 live postings across multiple pages; page 1 alone surfaces ~50 (a 3x
+    undercount for any category exceeding 50). Walks `?page=N` until a page stops adding
+    anything new (jobgether_should_continue), capped at JOBGETHER_MAX_PAGES. A redirecting
+    category (e.g. `agile-delivery-manager` 301s to `/search-offers?role=...` for the
+    worldwide/no-region-prefix variant) is handled for free — `requests` follows the
+    redirect transparently and harvesting/pagination proceeds against whatever page it
+    lands on.
     """
     urls = p.get("urls") or []
     slug = p.get("slug", "")
@@ -687,13 +687,14 @@ def fetch_jobgether(p: dict, cfg: dict) -> dict:
             notes.append(f"HTTP {r.status_code} on {u}")
             continue
         reached_200 = True
-        for c in _harvest_links(r.text, slug, p["name"]):
+        before = len(all_cands)
+        harvested = _harvest_links(r.text, slug, p["name"])
+        for c in harvested:
             all_cands.setdefault(c["url"], c)
-        max_pages = jobgether_max_pages(r.text)
-        if max_pages is None:
-            continue
+        page = 1
         sep = "&" if "?" in u else "?"
-        for page in range(2, max_pages + 1):
+        while jobgether_should_continue(len(harvested), len(all_cands) - before, page):
+            page += 1
             try:
                 r2 = _get(f"{u}{sep}page={page}")
             except Exception as exc:
@@ -702,7 +703,9 @@ def fetch_jobgether(p: dict, cfg: dict) -> dict:
             if r2.status_code != 200:
                 notes.append(f"HTTP {r2.status_code} on page {page} of {u}, partial")
                 break
-            for c in _harvest_links(r2.text, slug, p["name"]):
+            before = len(all_cands)
+            harvested = _harvest_links(r2.text, slug, p["name"])
+            for c in harvested:
                 all_cands.setdefault(c["url"], c)
     if not all_cands:
         return _down(p["name"], "; ".join(notes) or "no candidates harvested", http_ok=reached_200)
