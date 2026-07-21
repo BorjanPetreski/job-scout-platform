@@ -92,3 +92,18 @@ happen every session — the parts that quietly rot if left to memory.
   not — before moving on, and an already-"good enough" board gets reopened if the check finds
   something. Full protocol + the pattern checklist: `docs/HEALTH_LOG.md` "How a review works"
   step 5.
+  ## Compact Instructions
+Always preserve:
+1. Full test/output logs from the last task executed.
+2. Key architectural decisions, current branch goals, pending TODOs, and active test failures.
+3. Active branch name and target goals.
+Always drop:
+1.Raw build logs, long cat outputs, passing test outputs, preceeding file reads and historical trial-and-error diffs.
+Summarize chat history down to core architectural decisions.
+
+## Autonomous Execution Guardrails
+- **Verification First:** Before making multi-file changes, state the plan in 3 bullets and wait for human confirmation.
+- **Terminal Output Limit:** Never pipe full raw logs into chat; redirect large logs to `.claude/logs/` and read only the error stack.
+- **Subagent Policy:** Use subagents ONLY for isolated research/codebase reads. Do not spawn subagents to run nested edits.
+
+
