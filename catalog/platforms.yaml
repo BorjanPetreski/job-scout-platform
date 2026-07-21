@@ -144,7 +144,18 @@ platforms:
     categories:
       project-management: management-operations
       software-engineering: development
-    categories_verify_at_setup: [software-engineering]
+      data: data-analyst
+      design-ux: design
+      marketing: marketing
+      people-hr: hr-recruiter
+      content-writing: writing-editing
+      sales: business-development
+      it-support: [customer-support, technical-support]
+      # No ai-ml or qa mapping — Dynamite's ~19 parent categories (see comment above) have
+      # no clean match for either; a real platform-side coverage gap, not a config omission.
+    # No categories_verify_at_setup: every stream above was live-verified 2026-07-21 (this
+    # audit) via the sitemap directly — real HTTP 200s, plausible per-category posting
+    # counts (22-183), and sample titles spot-checked as genuinely on-topic.
     mirrors: []
     expired_markers: ["This job is no longer available"]
     quirks: >-
@@ -162,7 +173,13 @@ platforms:
       (vs. the old ~16 batch-limited/wrong-page render). Location is a client-side-only UI
       filter (confirmed: selecting it doesn't change the URL) — no server-side location
       param exists to fetch narrower by region; the profile's own location/region filters
-      handle that downstream, same as every other broad-category board.
+      handle that downstream, same as every other broad-category board. EXPANDED same day
+      (Borjan: "is this fixed for all templates/roles?" -> the sitemap-driven rebuild only
+      covered the 2 streams already wired; found Dynamite has ~19 parent categories with
+      clean matches for several more MK templates that had zero Dynamite coverage before —
+      wired data/design-ux/marketing/people-hr/content-writing/sales/it-support, each
+      live-verified (22-183 postings, sample titles on-topic). No ai-ml or qa match exists
+      on the platform — genuine gap, not fixable via config.
     notion_platform_name: { tracker: "Dynamite Jobs", passed_seen: "Dynamite Jobs" }
 
   - id: 4
