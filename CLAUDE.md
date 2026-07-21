@@ -40,14 +40,31 @@ happen every session — the parts that quietly rot if left to memory.
    a rewrite-everything pass — fix what's actually wrong, don't invent scope. No hook enforces
    this (unlike #1's GUIDED-FLOW nudge — "did this PR restructure core/ logic?" isn't
    mechanically detectable); treat it as part of done the same way.
-5. **No PII in the repo** — no CV body facts, emails, phone numbers, or addresses (the 3a.8
+5. **Broader architecture review — periodic, not per-PR (scheduled check).** DoD #4 is a
+   per-PR spot-check on the diff in front of you; some architectural quality dimensions never
+   show up in any single diff (module boundaries growing too large, coupling drifting, a
+   design pattern applied inconsistently across the codebase, extensibility eroding) and only
+   surface from a full-codebase pass. At natural checkpoints — a phase closing, or roughly
+   every 10 sessions that touched `core/` since the last full pass, whichever comes first —
+   **ask whether one is due.** Running it is a judgment call weighed against real cost/benefit
+   (a quiet, small, or recently-reviewed codebase may not need one) — never automatic busywork
+   for its own sake. When due and worth it: scope + run it as its OWN dedicated session (never
+   squeezed into an unrelated PR), scope and status tracked in
+   `docs/ARCHITECTURE_QUALITY_SCOPE.md` so each pass picks up where the last one left off
+   instead of re-scoping from scratch or silently re-covering the same ground. Same discipline
+   as #4 applies to the pass itself: verify every finding against the real code before acting,
+   fix what's proportionate, seed the rest (#8 below) rather than force it into one session. No
+   hook enforces the cadence (a "sessions since" counter isn't something this file's static
+   text can track); treat "is one due" as part of done the same way as #4 — a judgment call,
+   but a CHECKED one, not a skipped one.
+6. **No PII in the repo** — no CV body facts, emails, phone numbers, or addresses (the 3a.8
    no-PII denylist enforces the binding files; keep it true everywhere).
-6. **Capture build-method lessons (the meta-layer).** Assess whether this session taught something
+7. **Capture build-method lessons (the meta-layer).** Assess whether this session taught something
    reusable about *how to build apps* — a pattern, discipline, or pitfall that is **product-agnostic**
    (not job-scout-specific). If it's valuable, fold it into `docs/BUILD_AND_FLIP_PLAYBOOK.md` (the
    generic framework). The transferable asset across apps is the **method**, not this product — so
    don't let a good lesson evaporate. Skip only if nothing generic was actually learned; don't force it.
-7. **Seed unbuildable ideas into the plan of record (never lose feedback).** Anything raised this
+8. **Seed unbuildable ideas into the plan of record (never lose feedback).** Anything raised this
    session — user feedback, an idea, a gap you found — that **can't be built now** (needs a later
    phase, the app, an integration that doesn't exist yet) must be **seeded into `docs/PROJECT_PLAN.md`**
    (the right phase's scope, or the §3x parked table) before wrapping — not left only in a side doc or
