@@ -10,8 +10,13 @@ description: >
   validates profiles/<id>/profile.yaml, and offers a first scan. This is SETUP; the recurring
   scan is the separate job-scout-run skill.
 metadata:
-  version: "1.0.0"
-  status: "Phase 2 — first real onboarding (backend-java) run 2026-07-16."
+  version: "1.1.0"
+  status: "Phase 2 — first real onboarding (backend-java) run 2026-07-16. 1.1.0: step 6 now
+    requires a mandatory defaults-summary gate before provisioning — every template-inherited
+    value (hard_filters especially: tool_lockin_drop, role_exclusion_terms, clearance/travel/
+    grind_culture, timezone_window, closed_location_list) is shown and offered for override,
+    never left silent; skip_if_defaulted now only controls interview PACING, not visibility
+    (spec §1 rule 2 was already this; the skill text under-delivered it)."
   created_by: Borjan
   organization: 2Coders Studio
 ---
@@ -72,10 +77,24 @@ unset for judgment-time estimation via the template's `salary_estimation_heurist
 
 ### 6. Confirm interview (posture is the user's choice — D14)
 First offer, with a friendly one-line explanation, a choice between **(a) progressive** (confirm
-only high-impact / ambiguous fields, accept template defaults for the rest) and **(b) full
-field-by-field**. Then run the chosen posture. Surface `target_seniority.strict` and the
-`employment_type: any` escape explicitly. Never ask what a template default already answers
-(spec §1 rule 2); lean on each template's `interview.emphasize` / `skip_if_defaulted`.
+only high-impact / ambiguous fields one by one, accept template defaults for the rest) and **(b)
+full field-by-field**. Then run the chosen posture. Surface `target_seniority.strict` and the
+`employment_type: any` escape explicitly. `interview.emphasize` / `skip_if_defaulted` control
+which fields get asked about ONE BY ONE — they never mean the default stays unseen. Per spec §1
+rule 2, **"templates prefill, users override... every default is shown and changeable"** — no
+default is silent, ever.
+
+**Defaults summary (mandatory, both postures, before provisioning):** after the posture's
+questions are done, show the person the FULL set of template-inherited values not already
+individually confirmed — every `hard_filters` entry especially (`tool_lockin_drop`,
+`role_exclusion_terms`, `clearance`/`travel`/`grind_culture`, `timezone_window`,
+`closed_location_list`), plus `compensation.floor`/`published_equivalents` and `scoring.
+surface_threshold` if skipped above — labeled as inherited from `<template_id>`, with ONE
+consolidated question: "These came from the `<template>` template — want to override any of
+them, or good as-is?" Silence/accept = keep the template value; anything they flag gets
+overridden in the written profile. This is a hard gate before step 7 writes the draft
+`profile.yaml` — `skip_if_defaulted` shortens the interview, it never shortens what the person
+gets to see.
 
 ### 7. Provision → persist → validate
 Write a **draft** `profiles/<id>/profile.yaml` with `output.notion: { dry_run: true }` so it
