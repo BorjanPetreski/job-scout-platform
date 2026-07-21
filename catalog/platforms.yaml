@@ -215,6 +215,11 @@ platforms:
     categories:
       project-management: project-manager
       software-engineering: [software-engineer, react-developer]
+      data: data-analytics
+      design-ux: ux-design
+      marketing: digital-marketing
+      ai-ml: ai
+      qa: qa
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This job is no longer available"]
@@ -234,6 +239,25 @@ platforms:
       scope decision, not attempted here. Corrects the 2026-07-21 automated pass's "genuinely
       clean" verdict: the 10-posting count itself was right (no missed pagination/region
       split), but that pass never checked whether the site discloses a much larger gated set.
+      Same-day follow-up (retroactively applying the "is this fixed for all templates/
+      subvariants, and does this platform have untapped stream coverage" check to an
+      already-passed board, per Borjan's standing instruction): the catalog only ever wired
+      2 of 11 streams. Every `/remote-jobs/{slug}` category is capped at the same ~10-posting
+      teaser (the sign-up wall above applies uniformly), so "coverage" here means finding
+      which slugs are REAL, distinct, on-topic categories vs. Arc.dev silently falling back to
+      a generic/irrelevant feed for an unrecognized slug — confirmed live that this fallback
+      is real and easy to hit blind: `sales`, `hr`, `technical-support`, and `blog-writing`
+      (plausible-looking guesses for sales/people-hr/it-support/content-writing) each returned
+      clearly off-topic titles (e.g. "Software Engineer Romania" under `technical-support`),
+      not the requested category — checked against `sitemap0.xml` for better slugs first, none
+      found, so those 4 streams are a genuine gap here, not a config omission (same precedent
+      as Dynamite Jobs' missing ai-ml/qa). 5 slugs DID verify clean (distinct posting sets,
+      on-topic sample titles, cross-checked pairwise against each other and against the known-
+      bogus `sales` fallback): `data-analytics` (data — Data Scientist/Analyst titles),
+      `ux-design` (design-ux — UI/UX/Product Designer), `digital-marketing` (marketing),
+      `ai` (ai-ml — AI Engineer, loosely mixed with adjacent eng roles same as any broad-
+      category aggregator), `qa` (QA/Test Engineer). Wired those 5; `it-support`/`sales`/
+      `people-hr`/`content-writing` left inactive for this platform.
     notion_platform_name: { tracker: "Arc.dev", passed_seen: "Arc.dev" }
 
   - id: 5
