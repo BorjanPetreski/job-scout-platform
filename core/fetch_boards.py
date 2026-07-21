@@ -183,35 +183,39 @@ def fetch_remotive(p: dict, cfg: dict) -> dict:
                "category HTML masks companies and carries no job links")
 
 
-def fetch_workingnomads(p: dict, cfg: dict) -> dict:
-    api = (p.get("api") or ["https://www.workingnomads.com/api/exposed_jobs/"])[0]
-    try:
-        jobs = _get(api).json()
-    except Exception as exc:
-        return _down(p["name"], f"API error: {type(exc).__name__}")
-    cands = [
-        _cand(j.get("title"), j.get("company_name"), j.get("location"), j.get("url"),
-              p["name"], j.get("pub_date"), None, _text_of(j.get("description", "")) or None)
-        for j in jobs
-    ]
-    return _ok(p["name"], cands, "exposed_jobs sample (~33 rows; category param ignored)")
-
 
 def fetch_remoteok(p: dict, cfg: dict) -> dict:
-    api = (p.get("api") or ["https://remoteok.com/api"])[0]
-    try:
-        data = _get(api).json()
-    except Exception as exc:
-        return _down(p["name"], f"API error: {type(exc).__name__}")
-    cands = []
-    for j in data:
-        if not isinstance(j, dict) or not j.get("position"):
-            continue  # first element is a legal notice
-        cands.append(_cand(j.get("position"), j.get("company"), j.get("location"),
-                           j.get("url"), p["name"], j.get("date"),
-                           f"{j.get('salary_min') or ''}-{j.get('salary_max') or ''}".strip("-") or None,
-                           _text_of(j.get("description", "")) or None))
-    return _ok(p["name"], cands)
+    """Prefers the per-category tag feed (`p["urls"]` + ".json", e.g.
+    remoteok.com/remote-project-manager-jobs.json) over the generic `/api` — 2026-07-21
+    platform audit: the catalog's `url_patterns` already declared this per-category URL and
+    the quirk note already called it a "tag URL", but the fetcher never actually used it,
+    always hitting the generic sitewide-newest-100 `/api` regardless of category (verified
+    live: the two feeds barely overlap — 3-10 shared ids out of ~100 each — so this was a
+    real, silent coverage gap, not a redundant fallback). Falls back to the generic `/api`
+    only when no category URL resolved for this stream (mirrors every other board's
+    honest-skip convention rather than guessing)."""
+    urls = [u if u.endswith(".json") else f"{u}.json" for u in (p.get("urls") or [])]
+    if not urls:
+        urls = [(p.get("api") or ["https://remoteok.com/api"])[0]]
+    cands: dict[str, dict] = {}
+    notes = []
+    for u in urls:
+        try:
+            data = _get(u).json()
+        except Exception as exc:
+            notes.append(f"{type(exc).__name__} on {u}")
+            continue
+        for j in data:
+            if not isinstance(j, dict) or not j.get("position"):
+                continue  # first element is a legal notice
+            c = _cand(j.get("position"), j.get("company"), j.get("location"),
+                      j.get("url"), p["name"], j.get("date"),
+                      f"{j.get('salary_min') or ''}-{j.get('salary_max') or ''}".strip("-") or None,
+                      _text_of(j.get("description", "")) or None)
+            cands[c["url"]] = c
+    if not cands and notes:
+        return _down(p["name"], "; ".join(notes))
+    return _ok(p["name"], list(cands.values()), "; ".join(notes) or None)
 
 
 def fetch_justjoinit(p: dict, cfg: dict) -> dict:
@@ -513,10 +517,27 @@ def fetch_wwr(p: dict, cfg: dict) -> dict:
 # min_hyphens: minimum hyphens in the final slug — separates postings from category links
 HARVEST_SPECS: dict[str, dict] = {
     "himalayas": {"href": r"/companies/[^/]+/jobs/[^/]+/?", "base": "https://himalayas.app", "company_idx": 2},
+    # 2026-07-21 (platform audit): headless-only (its AngularJS app fetches results via a
+    # POST/ElasticSearch call on load; a plain fetch gets the empty shell). Company name
+    # isn't in the URL, so no company_idx — title falls back to a slug-derived one since
+    # the anchor's own text concatenates title+company with no separator.
+    "working-nomads": {"href": r"/jobs/[\w-]+", "base": "https://www.workingnomads.com"},
     "jobgether": {"href": r"/offer/[\w-]{10,}", "base": "https://jobgether.com"},
-    "arc": {"href": r"/remote-jobs/details/[\w-]+", "base": "https://arc.dev"},
-    "remote-rocketship-worldwide": {"href": r"/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 2},
-    "remote-rocketship-europe": {"href": r"/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 2},
+    # 2026-07-21 (platform audit): Arc.dev serves postings via TWO parallel URL schemes —
+    # native "/remote-jobs/details/{slug}" and syndicated "/remote-jobs/j/{slug}" (logos
+    # point at partner ATS hosts, e.g. Lever's S3 bucket). Confirmed the "j/" set is
+    # genuinely category-scoped, not a fixed sitewide widget: the python category page
+    # showed Data Scientist/Software Engineer "j/" links, marketing showed Growth Marketing
+    # Manager/Head of Marketing — different content per category. The old regex silently
+    # missed this entire class of postings on every category.
+    "arc": {"href": r"/remote-jobs/(?:details|j)/[\w-]+", "base": "https://arc.dev"},
+    # 2026-07-21 (platform audit, same-day as the morning scan): postings moved from
+    # "/company/{co}/jobs/{slug}" to "/publicjobs/company/{co}/jobs/{slug}" mid-day —
+    # confirmed by the SAME slug (epi-company-eu/.../test-project-manager-freelance-
+    # belgium-remote) appearing un-prefixed in this morning's harvested candidates and
+    # prefixed on a same-day re-fetch. The old pattern now matches zero real postings.
+    "remote-rocketship-worldwide": {"href": r"/publicjobs/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 3},
+    "remote-rocketship-europe": {"href": r"/publicjobs/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 3},
     "wttj": {"href": r"/en/companies/[^/]+/jobs/[^/]+", "base": "https://www.welcometothejungle.com", "company_idx": 3},
     "nodesk": {"href": r"/remote-jobs/[a-z0-9-]+/?", "base": "https://nodesk.co", "min_hyphens": 3},
     # dynamite: removed 2026-07-21 — now a dedicated HANDLERS entry (fetch_dynamite,
@@ -865,7 +886,6 @@ HANDLERS = {
     "dynamite": fetch_dynamite,
     "himalayas": fetch_himalayas,
     "remotive": fetch_remotive,
-    "working-nomads": fetch_workingnomads,
     "remote-ok": fetch_remoteok,
     "justjoin-it": fetch_justjoinit,
     "greenhouse": fetch_greenhouse,

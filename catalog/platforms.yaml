@@ -236,9 +236,13 @@ platforms:
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
     quirks: >-
-      DEGRADED 2026-07-11: Cloudflare now 403s list pages AND sitemap, direct and headless
-      alike (was: per-job 403s only). Source reports down until RR loosens up; roles mostly
-      mirror in from teamtailor/ATS anyway. Candidate for tier demotion at next recompute.
+      2026-07-11 Cloudflare 403 on list pages has since eased (2026-07-21 platform audit:
+      direct still 403s, but headless render reaches real content again — no longer a
+      standing degradation). 2026-07-21 (same audit, later same day): posting URLs moved
+      from "/company/{co}/jobs/{slug}" to "/publicjobs/company/{co}/jobs/{slug}" — the
+      morning scan's harvested candidates still show the old un-prefixed path, a same-day
+      re-fetch shows the new prefix on the identical posting slug. Harvest regex updated to
+      match; watch for a rollback or mixed-prefix period.
     per_job_fetch_mode: headless
     notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
 
@@ -265,9 +269,22 @@ platforms:
     name: Working Nomads
     tier_default: 3
     active: true
-    fetch_mode: api
-    api_patterns:
-      - "https://www.workingnomads.com/api/exposed_jobs/"
+    fetch_mode: headless
+    # region_urls (2026-07-21, platform audit — same mechanism as Jobgether): the bare
+    # "/remote-{category}-jobs" (no location suffix) and the "-europe" suffixed page are
+    # SEPARATE listings, not superset/subset (live-checked project-management: 50 links each,
+    # only 17 shared) — same non-superset shape as Jobgether's worldwide-vs-emea split.
+    # Prefers worldwide when the profile accepts it, same precedent as Jobgether; a profile
+    # with no regions_acceptable falls back to url_patterns (the -europe page) untouched.
+    # KNOWN LIMITATION: both pages independently cap at the site's initial-load batch (50,
+    # an Angular SPA "prefetched_hits" page size); the ~33 region-only postings NOT on the
+    # chosen region's page aren't captured. Fetching + merging both was considered and left
+    # as a future enhancement rather than built now (proportionate to a single-board fix).
+    region_urls:
+      worldwide:
+        - "https://www.workingnomads.com/remote-{category}-jobs"
+      eu:
+        - "https://www.workingnomads.com/remote-{category}-jobs-europe"
     url_patterns:
       - "https://www.workingnomads.com/remote-{category}-jobs-europe"
     categories:
@@ -286,7 +303,18 @@ platforms:
     categories_verify_at_setup: [software-engineering, data, design-ux, marketing, sales, it-support, content-writing, people-hr, devops-sre-platform, qa, ai-ml]
     mirrors: []
     expired_markers: []
-    quirks: "Category HTML now JS-rendered (2.10.0 regression) — API only, skip HTML. Verified live 2026-07-11. API is an all-category sample; keyword filter does the scoping."
+    quirks: >-
+      REVISED 2026-07-21 (platform audit): the 2026-07-11 note ("Category HTML now
+      JS-rendered — API only, skip HTML") was a correct diagnosis but the wrong call at the
+      time — headless rendering (render.py) now handles JS-rendered listings routinely
+      elsewhere in the catalog. Switched from the degraded `exposed_jobs` API (all-category
+      unfiltered sample, ~38 rows, category param silently ignored) to headless-scraping the
+      real category+region page, which embeds the site's own category/region-scoped search
+      results (its own AngularJS app calls a POST-based ElasticSearch endpoint on load; a
+      headless render captures the fully-hydrated result without needing to replicate that
+      API). Company name isn't cleanly separable from title in the harvested anchor text
+      (concatenated, same class of cosmetic issue as JustRemote's) — title falls back to a
+      slug-derived one; doesn't affect dedup (URL-keyed) or keyword matching.
     notion_platform_name: { tracker: "Working Nomads", passed_seen: "Working Nomads" }
 
   - id: 8
@@ -521,7 +549,15 @@ platforms:
     categories_verify_at_setup: [ai-ml, data, design-ux, marketing, sales, it-support, content-writing, devops-sre-platform, qa]
     mirrors: []
     expired_markers: []
-    quirks: "HTML is JS-rendered; public JSON API exists (all categories; first element is a legal notice). Tag-based categories: remote-{category}-jobs is a tag URL — the keyword filter does the real scoping."
+    quirks: >-
+      HTML is JS-rendered; public JSON API exists. FIXED 2026-07-21 (platform audit): the
+      fetcher previously ignored this per-category tag URL entirely and always hit the
+      generic sitewide-newest-100 `/api` — the tag feed (this URL + ".json") barely
+      overlaps with the generic one (3-10 shared ids of ~100 each), so this was a real,
+      silent coverage gap, not a redundant fallback. `fetch_remoteok()` now fetches the
+      per-category tag JSON feed, falling back to the generic API only when no category
+      URL resolves. Tag classification is loose (mixed titles per tag) — the keyword
+      filter does the real scoping, same as WWR/Himalayas.
     notion_platform_name: { tracker: "Remote OK", passed_seen: "Remote OK" }
 
   - id: 16
