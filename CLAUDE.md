@@ -86,3 +86,9 @@ happen every session — the parts that quietly rot if left to memory.
   title-scoped hard-drop for the pattern).
 - **Notion is the only scanner↔companion bridge**; the scanner never writes the Applications
   Tracker (firewall). Per-profile state is isolated under `profiles/<id>/state/`.
+- **A platform fix generalizes — check it, don't assume it's one-off** (2026-07-21). Any
+  fetch/coverage improvement found on one board (undercounted stream coverage, a region/scope
+  gap, incomplete pagination) is checked live against every OTHER board — already-audited or
+  not — before moving on, and an already-"good enough" board gets reopened if the check finds
+  something. Full protocol + the pattern checklist: `docs/HEALTH_LOG.md` "How a review works"
+  step 5.

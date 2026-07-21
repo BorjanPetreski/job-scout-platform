@@ -54,17 +54,19 @@ platforms:
       - "https://weworkremotely.com/remote-jobs"
     rss_patterns:
       - "https://weworkremotely.com/remote-jobs.rss"
-    categories:
-      project-management: project-management
-      software-engineering: programming
-      design-ux: design
-      marketing: sales-and-marketing
-      sales: sales-and-marketing
-      devops-sre-platform: devops-sysadmin
-      it-support: customer-support
-      qa: programming              # WWR has no dedicated QA category — QA folds into programming
-      ai-ml: programming           # nor a dedicated AI/ML category — folds into programming
-    categories_verify_at_setup: [design-ux, marketing, sales, devops-sre-platform, it-support, qa, ai-ml]
+    # categories: {} (2026-07-21, cross-platform audit follow-up — Borjan: "any improvement
+    # found needs to be checked against all platforms"). WWR's fetcher (fetch_wwr) has
+    # pulled the all-jobs RSS unconditionally since before this session — no per-category
+    # URL/fetch ever happens, {category} isn't even in url_patterns above. A non-empty
+    # categories dict here was therefore pure STREAM-GATING left over from before that
+    # design: 6 streams got the platform, 6 others (data, people-hr, content-writing,
+    # product-management, ai-ml/qa previously folded in) were silently skipped even though
+    # the SAME unfiltered fetch already covers them — an exact instance of the "broad fetch,
+    # narrow catalog gate" mismatch found on Dynamite Jobs. {} matches the precedent already
+    # used for boards with no category concept at all (Greenhouse/Lever/Workable/Pinpoint) —
+    # see _resolve_platforms' serves_stream check. Every stream's keyword filter narrows the
+    # same RSS downstream, same as always.
+    categories: {}
     mirrors: []
     expired_markers: ["This job has been closed", "no longer accepting applications"]
     quirks: >-
@@ -101,6 +103,26 @@ platforms:
     categories:
       project-management: [project-manager, scrum-master, agile-delivery-manager]
       software-engineering: [software-engineer, frontend-developer]
+      # Expanded 2026-07-21 (cross-platform audit follow-up — Borjan: "any improvement found
+      # needs to be checked against all platforms"). Jobgether's landing-page sitemap
+      # (/sitemap/index-landings.xml) lists ~4,400 role/skill/location pages — far more
+      # granular than a clean parent-category list — but each of these resolves to a real,
+      # live-verified page (HTTP 200, ~49-50 harvested links) via the SAME fetch_jobgether/
+      # region_urls machinery already built, no new code needed. Some redirect to
+      # /search-offers?role=... (no dedicated worldwide landing page for that slug, same
+      # shape as agile-delivery-manager above) — pagination on those is effectively
+      # page-1-only (~50) since the redirect drops the ?page= param, still real coverage
+      # where there was previously none.
+      data: data
+      design-ux: design
+      marketing: marketing
+      sales: sales
+      people-hr: human-resources
+      content-writing: content-writing
+      it-support: it-support
+      ai-ml: ai-and-machine-learning
+      qa: qa
+      product-management: product-management
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This offer is no longer available"]
