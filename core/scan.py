@@ -34,6 +34,7 @@ What gets auto-logged to seen.jsonl by a scan (everything else is Claude's call)
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import hashlib
 import json
 import re
@@ -461,14 +462,30 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         mid = (len(platforms) + 1) // 2
         platforms = platforms[:mid] if half == "AM" else platforms[mid:]
 
-    _log(f"fetching {len(platforms)} active platforms (tier order)…")
-    results = []
-    for i, p in enumerate(platforms, 1):
-        _log(f"  [{i}/{len(platforms)}] T{p.get('tier','?')} {p.get('name','?')}…")
-        r = fetch_boards.fetch_platform(p, cfg)
-        _log(f"      → {len(r.get('candidates') or [])} raw"
-             + (" · SOURCE DOWN" if r.get('source_down') else ""))
-        results.append(r)
+    # Concurrent fetch (2026-07-21): platforms are different hosts, so fetching them in
+    # parallel doesn't add load to any single server beyond what it already tolerates
+    # sequentially (_polite() rate-limits per-host, unaffected by cross-platform concurrency).
+    # Headless (Playwright) platforms get their own tighter cap via fetch_platform_bounded —
+    # that's the one real shared resource (CPU/memory per browser instance). Results land in
+    # the pre-sized `results` list by ORIGINAL tier-order index, not completion order, so the
+    # rest of this function (ledger, candidates JSON) is byte-identical to the sequential run.
+    _log(f"fetching {len(platforms)} active platforms (tier order, up to "
+         f"{min(len(platforms), fetch_boards.MAX_CONCURRENT_HTTP)} concurrent / "
+         f"{fetch_boards.MAX_CONCURRENT_HEADLESS} concurrent headless)…")
+    results: list[dict] = [{}] * len(platforms)
+    done = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, len(platforms))) as ex:
+        future_to_idx = {ex.submit(fetch_boards.fetch_platform_bounded, p, cfg): i
+                          for i, p in enumerate(platforms)}
+        for fut in concurrent.futures.as_completed(future_to_idx):
+            i = future_to_idx[fut]
+            p = platforms[i]
+            r = fut.result()
+            results[i] = r
+            done += 1
+            _log(f"  [{done}/{len(platforms)}] T{p.get('tier','?')} {p.get('name','?')} → "
+                 f"{len(r.get('candidates') or [])} raw"
+                 + (" · SOURCE DOWN" if r.get('source_down') else ""))
     if cfg["linkedin_tripwire"].get("enabled", True):
         _log("  LinkedIn tripwire…")
         results.append(linkedin_tripwire.fetch_tripwire(cfg))

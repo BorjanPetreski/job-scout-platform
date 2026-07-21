@@ -32,6 +32,7 @@ Endpoint state as verified live 2026-07-11 (endpoints drift — see BUILD findin
 
 from __future__ import annotations
 
+import concurrent.futures
 import json
 import re
 import sys
@@ -57,6 +58,16 @@ HEADERS = {
 
 _host_last: dict[str, float] = {}
 _host_lock = threading.Lock()
+
+# Cross-platform concurrency (2026-07-21): platforms are different hosts, so running them
+# in parallel doesn't make us ruder to any single server — _polite()'s per-host lock above
+# was already written thread-safe for exactly this ("sleep OUTSIDE the lock — other hosts
+# must not stall behind it"). The one real resource cost is headless (Playwright/Chromium)
+# rendering — CPU/memory per instance, not just network I/O — so it gets its own tighter
+# cap, separate from (and independent of) the plain-HTTP platforms.
+MAX_CONCURRENT_HEADLESS = 4
+MAX_CONCURRENT_HTTP = 12
+_headless_sem = threading.Semaphore(MAX_CONCURRENT_HEADLESS)
 
 
 def _polite(url: str, min_delay: float = 1.0) -> None:
@@ -705,11 +716,36 @@ def fetch_platform(p: dict, cfg: dict) -> dict:
         return _down(p["name"], f"handler crashed: {type(exc).__name__}: {exc}")
 
 
+def _is_headless_platform(p: dict) -> bool:
+    """True only for platforms that ALWAYS render via Playwright (fetch_mode headless/
+    headless_scroll, and not a lightweight custom HANDLERS entry that bypasses fetch_mode
+    entirely — e.g. himalayas/wwr are catalog fetch_mode 'direct' but dispatch through their
+    own API handler, never touching render()). A generic fetch_mode 'direct' platform CAN
+    still escalate to headless inside fetch_html_listing on failure, but that's an occasional
+    fallback, not its steady state, so it stays in the lighter (HTTP) concurrency group."""
+    return p.get("slug") not in HANDLERS and p.get("fetch_mode") in ("headless", "headless_scroll")
+
+
+def fetch_platform_bounded(p: dict, cfg: dict) -> dict:
+    """fetch_platform, gated so at most MAX_CONCURRENT_HEADLESS Playwright instances run at
+    once. Plain-HTTP platforms aren't throttled here beyond the caller's own thread-pool
+    size — _polite() already rate-limits each host independently, so extra platforms in
+    flight cost nothing extra per host."""
+    if _is_headless_platform(p):
+        with _headless_sem:
+            return fetch_platform(p, cfg)
+    return fetch_platform(p, cfg)
+
+
 def fetch_all(cfg: dict) -> list[dict]:
-    """Fetch every active platform in tier order. Returns one result dict per platform."""
+    """Fetch every active platform concurrently (bounded — see fetch_platform_bounded).
+    Returns one result dict per platform, in tier order regardless of completion order."""
     platforms = [p for p in cfg["platforms"] if p.get("active")]
     platforms.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
-    return [fetch_platform(p, cfg) for p in platforms]
+    if not platforms:
+        return []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(platforms)) as ex:
+        return list(ex.map(lambda p: fetch_platform_bounded(p, cfg), platforms))
 
 
 if __name__ == "__main__":
