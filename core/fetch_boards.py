@@ -63,11 +63,10 @@ _host_lock = threading.Lock()
 # in parallel doesn't make us ruder to any single server — _polite()'s per-host lock above
 # was already written thread-safe for exactly this ("sleep OUTSIDE the lock — other hosts
 # must not stall behind it"). The one real resource cost is headless (Playwright/Chromium)
-# rendering — CPU/memory per instance, not just network I/O — so it gets its own tighter
-# cap, separate from (and independent of) the plain-HTTP platforms.
+# rendering — CPU/memory per instance, not just network I/O — so it gets its own tighter,
+# separately-pooled cap (bulkhead pattern — see fetch_many below), not just a higher number.
 MAX_CONCURRENT_HEADLESS = 4
 MAX_CONCURRENT_HTTP = 12
-_headless_sem = threading.Semaphore(MAX_CONCURRENT_HEADLESS)
 
 
 def _polite(url: str, min_delay: float = 1.0) -> None:
@@ -726,26 +725,55 @@ def _is_headless_platform(p: dict) -> bool:
     return p.get("slug") not in HANDLERS and p.get("fetch_mode") in ("headless", "headless_scroll")
 
 
-def fetch_platform_bounded(p: dict, cfg: dict) -> dict:
-    """fetch_platform, gated so at most MAX_CONCURRENT_HEADLESS Playwright instances run at
-    once. Plain-HTTP platforms aren't throttled here beyond the caller's own thread-pool
-    size — _polite() already rate-limits each host independently, so extra platforms in
-    flight cost nothing extra per host."""
-    if _is_headless_platform(p):
-        with _headless_sem:
-            return fetch_platform(p, cfg)
-    return fetch_platform(p, cfg)
+def fetch_many(platforms: list[dict], cfg: dict, on_progress=None) -> list[dict]:
+    """Fetch every platform in `platforms` concurrently. Returns one result dict per
+    platform, in INPUT order, regardless of completion order.
+
+    Bulkhead pattern (2026-07-21): two dedicated, independently-sized thread pools —
+    one for headless/Playwright platforms (MAX_CONCURRENT_HEADLESS: the real
+    resource-heavy group, each fetch launches its own full Chromium process — see
+    render.py) and one for plain-HTTP/API platforms (MAX_CONCURRENT_HTTP). Each pool's
+    OWN size is the enforced cap — no semaphore gating a subset of tasks inside one
+    shared pool, which would let blocked-on-semaphore headless tasks sit holding worker
+    threads HTTP tasks need (head-of-line blocking) if that shared pool were ever sized
+    to a real bound instead of unboundedly by input count.
+
+    on_progress(done_count, total, platform, result), if given, is called once per
+    result as it completes — from THIS function's own thread (the as_completed loop
+    below), never from a worker thread, so no extra locking is needed for it.
+    """
+    if not platforms:
+        return []
+    results: list[dict | None] = [None] * len(platforms)
+    headless = [i for i, p in enumerate(platforms) if _is_headless_platform(p)]
+    http = [i for i, p in enumerate(platforms) if not _is_headless_platform(p)]
+
+    with concurrent.futures.ThreadPoolExecutor(
+                max_workers=max(1, min(len(headless), MAX_CONCURRENT_HEADLESS))) as headless_ex, \
+            concurrent.futures.ThreadPoolExecutor(
+                max_workers=max(1, min(len(http), MAX_CONCURRENT_HTTP))) as http_ex:
+        future_to_idx = {}
+        for i in headless:
+            future_to_idx[headless_ex.submit(fetch_platform, platforms[i], cfg)] = i
+        for i in http:
+            future_to_idx[http_ex.submit(fetch_platform, platforms[i], cfg)] = i
+        done = 0
+        for fut in concurrent.futures.as_completed(future_to_idx):
+            i = future_to_idx[fut]
+            r = fut.result()
+            results[i] = r
+            done += 1
+            if on_progress:
+                on_progress(done, len(platforms), platforms[i], r)
+    return results  # every index was submitted above, so every slot is filled
 
 
 def fetch_all(cfg: dict) -> list[dict]:
-    """Fetch every active platform concurrently (bounded — see fetch_platform_bounded).
+    """Fetch every active platform concurrently (bounded — see fetch_many).
     Returns one result dict per platform, in tier order regardless of completion order."""
     platforms = [p for p in cfg["platforms"] if p.get("active")]
     platforms.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
-    if not platforms:
-        return []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(platforms)) as ex:
-        return list(ex.map(lambda p: fetch_platform_bounded(p, cfg), platforms))
+    return fetch_many(platforms, cfg)
 
 
 if __name__ == "__main__":

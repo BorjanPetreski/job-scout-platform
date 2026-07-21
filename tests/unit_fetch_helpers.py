@@ -62,40 +62,57 @@ def main() -> list[str]:
     s.ok(not fb._is_headless_platform({"slug": "wttj", "fetch_mode": "direct"}),
          "fetch_mode=direct, not a HANDLERS entry -> HTTP group (occasional escalation, not steady-state)")
 
-    # --- fetch_all: concurrency cap + order preservation (stubbed fetch_platform, no network) -
+    # --- fetch_all: concurrency caps + order preservation (stubbed fetch_platform, no network).
+    # Deliberately queues MORE than each cap in BOTH groups — a bug that leaves one group
+    # unbounded (e.g. a pool sized by input count instead of the real cap; this exact bug
+    # shipped once, caught only because a fresh run with >12 HTTP platforms queued was tried)
+    # is invisible with too few tasks to ever hit the ceiling. ------------------------------
     lock = threading.Lock()
-    concurrent_headless = 0
-    max_concurrent_headless_seen = 0
+    concurrent_headless = concurrent_http = 0
+    max_concurrent_headless_seen = max_concurrent_http_seen = 0
     orig_fetch_platform = fb.fetch_platform
 
     def fake_fetch_platform(p, cfg):
-        nonlocal concurrent_headless, max_concurrent_headless_seen
+        nonlocal concurrent_headless, concurrent_http, max_concurrent_headless_seen, max_concurrent_http_seen
         is_h = fb._is_headless_platform(p)
-        if is_h:
-            with lock:
+        with lock:
+            if is_h:
                 concurrent_headless += 1
                 max_concurrent_headless_seen = max(max_concurrent_headless_seen, concurrent_headless)
+            else:
+                concurrent_http += 1
+                max_concurrent_http_seen = max(max_concurrent_http_seen, concurrent_http)
         time.sleep(0.02)
-        if is_h:
-            with lock:
+        with lock:
+            if is_h:
                 concurrent_headless -= 1
+            else:
+                concurrent_http -= 1
         return {"platform": p["name"], "candidates": [], "source_down": False, "note": ""}
 
     fb.fetch_platform = fake_fetch_platform
     try:
+        n_headless, n_http = fb.MAX_CONCURRENT_HEADLESS * 3, fb.MAX_CONCURRENT_HTTP * 2
         platforms = ([{"slug": f"headless-{i}", "name": f"H{i}", "id": i, "tier": 1,
-                        "active": True, "fetch_mode": "headless"} for i in range(12)]
+                        "active": True, "fetch_mode": "headless"} for i in range(n_headless)]
                      + [{"slug": f"api-{i}", "name": f"A{i}", "id": 100 + i, "tier": 2,
-                         "active": True, "fetch_mode": "api"} for i in range(6)])
+                         "active": True, "fetch_mode": "api"} for i in range(n_http)])
         results = fb.fetch_all({"platforms": platforms})
-        s.eq([r["platform"] for r in results], [f"H{i}" for i in range(12)] + [f"A{i}" for i in range(6)],
+        s.eq([r["platform"] for r in results],
+             [f"H{i}" for i in range(n_headless)] + [f"A{i}" for i in range(n_http)],
              "fetch_all: output order matches tier-sort order, not completion order")
         s.ok(max_concurrent_headless_seen <= fb.MAX_CONCURRENT_HEADLESS,
-             f"fetch_all: headless concurrency never exceeded the cap "
+             f"fetch_all: headless concurrency never exceeded its cap "
              f"(saw {max_concurrent_headless_seen}, cap {fb.MAX_CONCURRENT_HEADLESS})")
         s.eq(max_concurrent_headless_seen, fb.MAX_CONCURRENT_HEADLESS,
-             "fetch_all: with 12 headless platforms queued, the cap is actually reached "
-             "(proves it's a real bound, not accidentally unconstrained)")
+             f"fetch_all: with {n_headless} headless platforms queued, its cap is actually "
+             "reached (proves it's a real bound, not accidentally unconstrained)")
+        s.ok(max_concurrent_http_seen <= fb.MAX_CONCURRENT_HTTP,
+             f"fetch_all: HTTP concurrency never exceeded its cap "
+             f"(saw {max_concurrent_http_seen}, cap {fb.MAX_CONCURRENT_HTTP}) — regression "
+             "guard for the bug where this pool was sized by len(platforms) instead of the cap")
+        s.eq(max_concurrent_http_seen, fb.MAX_CONCURRENT_HTTP,
+             f"fetch_all: with {n_http} HTTP platforms queued, its cap is actually reached")
     finally:
         fb.fetch_platform = orig_fetch_platform
 
