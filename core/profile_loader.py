@@ -467,6 +467,38 @@ def _compile_hard_filters(merged: dict, defaults: dict) -> dict:
 
 # ---------------------------------------------------------- platform resolve
 
+def region_url_patterns(cp: dict, regions_acceptable: list[str]) -> list[str] | None:
+    """Pick which of a platform's per-region `url_patterns` variants this profile should
+    fetch (2026-07-21, manual platform audit — Jobgether's own EMEA listing undercounted a
+    worldwide-accepting profile by ~10x; its `region_urls` carries a real per-region choice,
+    not just one hardcoded default). Returns None when the platform declares no
+    `region_urls` at all, so `_resolve_platforms` falls back to its existing plain
+    `url_patterns` unchanged — fully backward-compatible for every platform/profile that
+    hasn't opted in.
+
+    Resolution: prefer `worldwide` when the profile accepts it (broadest — "get as much as
+    possible, let the profile's own downstream filters narrow it down" was the explicit
+    design call), else the first of the profile's `regions_acceptable` the platform actually
+    offers. A profile with NO `regions_acceptable` at all returns None (same as a platform
+    with no `region_urls`) — expressing no preference must leave the platform's plain
+    `url_patterns` untouched, not silently pick a region for it (found live: without this,
+    every profile that had never set `regions_acceptable` — most of the demo profiles —
+    would have silently jumped from Jobgether's EMEA listing to its worldwide one the moment
+    ANY platform gained a `region_urls` entry, an unintended behavior change for a profile
+    that asked for nothing). Only a profile that DID state a preference but matches none of
+    this platform's declared regions falls back to whatever's listed first, so an active
+    board still fetches something instead of silently going empty."""
+    region_urls = cp.get("region_urls")
+    if not region_urls or not regions_acceptable:
+        return None
+    if "worldwide" in regions_acceptable and "worldwide" in region_urls:
+        return region_urls["worldwide"]
+    for region in regions_acceptable:
+        if region in region_urls:
+            return region_urls[region]
+    return next(iter(region_urls.values()), None)
+
+
 def _expand(patterns: list[str], mapping, params: dict) -> list[str]:
     """Expand {category}/{category_id} patterns; mapping may be a slug or list of slugs."""
     slugs = mapping if isinstance(mapping, list) else ([mapping] if mapping else [])
@@ -489,6 +521,7 @@ def _resolve_platforms(merged: dict, catalog: dict) -> tuple[list[dict], dict[st
     disabled = set(plats.get("disabled") or [])
     overrides = (merged.get("search") or {}).get("platform_slugs") or {}
     ats_boards = plats.get("ats_boards") or {}
+    regions_acceptable = list((merged.get("search") or {}).get("regions_acceptable") or [])
     tier_of: dict[str, int] = {}
     for t, slugs in (plats.get("tiers") or {}).items():
         for s in slugs:
@@ -512,8 +545,11 @@ def _resolve_platforms(merged: dict, catalog: dict) -> tuple[list[dict], dict[st
             params["category_id"] = cids[mapping]
         elif stream in cids:
             params["category_id"] = cids[stream]
-        urls = _expand(cp.get("url_patterns"), mapping if mapping != "all" else None, params) \
-            if mapping != "all" else list(cp.get("url_patterns") or [])
+        url_patterns = region_url_patterns(cp, regions_acceptable)
+        if url_patterns is None:
+            url_patterns = cp.get("url_patterns")
+        urls = _expand(url_patterns, mapping if mapping != "all" else None, params) \
+            if mapping != "all" else list(url_patterns or [])
         rss = _expand(cp.get("rss_patterns"), mapping, params) if mapping != "all" \
             else list(cp.get("rss_patterns") or [])
         api = _expand(cp.get("api_patterns"), mapping if mapping != "all" else None, params) \

@@ -46,21 +46,27 @@ platforms:
     tier_default: 3
     active: true
     fetch_mode: direct
+    # Category page ("/categories/remote-{category}-jobs") 301s to the homepage —
+    # confirmed live 2026-07-21 (manual platform audit) — do not use it for a manual
+    # spot-check. The fetcher already bypasses it (core/fetch_boards.py fetch_wwr) and
+    # pulls the all-jobs RSS; the human-browsable equivalent is /remote-jobs.
     url_patterns:
-      - "https://weworkremotely.com/categories/remote-{category}-jobs"
+      - "https://weworkremotely.com/remote-jobs"
     rss_patterns:
-      - "https://weworkremotely.com/categories/remote-{category}-jobs.rss"
-    categories:
-      project-management: project-management
-      software-engineering: programming
-      design-ux: design
-      marketing: sales-and-marketing
-      sales: sales-and-marketing
-      devops-sre-platform: devops-sysadmin
-      it-support: customer-support
-      qa: programming              # WWR has no dedicated QA category — QA folds into programming
-      ai-ml: programming           # nor a dedicated AI/ML category — folds into programming
-    categories_verify_at_setup: [design-ux, marketing, sales, devops-sre-platform, it-support, qa, ai-ml]
+      - "https://weworkremotely.com/remote-jobs.rss"
+    # categories: {} (2026-07-21, cross-platform audit follow-up — Borjan: "any improvement
+    # found needs to be checked against all platforms"). WWR's fetcher (fetch_wwr) has
+    # pulled the all-jobs RSS unconditionally since before this session — no per-category
+    # URL/fetch ever happens, {category} isn't even in url_patterns above. A non-empty
+    # categories dict here was therefore pure STREAM-GATING left over from before that
+    # design: 6 streams got the platform, 6 others (data, people-hr, content-writing,
+    # product-management, ai-ml/qa previously folded in) were silently skipped even though
+    # the SAME unfiltered fetch already covers them — an exact instance of the "broad fetch,
+    # narrow catalog gate" mismatch found on Dynamite Jobs. {} matches the precedent already
+    # used for boards with no category concept at all (Greenhouse/Lever/Workable/Pinpoint) —
+    # see _resolve_platforms' serves_stream check. Every stream's keyword filter narrows the
+    # same RSS downstream, same as always.
+    categories: {}
     mirrors: []
     expired_markers: ["This job has been closed", "no longer accepting applications"]
     quirks: >-
@@ -77,15 +83,69 @@ platforms:
     tier_default: 3
     active: true
     fetch_mode: direct
+    # region_urls: per-region URL variants (2026-07-21, manual platform audit) — resolved
+    # per-profile in profile_loader.region_url_patterns() against search.regions_acceptable,
+    # preferring worldwide when the profile accepts it (broadest; downstream per-posting
+    # filters do the real narrowing — travel/us_only/closed_location_list etc.). A profile
+    # with no regions_acceptable at all falls back to plain url_patterns below, unchanged.
+    # worldwide = the bare /remote-jobs/{category} page (no location prefix) — a materially
+    # BIGGER, separate listing from the emea one, not just a superset view of it (verified
+    # live: project-manager emea=156 vs worldwide=1,648). A category slug with no dedicated
+    # worldwide landing page (agile-delivery-manager) 301s to /search-offers?role=...; `_get`
+    # follows redirects transparently so this needs no special-casing.
+    region_urls:
+      worldwide:
+        - "https://jobgether.com/remote-jobs/{category}"
+      emea:
+        - "https://jobgether.com/remote-jobs/emea/{category}"
     url_patterns:
       - "https://jobgether.com/remote-jobs/emea/{category}"
     categories:
       project-management: [project-manager, scrum-master, agile-delivery-manager]
       software-engineering: [software-engineer, frontend-developer]
+      # Expanded 2026-07-21 (cross-platform audit follow-up — Borjan: "any improvement found
+      # needs to be checked against all platforms"). Jobgether's landing-page sitemap
+      # (/sitemap/index-landings.xml) lists ~4,400 role/skill/location pages — far more
+      # granular than a clean parent-category list — but each of these resolves to a real,
+      # live-verified page (HTTP 200, ~49-50 harvested links) via the SAME fetch_jobgether/
+      # region_urls machinery already built, no new code needed. Some redirect to
+      # /search-offers?role=... (no dedicated worldwide landing page for that slug, same
+      # shape as agile-delivery-manager above) — pagination on those is effectively
+      # page-1-only (~50) since the redirect drops the ?page= param, still real coverage
+      # where there was previously none.
+      data: data
+      design-ux: design
+      marketing: marketing
+      sales: sales
+      people-hr: human-resources
+      content-writing: content-writing
+      it-support: it-support
+      ai-ml: ai-and-machine-learning
+      qa: qa
+      product-management: product-management
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This offer is no longer available"]
-    quirks: "Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no retry."
+    quirks: >-
+      Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no
+      retry. FIXED 2026-07-21 (manual platform audit, 2 rounds): (1) listing pages paginate
+      at 50/page — a single category can carry 1,000+ live postings, but the generic
+      single-fetch harvester only ever saw page 1. Dedicated fetch_jobgether() walks
+      ?page=N until a page stops adding new links (jobgether_should_continue) — NOT by
+      trusting the site's own total/maxPages counters, both proven unreliable live
+      (maxPages undercounts the worldwide listing's real page count, 10 vs a confirmed 33;
+      total was flat-out wrong for scrum-master, reporting 134,141 — a site-side bug, not a
+      real count). Capped at JOBGETHER_MAX_PAGES=40/category (~2000 jobs) — a full
+      borjan-pm Jobgether fetch (3 categories, worldwide) now takes ~75-80s, up from
+      near-instant at the old single-page-per-category volume; worth knowing if scan
+      wall-clock time starts to matter. (2) Switched borjan-pm (and any profile whose
+      search.regions_acceptable includes worldwide) from the EMEA-only listing to the
+      worldwide one via the new region_urls mechanism (see above) — the two are NOT nested
+      supersets, they're separately-served listings (verified live: project-manager
+      emea=156 vs worldwide=1,648). Verified live end-to-end: borjan-pm raw 66 -> 3,530
+      across the 3 categories, sampled titles genuinely on-topic ("Senior Project Manager",
+      "Principal Project Manager - Microsoft", etc.) — downstream keyword/region filters
+      (already proven on Himalayas/WWR's broad-fetch pattern) do the real narrowing.
     notion_platform_name: { tracker: "Jobgether", passed_seen: "Jobgether" }
 
   - id: 3
@@ -93,16 +153,55 @@ platforms:
     name: Dynamite Jobs
     tier_default: 3
     active: true
-    fetch_mode: headless
+    fetch_mode: api
+    # Sitemap-driven (2026-07-21 manual platform audit) — see fetch_dynamite() docstring.
+    # {category} = Dynamite's PARENT taxonomy slug (the sitemap index at
+    # /sitemap/jobs-categories-index.xml lists ~19: admin-va, business-development,
+    # community-manager, crypto-web3-blockchain, customer-support, data-analyst, design,
+    # development, e-commerce, finance-accounting, hr-recruiter, management-operations,
+    # marketing, multimedia, paid-ads, product, seo, teacher-coach, technical-support,
+    # writing-editing), NOT the browsable-URL subcategory slug the old url_patterns used.
     url_patterns:
-      - "https://dynamitejobs.com/remote-jobs/{category}"
+      - "https://dynamitejobs.com/sitemap/jobs-of-category.xml?category={category}"
     categories:
-      project-management: project-management
-      software-engineering: software-development
-    categories_verify_at_setup: [software-engineering]
+      project-management: management-operations
+      software-engineering: development
+      data: data-analyst
+      design-ux: design
+      marketing: marketing
+      people-hr: hr-recruiter
+      content-writing: writing-editing
+      sales: business-development
+      it-support: [customer-support, technical-support]
+      # No ai-ml or qa mapping — Dynamite's ~19 parent categories (see comment above) have
+      # no clean match for either; a real platform-side coverage gap, not a config omission.
+    # No categories_verify_at_setup: every stream above was live-verified 2026-07-21 (this
+    # audit) via the sitemap directly — real HTTP 200s, plausible per-category posting
+    # counts (22-183), and sample titles spot-checked as genuinely on-topic.
     mirrors: []
     expired_markers: ["This job is no longer available"]
-    quirks: "Category pages JS-rendered (v2.10.0)."
+    quirks: >-
+      FIXED 2026-07-21 (manual platform audit, Borjan's live find): the old category URL
+      (`/remote-jobs/project-management`) 301-redirected to the homepage — verified live,
+      0 URL overlap with the correct `/remote-jobs/management-operations/project-manager`
+      page, so the previously-reported raw count wasn't even category-scoped. Separately,
+      Dynamite's listings load in scroll-triggered batches (confirmed live: headless render
+      plateaus at ~16 regardless of scroll_rounds, i.e. one batch, not "no more jobs").
+      Switched to the platform's public sitemap
+      (/sitemap/jobs-of-category.xml?category={parent}) instead of headless HTML scraping —
+      one direct HTTP fetch returns every live posting in the parent category, each with a
+      lastmod date and usually a "Company - Title" caption; no scroll/batch-size guessing,
+      no bot-wall-prone rendering. Verified live: 125 postings for management-operations
+      (vs. the old ~16 batch-limited/wrong-page render). Location is a client-side-only UI
+      filter (confirmed: selecting it doesn't change the URL) — no server-side location
+      param exists to fetch narrower by region; the profile's own location/region filters
+      handle that downstream, same as every other broad-category board. EXPANDED same day
+      (Borjan: "is this fixed for all templates/roles?" -> the sitemap-driven rebuild only
+      covered the 2 streams already wired; found Dynamite has ~19 parent categories with
+      clean matches for several more MK templates that had zero Dynamite coverage before —
+      wired data/design-ux/marketing/people-hr/content-writing/sales/it-support, each
+      live-verified (22-183 postings, sample titles on-topic). No ai-ml or qa match exists
+      on the platform — genuine gap, not fixable via config.
     notion_platform_name: { tracker: "Dynamite Jobs", passed_seen: "Dynamite Jobs" }
 
   - id: 4
