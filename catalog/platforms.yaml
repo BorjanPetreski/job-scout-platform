@@ -243,10 +243,19 @@ platforms:
     active: true
     fetch_mode: direct
     url_patterns:
-      - "https://www.remoterocketship.com/jobs/anywhere-in-the-world/{category}/"
+      - "https://www.remoterocketship.com/jobs/{category}/"
     categories:
       project-management: scrum-master
       software-engineering: front-end-developer
+      data: data-analyst
+      design-ux: product-designer
+      marketing: marketing-manager
+      sales: account-executive
+      people-hr: recruitment
+      content-writing: content-writer
+      it-support: customer-support
+      ai-ml: ai-engineer
+      qa: qa-engineer
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
@@ -257,7 +266,29 @@ platforms:
       from "/company/{co}/jobs/{slug}" to "/publicjobs/company/{co}/jobs/{slug}" — the
       morning scan's harvested candidates still show the old un-prefixed path, a same-day
       re-fetch shows the new prefix on the identical posting slug. Harvest regex updated to
-      match; watch for a rollback or mixed-prefix period.
+      match; watch for a rollback or mixed-prefix period. 2026-07-21 manual walkthrough
+      (follow-up): the listing URL itself was structurally wrong, not just the posting-link
+      prefix — "/jobs/anywhere-in-the-world/{category}/" puts {category} in the site's
+      `contractTypeSlug` Next.js route slot, not the role slot, so it silently returned the
+      unfiltered sitewide "newest jobs" feed (172K+ total, generic titles like Healthcare
+      Call Center Representative, Financial Controller) for EVERY category, worldwide-wide —
+      confirmed live by comparing the page's own embedded `query` JSON across URL shapes.
+      The real role-scoped route is "/jobs/{category}/" (jobsInput slot directly, no
+      "anywhere-in-the-world" segment) — confirmed live (scrum-master: "Remote Scrum Master
+      Jobs", 173 positions; front-end-developer: "Remote Front End Developer Jobs", 279
+      positions), matching the shape Europe's route already used correctly
+      ("/country/{countrySlug}/jobs/{category}/"). Corrected `url_patterns` accordingly.
+      Same-day follow-up (Borjan: "is this fixed for all templates, all roles and
+      subvariants?"): the fix itself applies uniformly to the 2 already-wired streams (no
+      per-subvariant `platform_slugs` override exists for this platform, confirmed by search).
+      But the catalog only ever wired 2 of 11 streams — the site's `sitemap_job_titles.xml`
+      (2,529 role landing pages) has clean, live-verified matches for every other stream:
+      data-analyst (data), product-designer (design-ux), marketing-manager (marketing),
+      account-executive (sales), recruitment (people-hr), content-writer (content-writing),
+      customer-support (it-support), ai-engineer (ai-ml), qa-engineer (qa). Each verified live
+      for BOTH worldwide and Europe (HTTP 200 via headless render, page's own self-reported
+      count 74-9,746, correctly-labeled page title, e.g. "Remote Data Analyst Jobs") before
+      wiring — same rigor as the Dynamite Jobs/Jobgether stream expansions.
     per_job_fetch_mode: headless
     notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
 
@@ -272,10 +303,25 @@ platforms:
     categories:
       project-management: project-management
       software-engineering: software-engineering
+      data: data-analyst
+      design-ux: product-designer
+      marketing: marketing-manager
+      sales: account-executive
+      people-hr: recruitment
+      content-writing: content-writer
+      it-support: customer-support
+      ai-ml: ai-engineer
+      qa: qa-engineer
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
-    quirks: "Same engine as remote-rocketship-worldwide — same 2026-07-11 Cloudflare degradation."
+    quirks: >-
+      Same engine as remote-rocketship-worldwide — same 2026-07-11 Cloudflare degradation.
+      2026-07-21 (manual walkthrough follow-up, same session as worldwide's URL fix):
+      expanded from 2 to 11 wired streams — each new category slug live-verified on this
+      Europe route (HTTP 200, plausible count, on-topic titles) alongside its worldwide
+      counterpart; see the worldwide entry's quirk note for the full per-stream slug list
+      and verification detail.
     per_job_fetch_mode: headless
     notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
 
