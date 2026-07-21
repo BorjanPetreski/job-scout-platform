@@ -243,7 +243,7 @@ platforms:
     active: true
     fetch_mode: direct
     url_patterns:
-      - "https://www.remoterocketship.com/jobs/anywhere-in-the-world/{category}/"
+      - "https://www.remoterocketship.com/jobs/{category}/"
     categories:
       project-management: scrum-master
       software-engineering: front-end-developer
@@ -257,7 +257,18 @@ platforms:
       from "/company/{co}/jobs/{slug}" to "/publicjobs/company/{co}/jobs/{slug}" — the
       morning scan's harvested candidates still show the old un-prefixed path, a same-day
       re-fetch shows the new prefix on the identical posting slug. Harvest regex updated to
-      match; watch for a rollback or mixed-prefix period.
+      match; watch for a rollback or mixed-prefix period. 2026-07-21 manual walkthrough
+      (follow-up): the listing URL itself was structurally wrong, not just the posting-link
+      prefix — "/jobs/anywhere-in-the-world/{category}/" puts {category} in the site's
+      `contractTypeSlug` Next.js route slot, not the role slot, so it silently returned the
+      unfiltered sitewide "newest jobs" feed (172K+ total, generic titles like Healthcare
+      Call Center Representative, Financial Controller) for EVERY category, worldwide-wide —
+      confirmed live by comparing the page's own embedded `query` JSON across URL shapes.
+      The real role-scoped route is "/jobs/{category}/" (jobsInput slot directly, no
+      "anywhere-in-the-world" segment) — confirmed live (scrum-master: "Remote Scrum Master
+      Jobs", 173 positions; front-end-developer: "Remote Front End Developer Jobs", 279
+      positions), matching the shape Europe's route already used correctly
+      ("/country/{countrySlug}/jobs/{category}/"). Corrected `url_patterns` accordingly.
     per_job_fetch_mode: headless
     notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
 
