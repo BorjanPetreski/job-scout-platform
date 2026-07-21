@@ -632,6 +632,7 @@ def load(profile_id: str | None = None) -> dict:
         "notion": notion,
         "recompute": dict(defaults.get("recompute", {"due_at_sessions": 5})),
         "health": dict(defaults.get("health", {})),
+        "arch_review": dict(defaults.get("arch_review", {})),
         "scoring": {
             "surface_threshold": (merged.get("scoring") or {}).get("surface_threshold", 7.0),
             "bands": tpl.get("scoring_bands", ""),

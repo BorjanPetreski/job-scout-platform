@@ -104,6 +104,20 @@ def main() -> list[str]:
     s.ok(sys_flags.count("DOWN_STREAK") == 0,
          "SYSTEMIC: per-board DOWN_STREAK suppressed (symptoms of the one cause)")
 
+    # systemic_min_boards gate (2026-07-21 finding D1): 3 boards all-zero is 100% frac but too
+    # small a sample to call a platform-wide outage — SYSTEMIC must NOT fire below the floor,
+    # and lowering the (now-declared) threshold makes it fire. Pins the previously-inline `>= 4`.
+    good3 = {f"P{i}": _stat(10) for i in range(3)}
+    bad3 = {f"P{i}": _stat(0, source_down=True) for i in range(3)}
+    small = health.compute_health(_runs(good3, good3, good3, bad3),
+                                  active_names=list(good3), thresholds=TH)
+    s.ok("SYSTEMIC" not in [f["flag"] for f in small["findings"]],
+         "SYSTEMIC: 3/3 boards ~0 but < systemic_min_boards (4) -> no systemic verdict")
+    small_lo = health.compute_health(_runs(good3, good3, good3, bad3), active_names=list(good3),
+                                     thresholds={**TH, "systemic_min_boards": 3})
+    s.ok("SYSTEMIC" in [f["flag"] for f in small_lo["findings"]],
+         "SYSTEMIC: lowering systemic_min_boards to 3 makes the same 3-board case fire")
+
     # a healthy history returns no findings ---------------------------------------------------
     ok = health.compute_health(_runs({"H": _stat(12)}, {"H": _stat(14)}, {"H": _stat(11)}),
                                active_names=["H"], thresholds=TH)

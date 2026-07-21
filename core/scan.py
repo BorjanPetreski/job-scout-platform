@@ -45,6 +45,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import arch_review
 import check_links
 import dedup
 import fetch_boards
@@ -180,6 +181,12 @@ _LANG_NICE = re.compile(
 _APPLY_IN = re.compile(
     r"(appl(?:y|ication|ications|ying)|cv|resume|résumé|cover\s+letter|correspondence)"
     r"[^.\n]{0,30}\bin\s+(" + "|".join(_LANG_NAMES) + r")\b")
+# Per-language-name word-boundary patterns, compiled ONCE at import (2026-07-21 perf finding
+# A#7): stated_language_requirement's part (b) scans the JD once per non-target language name
+# — up to 26 full-text passes per survivor — and previously rebuilt the `\bNAME\b` pattern
+# string on every pass of every candidate. The names are a static set, so the patterns are
+# hoisted here; the loop below just indexes this map.
+_LANG_NAME_RES = {nm: re.compile(rf"\b{nm}\b") for nm in _LANG_NAMES}
 
 
 def stated_language_requirement(text: str, target_langs: set[str]) -> tuple[str | None, str]:
@@ -202,7 +209,7 @@ def stated_language_requirement(text: str, target_langs: set[str]) -> tuple[str 
     for nm, code in _LANG_NAMES.items():
         if code in target_langs:
             continue
-        for m in re.finditer(rf"\b{nm}\b", low):
+        for m in _LANG_NAME_RES[nm].finditer(low):
             win = low[max(0, m.start() - 45): m.end() + 45]
             if _LANG_NICE.search(win):
                 continue                              # explicitly optional — not a barrier
@@ -346,6 +353,16 @@ def hard_filter(cand: dict, hf: dict) -> tuple[str | None, list[str]]:
     return None, flags
 
 
+def _log_drop(c: dict, status: str, reason: str, notes: str) -> None:
+    """Append one mechanical-drop record for candidate `c`, through dedup's canonical
+    record constructor. Was four hand-built raw-dict literals in run_scan (2026-07-21
+    coupling finding 4.1) — same 11-field shape each, varying only status/reason/notes —
+    so a field rename drifted silently against notion_sync's field-by-field reader."""
+    dedup.append(dedup.make_seen_record(
+        company=c["company"], role=c["title"], locdom=c.get("loc", ""), url=c["url"],
+        platform=c["platform"], status=status, reason=reason, notes=notes))
+
+
 def print_plan(cfg: dict) -> None:
     """--plan: the resolved scan plan, zero network. The dry-run acceptance surface."""
     prof = cfg["profile"]
@@ -371,8 +388,7 @@ def print_plan(cfg: dict) -> None:
     else:
         print("salary floor: none set — below-floor first-pass disabled; "
               "judgment-layer estimation via template heuristics (D20)")
-    active = [p for p in cfg["platforms"] if p.get("active")]
-    active.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
+    active = fetch_boards.active_platforms(cfg)
     print(f"\nrotation ({len(active)} active platforms, tier order):")
     for p in active:
         targets = (p.get("api") or []) + (p.get("urls") or [])
@@ -446,7 +462,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
             _runs_peek = json.loads(_runs_peek_path.read_text(encoding="utf-8"))
             _last_ran_at = max(
                 (rec["ran_at"] for day, labels in _runs_peek.items()
-                 if day not in ("recompute", "health_review") and isinstance(labels, dict)
+                 if day not in ("recompute", "health_review", "arch_review") and isinstance(labels, dict)
                  for rec in labels.values() if isinstance(rec, dict) and rec.get("ran_at")),
                 default=None)
             if _last_ran_at:
@@ -458,8 +474,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         scan_gap_hours = gap_hours
     cfg["scan_gap_hours"] = scan_gap_hours
 
-    platforms = [p for p in cfg["platforms"] if p.get("active")]
-    platforms.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
+    platforms = fetch_boards.active_platforms(cfg)
     if half:  # degraded/manual mode only — the r2 default is the full rotation
         mid = (len(platforms) + 1) // 2
         platforms = platforms[:mid] if half == "AM" else platforms[mid:]
@@ -483,7 +498,18 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     results = fetch_boards.fetch_many(platforms, cfg, on_progress=_log_progress)
     if cfg["linkedin_tripwire"].get("enabled", True):
         _log("  LinkedIn tripwire…")
-        results.append(linkedin_tripwire.fetch_tripwire(cfg))
+        # Same fault-isolation boundary every board gets via fetch_platform (a fetcher bug
+        # must never take down the whole run). The tripwire was previously called raw, outside
+        # that boundary, then dereferenced with r["source_down"]/r["note"] below — a raise or
+        # missing key here would crash the entire scan (2026-07-21 finding A#1).
+        try:
+            results.append(linkedin_tripwire.fetch_tripwire(cfg))
+        except Exception as exc:
+            # mirror the tripwire's own result shape (http_ok/healed are read with .get defaults
+            # downstream, exactly as they are for a normal tripwire result which omits them).
+            results.append({"platform": linkedin_tripwire.PLATFORM, "candidates": [],
+                            "source_down": True,
+                            "note": f"tripwire crashed: {type(exc).__name__}: {exc}"})
 
     sources_down = [r["platform"] for r in results if r["source_down"]]
     notes = {r["platform"]: r["note"] for r in results if r["note"]}
@@ -531,10 +557,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
             reason, flags = hard_filter(c, cfg.get("hard_filters", {}))
             c["flags"] = sorted(set((c.get("flags") or []) + flags))
             if reason:
-                dedup.append({"company": c["company"], "role": c["title"], "locdom": c.get("loc", ""),
-                              "url": c["url"], "platform": c["platform"], "status": "dropped",
-                              "reason": "Filtered Out", "fit": "N/A", "archetype": "",
-                              "keyword_source": c["title"], "notes": reason})
+                _log_drop(c, "dropped", "Filtered Out", reason)
                 dropped += 1
                 drop_by_param[_drop_param(reason)] = drop_by_param.get(_drop_param(reason), 0) + 1
                 continue
@@ -582,24 +605,19 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
             continue
         v = verdicts.get(c.get("source_url") or c["url"], {"verdict": "unverifiable_direct"})
         if v["verdict"] == "stale":
-            dedup.append({"company": c["company"], "role": c["title"], "locdom": c.get("loc", ""),
-                          "url": c["url"], "platform": c["platform"], "status": "dropped",
-                          "reason": "Stale/Expired", "fit": "N/A", "archetype": "",
-                          "keyword_source": c["title"],
-                          "notes": f"link check: {v.get('note', '')} (source URL {c.get('source_url') or 'n/a'})"})
+            _log_drop(c, "dropped", "Stale/Expired",
+                      f"link check: {v.get('note', '')} (source URL {c.get('source_url') or 'n/a'})")
             link_dead += 1
             drop_by_param["stale"] = drop_by_param.get("stale", 0) + 1
             continue
         if v["verdict"] == "unverifiable_direct" and not c.get("jd_text"):
             # nothing to evaluate and no way to verify: confirmed dead end (2.6.0 / SysMap)
-            dedup.append({"company": c["company"], "role": c["title"], "locdom": c.get("loc", ""),
-                          "url": c["url"], "platform": c["platform"], "status": "unverified_blocked",
-                          "reason": "Unverified/Blocked", "fit": "N/A", "archetype": "",
-                          "keyword_source": c["title"], "notes": f"blocked: {v.get('note', '')}"})
+            _log_drop(c, "unverified_blocked", "Unverified/Blocked", f"blocked: {v.get('note', '')}")
             dropped += 1
             drop_by_param["unverified_blocked"] = drop_by_param.get("unverified_blocked", 0) + 1
             continue
-        c["link_status"] = {"live": "✅ live", "unverifiable_direct": "❓ unverified"}[v["verdict"]]
+        c["link_status"] = {"live": "✅ live",
+                            "unverifiable_direct": "❓ unverified"}.get(v["verdict"], "❓ unverified")
         survivors.append(c)
 
     # ---- salary assessment (4.0, ADDITIVE metadata for the judgment layer — never a
@@ -729,16 +747,14 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
                 param = "language_mismatch"
                 reason = c.get("language_note") or f"non-target language (accepts {sorted(target_langs)})"
             if reason:
-                dedup.append({"company": c["company"], "role": c["title"], "locdom": c.get("loc", ""),
-                              "url": c["url"], "platform": c["platform"], "status": "dropped",
-                              "reason": "Filtered Out", "fit": "N/A", "archetype": "",
-                              "keyword_source": c["title"], "notes": reason})
+                _log_drop(c, "dropped", "Filtered Out", reason)
                 dropped += 1
                 drop_by_param[param] = drop_by_param.get(param, 0) + 1
                 continue
             kept.append(c)
         _log(f"hard-eligibility drop: {len(survivors) - len(kept)} off-target "
-             f"(work_arrangement={wa_mode}, employment_mismatch={em_mode})")
+             f"(work_arrangement={wa_mode}, employment_mismatch={em_mode}, "
+             f"language_mismatch={lm_mode})")
         survivors = kept
 
     # ---- shortlist liveness sweep (4.0, step 8 — ARCHITECTURE.md §6)
@@ -808,6 +824,11 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     hr = runs.setdefault("health_review", {"last": today, "sessions_since": 0,
                                            "due_at_sessions": cfg.get("health", {}).get("due_at_sessions", 6)})
     hr["sessions_since"] = hr.get("sessions_since", 0) + 1
+    # architecture-review-due counter (CLAUDE.md DoD #5): same rails again — prints "⚠ architecture
+    # review due" every N scans as Claude's cue to ASSESS whether a full whole-codebase pass is worth
+    # running (a judgment call, not an order). core/arch_review.py --ack resets it after a pass.
+    ar = arch_review.bump(runs, cfg.get("arch_review", {}).get("due_at_sessions",
+                                                               arch_review.DEFAULT_DUE_AT_SESSIONS))
     runs_path.write_text(json.dumps(runs, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # ---- ledger print (replaces the 20-item chat checklist; partial-labeled-partial)
@@ -854,6 +875,8 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     if hr["sessions_since"] >= hr.get("due_at_sessions", 6):
         print(f"⚠ platform health review due: {hr['sessions_since']} sessions since {hr['last']} "
               "(run `python3 core/health.py` and diagnose flagged boards)")
+    if arch_review.is_due(ar):
+        print(arch_review.nudge_line(ar))
     print(f"candidates JSON: {out_path.relative_to(paths.REPO_ROOT)}")
     return {"new": len(survivors), "dropped": dropped, "link_dead": link_dead,
             "sweep": sweep_counts, "sources_down": sources_down}

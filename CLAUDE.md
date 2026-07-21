@@ -53,10 +53,15 @@ happen every session — the parts that quietly rot if left to memory.
    `docs/ARCHITECTURE_QUALITY_SCOPE.md` so each pass picks up where the last one left off
    instead of re-scoping from scratch or silently re-covering the same ground. Same discipline
    as #4 applies to the pass itself: verify every finding against the real code before acting,
-   fix what's proportionate, seed the rest (#8 below) rather than force it into one session. No
-   hook enforces the cadence (a "sessions since" counter isn't something this file's static
-   text can track); treat "is one due" as part of done the same way as #4 — a judgment call,
-   but a CHECKED one, not a skipped one.
+   fix what's proportionate, seed the rest (#8 below) rather than force it into one session.
+   The cadence is now NUDGED (added 2026-07-21): the scan ledger prints `⚠ architecture review
+   due` once the `arch_review` counter in `runs.json` crosses `due_at_sessions` (default 10),
+   riding the same rails as the health-review/recompute nudges (`core/arch_review.py`) — so "is
+   one due?" is prompted, not left to memory. The nudge is a CUE to ASSESS, never an order to
+   run: running the pass stays a judgment call weighed against real cost/benefit, and
+   `python3 core/arch_review.py --ack` resets the counter after a pass (acks every profile — one
+   pass covers the shared engine). Treat "is one due" as part of done the same way as #4 — a
+   judgment call, but a CHECKED (and now nudged) one, not a skipped one.
 6. **No PII in the repo** — no CV body facts, emails, phone numbers, or addresses (the 3a.8
    no-PII denylist enforces the binding files; keep it true everywhere).
 7. **Capture build-method lessons (the meta-layer).** Assess whether this session taught something

@@ -46,6 +46,11 @@ _SEV_LABEL = {0: "critical", 1: "high", 2: "medium", 3: "low"}
 _DEFAULT_TH = {
     "window": 6, "down_streak": 4, "yield_collapse_factor": 0.15,
     "min_baseline": 3, "never_produced_min_runs": 4, "systemic_frac": 0.7,
+    # minimum active boards present before a SYSTEMIC verdict is even possible — below this,
+    # "most boards at zero" is too small a sample to call a platform-wide outage. Hoisted from
+    # an inline `>= 4` literal (2026-07-21 pass, finding D1): its sibling `systemic_frac` was
+    # already a declared/overridable threshold, so this half of the same rule lived undeclared.
+    "systemic_min_boards": 4,
 }
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -128,7 +133,7 @@ def compute_health(runs: dict, active_names: list[str] | None = None,
     present = [n for n in latest if n in active] if active else list(latest)
     zeros = [n for n in present if _is_zero(latest[n])]
     frac = len(zeros) / len(present) if present else 0.0
-    systemic = len(present) >= 4 and frac >= th["systemic_frac"]
+    systemic = len(present) >= th["systemic_min_boards"] and frac >= th["systemic_frac"]
     if systemic:
         emit("(platform-wide)", "SYSTEMIC",
              f"{len(zeros)}/{len(present)} active boards at ~zero in the latest run "

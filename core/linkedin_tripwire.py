@@ -24,6 +24,15 @@ UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 )
+# The tripwire's platform label — one constant, not six inline literals across the return
+# points + candidate cards (2026-07-21 finding D3, matching fetch_boards._cand's discipline).
+PLATFORM = "LinkedIn (tripwire)"
+
+
+def _result(candidates: dict, source_down: bool, note: str) -> dict:
+    """The single shaped result the scan consumes (was hand-built at five return points)."""
+    return {"platform": PLATFORM, "candidates": list(candidates.values()),
+            "source_down": source_down, "note": note}
 
 TITLE_RE = re.compile(r'base-search-card__title[^>]*>\s*([^<]+)')
 COMPANY_RE = re.compile(r'base-search-card__subtitle[^>]*>\s*(?:<a[^>]*>)?\s*([^<]+)', re.S)
@@ -40,17 +49,20 @@ def fetch_tripwire(cfg: dict) -> dict:
     """Returns {"platform": "LinkedIn (tripwire)", "candidates": [...], "source_down": bool, "note": str}."""
     lt = cfg.get("linkedin_tripwire", {})
     caps = cfg.get("caps", {})
+    candidates: dict[str, dict] = {}
     if not lt.get("enabled", True):
-        return {"platform": "LinkedIn (tripwire)", "candidates": [], "source_down": False,
-                "note": "disabled in config"}
+        return _result(candidates, False, "disabled in config")
     max_req = int(caps.get("linkedin_requests_per_run", 10))
     delay = float(caps.get("linkedin_min_delay_s", 3))
     keywords = lt.get("keywords", ["Project Manager"])
     locations = lt.get("locations", ["European Union", "Worldwide"])
 
-    candidates: dict[str, dict] = {}
     requests_made = 0
     note = ""
+    errors: list[str] = []   # transient non-200s: reported ALONGSIDE the summary, never
+                             # MASKING it (2026-07-21 finding D4: a mid-run HTTP error left a
+                             # stale `note` that the final `note or summary` returned instead of
+                             # the real "N requests, M cards" outcome after a later 200 succeeded).
     for kw in keywords:
         for loc in locations:
             if requests_made >= max_req:
@@ -65,14 +77,12 @@ def fetch_tripwire(cfg: dict) -> dict:
                 r = requests.get(ENDPOINT, params=params, headers={"User-Agent": UA}, timeout=20)
                 requests_made += 1
             except requests.RequestException as exc:
-                return {"platform": "LinkedIn (tripwire)", "candidates": list(candidates.values()),
-                        "source_down": True, "note": f"network error: {type(exc).__name__}"}
+                return _result(candidates, True, f"network error: {type(exc).__name__}")
             if r.status_code in (429, 999):
-                return {"platform": "LinkedIn (tripwire)", "candidates": list(candidates.values()),
-                        "source_down": True,
-                        "note": f"HTTP {r.status_code} — rate-limited, stopped immediately"}
+                return _result(candidates, True,
+                               f"HTTP {r.status_code} — rate-limited, stopped immediately")
             if r.status_code != 200:
-                note = f"HTTP {r.status_code} on ({kw!r}, {loc!r})"
+                errors.append(f"HTTP {r.status_code} on ({kw!r}, {loc!r})")
                 time.sleep(delay)
                 continue
             # split into per-card chunks (each card is a <li> holding one job link)
@@ -91,7 +101,7 @@ def fetch_tripwire(cfg: dict) -> dict:
                     continue
                 candidates.setdefault(url, {
                     "title": title, "company": company, "loc": locname, "url": url,
-                    "platform": "LinkedIn (tripwire)",
+                    "platform": PLATFORM,
                     "posted_at": posted.group(1) if posted else None,
                     "salary": None, "jd_text": None,
                     "flags": ["LinkedIn guest card — full JD via public job page where it "
@@ -100,9 +110,10 @@ def fetch_tripwire(cfg: dict) -> dict:
             time.sleep(delay)
         if requests_made >= max_req:
             break
-    return {"platform": "LinkedIn (tripwire)", "candidates": list(candidates.values()),
-            "source_down": False,
-            "note": note or f"{requests_made} guest requests, {len(candidates)} unique cards"}
+    summary = note or f"{requests_made} guest requests, {len(candidates)} unique cards"
+    if errors:  # append transient errors — they inform, they never replace the real outcome
+        summary += f" (transient: {len(errors)} non-200 — {'; '.join(errors[:3])})"
+    return _result(candidates, False, summary)
 
 
 if __name__ == "__main__":
