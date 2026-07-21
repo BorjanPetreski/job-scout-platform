@@ -514,7 +514,14 @@ def fetch_wwr(p: dict, cfg: dict) -> dict:
 HARVEST_SPECS: dict[str, dict] = {
     "himalayas": {"href": r"/companies/[^/]+/jobs/[^/]+/?", "base": "https://himalayas.app", "company_idx": 2},
     "jobgether": {"href": r"/offer/[\w-]{10,}", "base": "https://jobgether.com"},
-    "arc": {"href": r"/remote-jobs/details/[\w-]+", "base": "https://arc.dev"},
+    # 2026-07-21 (platform audit): Arc.dev serves postings via TWO parallel URL schemes —
+    # native "/remote-jobs/details/{slug}" and syndicated "/remote-jobs/j/{slug}" (logos
+    # point at partner ATS hosts, e.g. Lever's S3 bucket). Confirmed the "j/" set is
+    # genuinely category-scoped, not a fixed sitewide widget: the python category page
+    # showed Data Scientist/Software Engineer "j/" links, marketing showed Growth Marketing
+    # Manager/Head of Marketing — different content per category. The old regex silently
+    # missed this entire class of postings on every category.
+    "arc": {"href": r"/remote-jobs/(?:details|j)/[\w-]+", "base": "https://arc.dev"},
     # 2026-07-21 (platform audit, same-day as the morning scan): postings moved from
     # "/company/{co}/jobs/{slug}" to "/publicjobs/company/{co}/jobs/{slug}" mid-day —
     # confirmed by the SAME slug (epi-company-eu/.../test-project-manager-freelance-
