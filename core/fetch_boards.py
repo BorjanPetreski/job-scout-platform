@@ -62,9 +62,15 @@ _host_lock = threading.Lock()
 # Cross-platform concurrency (2026-07-21): platforms are different hosts, so running them
 # in parallel doesn't make us ruder to any single server — _polite()'s per-host lock above
 # was already written thread-safe for exactly this ("sleep OUTSIDE the lock — other hosts
-# must not stall behind it"). The one real resource cost is headless (Playwright/Chromium)
-# rendering — CPU/memory per instance, not just network I/O — so it gets its own tighter,
-# separately-pooled cap (bulkhead pattern — see fetch_many below), not just a higher number.
+# must not stall behind it"). Headless (Playwright/Chromium) platforms get their own
+# thread pool (bulkhead pattern — see fetch_many below), sized by MAX_CONCURRENT_HEADLESS —
+# but that number bounds THREAD dispatch only, not actual browser launches: render.py
+# serializes every real chromium.launch() process-wide behind its own lock (proven-safe
+# pattern — check_links.py's 2026-07-11 history found concurrent per-thread Chromium
+# launches silently degrade results, not just crash). A headless-pool thread can still do
+# useful non-render work (the direct-fetch attempt, HTML harvest/parse) while another
+# thread holds the render lock — this bounds wasted idle threads, it doesn't reintroduce
+# concurrent browser processes.
 MAX_CONCURRENT_HEADLESS = 4
 MAX_CONCURRENT_HTTP = 12
 
@@ -87,12 +93,16 @@ _TRANSIENT_EXC = (requests.exceptions.ConnectionError, requests.exceptions.Timeo
 _RETRY_STATUS = {429, 500, 502, 503, 504}
 
 
-def _get(url: str, timeout: int = 25, retries: int = 2, **kw) -> requests.Response:
+def _request(method: str, url: str, timeout: int = 25, retries: int = 2, **kw) -> requests.Response:
+    """Shared retry/backoff/politeness core for _get/_post — every fetcher that talks HTTP
+    goes through one of these two, never requests.get/post directly (2026-07-21: found
+    fetch_workable calling requests.post() straight, bypassing this entirely — a single
+    transient error dropped the whole board with no retry, unlike every sibling fetcher)."""
     last_exc: Exception | None = None
     for attempt in range(retries + 1):
         _polite(url)
         try:
-            r = requests.get(url, headers=HEADERS, timeout=timeout, **kw)
+            r = requests.request(method, url, headers=HEADERS, timeout=timeout, **kw)
         except _TRANSIENT_EXC as exc:
             last_exc = exc
             if attempt < retries:
@@ -104,6 +114,14 @@ def _get(url: str, timeout: int = 25, retries: int = 2, **kw) -> requests.Respon
             continue
         return r
     raise last_exc  # unreachable, but keeps the type checker honest
+
+
+def _get(url: str, timeout: int = 25, retries: int = 2, **kw) -> requests.Response:
+    return _request("GET", url, timeout=timeout, retries=retries, **kw)
+
+
+def _post(url: str, timeout: int = 25, retries: int = 2, **kw) -> requests.Response:
+    return _request("POST", url, timeout=timeout, retries=retries, **kw)
 
 
 def _cand(title, company, loc, url, platform, posted_at=None, salary=None, jd=None) -> dict:
@@ -285,6 +303,7 @@ def fetch_himalayas(p: dict, cfg: dict) -> dict:
     phrases = [s.lower() for s in (p.get("params") or {}).get("prefilter_phrases", [])]
     pages = himalayas_pages_for_gap(cfg.get("scan_gap_hours", 24.0))
     cands = []
+    page = 0
     try:
         for page in range(pages):
             d = _get(f"https://himalayas.app/jobs/api?limit=20&offset={page * 20}", timeout=30).json()
@@ -309,7 +328,15 @@ def fetch_himalayas(p: dict, cfg: dict) -> dict:
     except Exception as exc:
         if not cands:
             return _down(p["name"], f"API error: {type(exc).__name__}")
-    return _ok(p["name"], cands, "jobs/api newest 1000, stream-prefiltered (HTML listing 403s)")
+        # matches fetch_justjoinit's honesty convention for the same situation: a mid-run
+        # break with SOME candidates already collected must say "partial", not read as a
+        # normal complete sweep — health.py/the ledger can't otherwise tell a genuine
+        # ~1000-job pull apart from one truncated after page 3 (2026-07-21 audit finding).
+        return _ok(p["name"], cands, f"partial: pagination broke after {page} pages")
+    # `page` is the last 0-indexed iteration reached — page+1 whether the loop ran to its
+    # full `pages` target or exited early via `if not jobs: break` (fewer real pages existed
+    # than requested); `pages` itself would overstate the early-break case.
+    return _ok(p["name"], cands, f"{page + 1} pages, jobs/api newest, stream-prefiltered (HTML listing 403s)")
 
 
 def fetch_greenhouse(p: dict, cfg: dict) -> dict:
@@ -367,9 +394,7 @@ def fetch_workable(p: dict, cfg: dict) -> dict:
                 body = {"query": "", "location": [], "department": [], "worktype": [], "remote": []}
                 if token:
                     body["token"] = token
-                _polite(f"https://apply.workable.com/{b}")
-                r = requests.post(f"https://apply.workable.com/api/v3/accounts/{b}/jobs",
-                                  json=body, headers=HEADERS, timeout=25)
+                r = _post(f"https://apply.workable.com/api/v3/accounts/{b}/jobs", json=body)
                 d = r.json()
                 for j in d.get("results", []):
                     loc = (j.get("location") or {}).get("city") or ""
@@ -720,8 +745,10 @@ def _is_headless_platform(p: dict) -> bool:
     headless_scroll, and not a lightweight custom HANDLERS entry that bypasses fetch_mode
     entirely — e.g. himalayas/wwr are catalog fetch_mode 'direct' but dispatch through their
     own API handler, never touching render()). A generic fetch_mode 'direct' platform CAN
-    still escalate to headless inside fetch_html_listing on failure, but that's an occasional
-    fallback, not its steady state, so it stays in the lighter (HTTP) concurrency group."""
+    still escalate to headless inside fetch_html_listing on failure — that stays in the
+    lighter (HTTP) THREAD pool (occasional fallback, not its steady state), but it's just as
+    safe as the headless group's own render calls: render.py serializes every actual
+    browser launch process-wide, so which thread pool triggered it doesn't matter."""
     return p.get("slug") not in HANDLERS and p.get("fetch_mode") in ("headless", "headless_scroll")
 
 
@@ -730,13 +757,15 @@ def fetch_many(platforms: list[dict], cfg: dict, on_progress=None) -> list[dict]
     platform, in INPUT order, regardless of completion order.
 
     Bulkhead pattern (2026-07-21): two dedicated, independently-sized thread pools —
-    one for headless/Playwright platforms (MAX_CONCURRENT_HEADLESS: the real
-    resource-heavy group, each fetch launches its own full Chromium process — see
-    render.py) and one for plain-HTTP/API platforms (MAX_CONCURRENT_HTTP). Each pool's
-    OWN size is the enforced cap — no semaphore gating a subset of tasks inside one
-    shared pool, which would let blocked-on-semaphore headless tasks sit holding worker
-    threads HTTP tasks need (head-of-line blocking) if that shared pool were ever sized
-    to a real bound instead of unboundedly by input count.
+    one for headless/Playwright platforms (MAX_CONCURRENT_HEADLESS) and one for plain-
+    HTTP/API platforms (MAX_CONCURRENT_HTTP). Each pool's OWN size is the enforced
+    THREAD-dispatch cap — no semaphore gating a subset of tasks inside one shared pool,
+    which would let blocked-on-semaphore headless tasks sit holding worker threads HTTP
+    tasks need (head-of-line blocking) if that shared pool were ever sized to a real
+    bound instead of unboundedly by input count. Separately, and more importantly: the
+    actual resource-heavy step (a Chromium process) is bounded to ONE AT A TIME
+    process-wide by render.py's own lock, regardless of which pool's thread calls it —
+    see render.py's module docstring for why (a proven failure mode, not a guess).
 
     on_progress(done_count, total, platform, result), if given, is called once per
     result as it completes — from THIS function's own thread (the as_completed loop

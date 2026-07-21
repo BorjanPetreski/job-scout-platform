@@ -48,6 +48,10 @@ class _Resp:
     def json(self) -> dict:
         return self._payload
 
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
+
 
 class FakeNotion:
     """A Passed/Seen Log that can hold MORE THAN ONE row per Job URL — the whole point of the
@@ -77,11 +81,18 @@ class FakeNotion:
                 for r in self.rows], "has_more": False})
         if method == "GET" and url.startswith(f"{API}/pages/"):
             row = self._by_id(url.rsplit("/", 1)[-1])
-            return _Resp(200, {"properties": {"Reason Passed": {"select": {"name": row["reason"]}}}})
+            # _patch_verified (2026-07-21) re-fetches and compares EVERY property it PATCHed,
+            # not just Reason Passed — the fake page must actually store+echo back whatever
+            # was last written, same as real Notion, or the post-write assertion (correctly)
+            # flags a mismatch that was really just an under-modeled fake.
+            props = dict(row.get("properties") or {"Reason Passed": {"select": {"name": row["reason"]}}})
+            return _Resp(200, {"properties": props})
         if method == "PATCH" and url.startswith(f"{API}/pages/"):
             pid = url.rsplit("/", 1)[-1]
             row = self._by_id(pid)
-            new = (kw["json"]["properties"].get("Reason Passed") or {}).get("select", {}).get("name")
+            sent = kw["json"]["properties"]
+            row.setdefault("properties", {"Reason Passed": {"select": {"name": row["reason"]}}}).update(sent)
+            new = (sent.get("Reason Passed") or {}).get("select", {}).get("name")
             if new:
                 row["reason"] = new
             self.patches.append((pid, new))

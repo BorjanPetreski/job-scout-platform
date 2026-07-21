@@ -52,7 +52,9 @@ _TEMPLATE_KEYS = {"schema_version", "template_id", "label", "suggest_also", "ext
                   "defaults", "scoring_bands", "salary_estimation_heuristics", "interview",
                   # Phase 2 v2 template-only blocks (§3.3):
                   "platform_tiers",     # per-stream tier ordering — seeds profile.platforms.tiers
-                                        #   at INTERVIEW time (2.6); NEVER loader-merged (see note below)
+                                        #   at INTERVIEW time (2.6); NEVER loader-merged. Excluded
+                                        #   from _TOP_KEYS below is the actual enforcement; this
+                                        #   entry only lets the loader recognize it as a known key.
                   "seniority_titles"}   # title->band extensions to the base seniority_lexicon (D21)
 _US_NAMES = {"united states", "usa", "us", "united states of america"}
 
@@ -132,13 +134,20 @@ def load_seniority_lexicon() -> dict:
 
 
 def _merge(base, override):
-    """Deep merge: dicts recurse; everything else (incl. lists) is replaced by override."""
+    """Deep merge: dicts recurse; everything else (incl. lists AND explicit null) is
+    replaced by override — "later wins" unconditionally (2026-07-21 fix: the prior `else
+    base` fallback treated an explicit `key: null` override as "not set, keep base",
+    silently defeating the documented D20 floorless contract — a profile writing
+    `compensation.floor: null` over a template that DOES set a floor kept the template's
+    floor with no error. The loop below only ever calls this with a `v` that WAS present
+    in override.items(), so None here always means "explicitly nulled," never "absent" —
+    there is no legitimate case in this codebase where that should mean "keep base"."""
     if isinstance(base, dict) and isinstance(override, dict):
         out = dict(base)
         for k, v in override.items():
             out[k] = _merge(base.get(k), v) if k in base else v
         return out
-    return override if override is not None else base
+    return override
 
 
 # ---------------------------------------------------------------- validation

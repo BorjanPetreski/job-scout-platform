@@ -19,7 +19,10 @@ Usage:
                               ledger is unchanged; a long silent run becomes watchable)
 
 What gets auto-logged to seen.jsonl by a scan (everything else is Claude's call):
-  dropped/Filtered Out    auto_drop_patterns or the closed-location-list detector matched
+  dropped/Filtered Out    auto_drop_patterns / auto_drop_title_patterns / the closed-location-
+                          list detector matched, OR (opt-in per profile) a hard-eligibility drop
+                          on work_arrangement_mismatch / employment_off_target /
+                          non_target_language when the profile sets that filter to "drop" mode
   dropped/Stale-Expired   liveness check said stale (mechanical) — incl. the sweep's
                           post-shortlist retirements (ARCHITECTURE.md §6)
   unverified_blocked      no JD obtainable AND liveness unverifiable — confirmed dead end
@@ -839,7 +842,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
               f"{reconcile['backfilled']} back-filled applied, {reconcile['already']} already, "
               f"{reconcile['unmatched']} unmatched")
     dq = {f: sum(1 for c in survivors if f in (c.get("flags") or []))
-          for f in ("non_english_jd", "start_date_passed", "missing_company",
+          for f in ("non_target_language", "start_date_passed", "missing_company",
                     "applied_variant_saturation")}
     dq = {k: v for k, v in dq.items() if v}
     if dq:
