@@ -33,6 +33,7 @@ Endpoint state as verified live 2026-07-11 (endpoints drift — see BUILD findin
 from __future__ import annotations
 
 import concurrent.futures
+import html
 import json
 import re
 import sys
@@ -518,7 +519,8 @@ HARVEST_SPECS: dict[str, dict] = {
     "remote-rocketship-europe": {"href": r"/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 2},
     "wttj": {"href": r"/en/companies/[^/]+/jobs/[^/]+", "base": "https://www.welcometothejungle.com", "company_idx": 3},
     "nodesk": {"href": r"/remote-jobs/[a-z0-9-]+/?", "base": "https://nodesk.co", "min_hyphens": 3},
-    "dynamite": {"href": r"(?:https://dynamitejobs\.com)?/company/[^/]+/remote-job/[\w-]+/?", "base": "https://dynamitejobs.com", "company_idx": 2},
+    # dynamite: removed 2026-07-21 — now a dedicated HANDLERS entry (fetch_dynamite,
+    # sitemap-driven), which bypasses this generic-harvester spec entirely.
     # 2026-07-20: site redesign — postings now render client-side (headless already handles
     # that) under a RELATIVE href (no leading slash, no "/remote-jobs/" prefix):
     # "remote-manager-exec-jobs/product-owner-d365-finance-operations-nutrafol-8ab854..."
@@ -712,6 +714,78 @@ def fetch_jobgether(p: dict, cfg: dict) -> dict:
     return _ok(p["name"], list(all_cands.values()), "; ".join(notes))
 
 
+# Dynamite Jobs sitemap entries: <loc>...</loc>, optional <lastmod>...</lastmod>, optional
+# <image:caption>"Company - Title (remote job)"</image:caption>.
+_DYNAMITE_SITEMAP_ENTRY_RE = re.compile(
+    r"<url>\s*<loc>(https://dynamitejobs\.com/company/[^/]+/remote-job/[\w-]+)</loc>"
+    r"(?P<rest>.*?)</url>", re.S)
+_DYNAMITE_LASTMOD_RE = re.compile(r"<lastmod>([^<]+)</lastmod>")
+_DYNAMITE_CAPTION_RE = re.compile(r"<image:caption>([^<]+)</image:caption>")
+
+
+def dynamite_title_company(caption: str | None, url: str) -> tuple[str, str]:
+    """Pure parse of a Dynamite Jobs sitemap <image:caption> ("Company - Title (remote
+    job)") into (title, company); unit-tested in isolation from the HTTP fetch. Falls back
+    to the URL slug when the caption is missing or doesn't match the expected shape (2026-
+    07-21 manual platform audit: ~95% of sampled entries had it, not universal)."""
+    if caption:
+        caption = re.sub(r"\s*\(remote job\)\s*$", "", html.unescape(caption))
+        if " - " in caption:
+            company, title = caption.split(" - ", 1)
+            return title.strip(), company.strip()
+    return _slug_title(url), ""
+
+
+def fetch_dynamite(p: dict, cfg: dict) -> dict:
+    """Dynamite Jobs' listing pages are JS-rendered AND load in scroll-triggered batches
+    (2026-07-21 manual platform audit, Borjan's live find) — a plain headless render only
+    ever captures the first batch (~16 postings) regardless of category, and the catalog's
+    prior category URL (`/remote-jobs/{category}` with a bare stream-shaped slug like
+    "project-management") 301-redirected to the homepage, so that ~16 wasn't even
+    category-scoped: verified live it was a completely different, unrelated set of postings
+    from the real `management-operations` category page (0 URL overlap).
+
+    Their public sitemap (`/sitemap/jobs-of-category.xml?category={parent}`) sidesteps both
+    problems at once: one direct HTTP fetch returns EVERY live posting in that parent
+    category (verified live: 125 for management-operations vs. the ~16 batch-limited
+    headless render), each with a `lastmod` date and usually a `"Company - Title"` caption —
+    no scrolling, no bot-wall-prone rendering, no batch-size guessing. Categories now map to
+    Dynamite's PARENT taxonomy (management-operations, development — the full sitemap
+    index at /sitemap/jobs-categories-index.xml lists ~19), a broad bucket like Himalayas/
+    WWR/Jobgether-worldwide; the profile's keyword filter narrows it downstream, same as
+    always. Falls back to source_down if the sitemap shape isn't found (site change) —
+    degrades honestly, never crashes.
+    """
+    urls = p.get("urls") or []
+    if not urls:
+        return _down(p["name"], "no listing urls configured")
+    all_cands: dict[str, dict] = {}
+    notes: list[str] = []
+    reached_200 = False
+    for u in urls:
+        try:
+            r = _get(u, timeout=30)
+        except Exception as exc:
+            notes.append(f"{type(exc).__name__} on {u}")
+            continue
+        if r.status_code != 200:
+            notes.append(f"HTTP {r.status_code} on {u}")
+            continue
+        reached_200 = True
+        for m in _DYNAMITE_SITEMAP_ENTRY_RE.finditer(r.text):
+            url, rest = m.group(1), m.group("rest")
+            if url in all_cands:
+                continue
+            cap_m = _DYNAMITE_CAPTION_RE.search(rest)
+            title, company = dynamite_title_company(cap_m.group(1) if cap_m else None, url)
+            lm_m = _DYNAMITE_LASTMOD_RE.search(rest)
+            posted = html.unescape(lm_m.group(1)) if lm_m else None
+            all_cands[url] = _cand(title, company, "", url, p["name"], posted)
+    if not all_cands:
+        return _down(p["name"], "; ".join(notes) or "no candidates harvested", http_ok=reached_200)
+    return _ok(p["name"], list(all_cands.values()), "; ".join(notes))
+
+
 # ----------------------------------------------------------- JD fetch + mirrors
 
 ATS_URL_PATTERNS = re.compile(
@@ -788,6 +862,7 @@ def _visible_text(html: str) -> str:
 HANDLERS = {
     "wwr": fetch_wwr,
     "jobgether": fetch_jobgether,
+    "dynamite": fetch_dynamite,
     "himalayas": fetch_himalayas,
     "remotive": fetch_remotive,
     "working-nomads": fetch_workingnomads,

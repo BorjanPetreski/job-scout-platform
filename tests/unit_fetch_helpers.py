@@ -135,6 +135,33 @@ def main() -> list[str]:
     s.ok(fb.jobgether_should_continue(6, 6, fb.JOBGETHER_MAX_PAGES - 1),
          "one page short of the ceiling with real new content -> still continues")
 
+    # --- dynamite_title_company: found 2026-07-21 (manual platform audit, Borjan's live
+    # find) — Dynamite Jobs' category URL was wrong (301'd to the homepage) AND its listings
+    # load in scroll-triggered batches a plain headless render can't get past. Switched to
+    # their public sitemap, which usually carries a "Company - Title (remote job)" caption;
+    # pins the pure caption parse in isolation from the HTTP fetch.
+    s.eq(fb.dynamite_title_company(
+        "Alyssa Nobriga - Program Manager — Academic Programs &amp; Master’s Pathway (remote job)",
+        "https://dynamitejobs.com/company/alyssanobriga/remote-job/program-manager-x"),
+        ("Program Manager — Academic Programs & Master’s Pathway", "Alyssa Nobriga"),
+        "real caption -> (title, company), HTML entities unescaped, trailing '(remote job)' stripped")
+    s.eq(fb.dynamite_title_company(
+        "ClickGUARD Inc. - GTM Engineer - Demand Generation (remote job)",
+        "https://dynamitejobs.com/company/clickguard/remote-job/gtm-engineer"),
+        ("GTM Engineer - Demand Generation", "ClickGUARD Inc."),
+        "a title that itself contains ' - ' -> splits on the FIRST separator only "
+        "(company can never contain it, titles sometimes do)")
+    s.eq(fb.dynamite_title_company(None,
+        "https://dynamitejobs.com/company/novantro/remote-job/coo"),
+        ("coo", ""),
+        "no caption (2026-07-21 sample: ~5% of entries) -> falls back to the URL slug, "
+        "empty company rather than a guess")
+    s.eq(fb.dynamite_title_company("malformed caption with no separator",
+        "https://dynamitejobs.com/company/x/remote-job/some-role"),
+        ("some role", ""),
+        "caption present but doesn't match the expected 'Company - Title' shape -> "
+        "falls back to the URL slug (_slug_title) rather than misparsing")
+
     return s.done()
 
 

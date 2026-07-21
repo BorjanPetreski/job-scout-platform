@@ -131,16 +131,38 @@ platforms:
     name: Dynamite Jobs
     tier_default: 3
     active: true
-    fetch_mode: headless
+    fetch_mode: api
+    # Sitemap-driven (2026-07-21 manual platform audit) — see fetch_dynamite() docstring.
+    # {category} = Dynamite's PARENT taxonomy slug (the sitemap index at
+    # /sitemap/jobs-categories-index.xml lists ~19: admin-va, business-development,
+    # community-manager, crypto-web3-blockchain, customer-support, data-analyst, design,
+    # development, e-commerce, finance-accounting, hr-recruiter, management-operations,
+    # marketing, multimedia, paid-ads, product, seo, teacher-coach, technical-support,
+    # writing-editing), NOT the browsable-URL subcategory slug the old url_patterns used.
     url_patterns:
-      - "https://dynamitejobs.com/remote-jobs/{category}"
+      - "https://dynamitejobs.com/sitemap/jobs-of-category.xml?category={category}"
     categories:
-      project-management: project-management
-      software-engineering: software-development
+      project-management: management-operations
+      software-engineering: development
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This job is no longer available"]
-    quirks: "Category pages JS-rendered (v2.10.0)."
+    quirks: >-
+      FIXED 2026-07-21 (manual platform audit, Borjan's live find): the old category URL
+      (`/remote-jobs/project-management`) 301-redirected to the homepage — verified live,
+      0 URL overlap with the correct `/remote-jobs/management-operations/project-manager`
+      page, so the previously-reported raw count wasn't even category-scoped. Separately,
+      Dynamite's listings load in scroll-triggered batches (confirmed live: headless render
+      plateaus at ~16 regardless of scroll_rounds, i.e. one batch, not "no more jobs").
+      Switched to the platform's public sitemap
+      (/sitemap/jobs-of-category.xml?category={parent}) instead of headless HTML scraping —
+      one direct HTTP fetch returns every live posting in the parent category, each with a
+      lastmod date and usually a "Company - Title" caption; no scroll/batch-size guessing,
+      no bot-wall-prone rendering. Verified live: 125 postings for management-operations
+      (vs. the old ~16 batch-limited/wrong-page render). Location is a client-side-only UI
+      filter (confirmed: selecting it doesn't change the URL) — no server-side location
+      param exists to fetch narrower by region; the profile's own location/region filters
+      handle that downstream, same as every other broad-category board.
     notion_platform_name: { tracker: "Dynamite Jobs", passed_seen: "Dynamite Jobs" }
 
   - id: 4
