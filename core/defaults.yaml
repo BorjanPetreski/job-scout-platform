@@ -22,6 +22,11 @@ sweep:                              # shortlist liveness sweep (ARCHITECTURE.md 
 recompute:
   due_at_sessions: 5
 
+arch_review:
+  due_at_sessions: 10          # print "architecture review due" every N scans — Claude's cue to
+                               # ASSESS whether a full whole-codebase pass is due (CLAUDE.md DoD #5;
+                               # a judgment call, not automatic). core/arch_review.py --ack resets it.
+
 # ---------------------------------------------------------------------------
 # Platform health (HEALTH_MONITORING.md). Layer-1 mechanical thresholds that
 # core/health.py reads off the runs.json telemetry — "scripts flag, Claude

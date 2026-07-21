@@ -113,6 +113,11 @@ from scratch or silently re-covering the same ground.
 5. **Every fix needs the same rigor as any other core/ change** — `core/validate.py` +
    `tests/run_all.py` green, a unit test or sim for new/changed behavioral logic (DoD #3), and
    this doc's own gate (DoD #4) applied to the fixes themselves before wrapping.
+6. **Ack the cadence counter when done** — after a pass runs, `python3 core/arch_review.py --ack`
+   resets the `arch_review` "review due" counter in every profile's `runs.json` (the nudge that
+   printed `⚠ architecture review due` in the scan ledger, added 2026-07-21). Skipping the ack
+   just means the nudge keeps firing; running it without having done a real pass is lying to your
+   future self — so ack only after actually completing one, alongside updating this Status section.
 
 ---
 

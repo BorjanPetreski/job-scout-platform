@@ -45,6 +45,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import arch_review
 import check_links
 import dedup
 import fetch_boards
@@ -461,7 +462,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
             _runs_peek = json.loads(_runs_peek_path.read_text(encoding="utf-8"))
             _last_ran_at = max(
                 (rec["ran_at"] for day, labels in _runs_peek.items()
-                 if day not in ("recompute", "health_review") and isinstance(labels, dict)
+                 if day not in ("recompute", "health_review", "arch_review") and isinstance(labels, dict)
                  for rec in labels.values() if isinstance(rec, dict) and rec.get("ran_at")),
                 default=None)
             if _last_ran_at:
@@ -823,6 +824,11 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     hr = runs.setdefault("health_review", {"last": today, "sessions_since": 0,
                                            "due_at_sessions": cfg.get("health", {}).get("due_at_sessions", 6)})
     hr["sessions_since"] = hr.get("sessions_since", 0) + 1
+    # architecture-review-due counter (CLAUDE.md DoD #5): same rails again — prints "⚠ architecture
+    # review due" every N scans as Claude's cue to ASSESS whether a full whole-codebase pass is worth
+    # running (a judgment call, not an order). core/arch_review.py --ack resets it after a pass.
+    ar = arch_review.bump(runs, cfg.get("arch_review", {}).get("due_at_sessions",
+                                                               arch_review.DEFAULT_DUE_AT_SESSIONS))
     runs_path.write_text(json.dumps(runs, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # ---- ledger print (replaces the 20-item chat checklist; partial-labeled-partial)
@@ -869,6 +875,8 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
     if hr["sessions_since"] >= hr.get("due_at_sessions", 6):
         print(f"⚠ platform health review due: {hr['sessions_since']} sessions since {hr['last']} "
               "(run `python3 core/health.py` and diagnose flagged boards)")
+    if arch_review.is_due(ar):
+        print(arch_review.nudge_line(ar))
     print(f"candidates JSON: {out_path.relative_to(paths.REPO_ROOT)}")
     return {"new": len(survivors), "dropped": dropped, "link_dead": link_dead,
             "sweep": sweep_counts, "sources_down": sources_down}
