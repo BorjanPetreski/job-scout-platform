@@ -33,10 +33,23 @@
      batching, a public sitemap that sidesteps rendering entirely), or does it silently stop
      early (2026-07-21: Jobgether page-1-only; Dynamite Jobs' scroll-batch limit; Himalayas'
      2026-07-20 pagination-cap bug)?
+   - **Subvariant completeness** (2026-07-21, Remote Rocketship follow-up): a fix verified on
+     ONE category slug for a stream isn't automatically verified for every subvariant of that
+     stream — check for a per-subvariant `search.platform_slugs` override that might still point
+     at a stale/different slug, not just the one tested. In practice this is usually a fast
+     "no override exists, `categories` is keyed by stream" confirmation, but confirm it, don't
+     assume it.
    If a check above surfaces something for an ALREADY-reviewed board, go back and fix it in the
    same session/PR rather than deferring — don't let "already marked good enough" freeze a fix
    that's now known to apply. This is standing discipline for every future platform-health
-   session, not a one-time pass over today's findings.
+   session, not a one-time pass over today's findings. **Run this checklist unprompted, the
+   moment a fix ships — not only when asked.** (2026-07-21 honest note: this exact rule already
+   existed in writing when the Remote Rocketship worldwide URL fix shipped this same session,
+   and it still took Borjan asking "is it fixed for all templates/subvariants?" to trigger the
+   stream-coverage check that found 9 more wireable streams. The rule wasn't missing — it wasn't
+   applied reflexively. Treat "did I just ship a platform fix, and have I run this checklist
+   against it yet" as part of DONE for that fix, before reporting it finished or moving to the
+   next board.)
 6. Add a row below. Link the PR. Flip the board's `status` back to `active`/`verified` only once a
    live fetch produces sane, structured results.
 
