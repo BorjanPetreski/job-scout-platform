@@ -183,19 +183,6 @@ def fetch_remotive(p: dict, cfg: dict) -> dict:
                "category HTML masks companies and carries no job links")
 
 
-def fetch_workingnomads(p: dict, cfg: dict) -> dict:
-    api = (p.get("api") or ["https://www.workingnomads.com/api/exposed_jobs/"])[0]
-    try:
-        jobs = _get(api).json()
-    except Exception as exc:
-        return _down(p["name"], f"API error: {type(exc).__name__}")
-    cands = [
-        _cand(j.get("title"), j.get("company_name"), j.get("location"), j.get("url"),
-              p["name"], j.get("pub_date"), None, _text_of(j.get("description", "")) or None)
-        for j in jobs
-    ]
-    return _ok(p["name"], cands, "exposed_jobs sample (~33 rows; category param ignored)")
-
 
 def fetch_remoteok(p: dict, cfg: dict) -> dict:
     api = (p.get("api") or ["https://remoteok.com/api"])[0]
@@ -513,6 +500,11 @@ def fetch_wwr(p: dict, cfg: dict) -> dict:
 # min_hyphens: minimum hyphens in the final slug — separates postings from category links
 HARVEST_SPECS: dict[str, dict] = {
     "himalayas": {"href": r"/companies/[^/]+/jobs/[^/]+/?", "base": "https://himalayas.app", "company_idx": 2},
+    # 2026-07-21 (platform audit): headless-only (its AngularJS app fetches results via a
+    # POST/ElasticSearch call on load; a plain fetch gets the empty shell). Company name
+    # isn't in the URL, so no company_idx — title falls back to a slug-derived one since
+    # the anchor's own text concatenates title+company with no separator.
+    "working-nomads": {"href": r"/jobs/[\w-]+", "base": "https://www.workingnomads.com"},
     "jobgether": {"href": r"/offer/[\w-]{10,}", "base": "https://jobgether.com"},
     # 2026-07-21 (platform audit): Arc.dev serves postings via TWO parallel URL schemes —
     # native "/remote-jobs/details/{slug}" and syndicated "/remote-jobs/j/{slug}" (logos
@@ -877,7 +869,6 @@ HANDLERS = {
     "dynamite": fetch_dynamite,
     "himalayas": fetch_himalayas,
     "remotive": fetch_remotive,
-    "working-nomads": fetch_workingnomads,
     "remote-ok": fetch_remoteok,
     "justjoin-it": fetch_justjoinit,
     "greenhouse": fetch_greenhouse,
