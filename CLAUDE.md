@@ -25,14 +25,29 @@ happen every session — the parts that quietly rot if left to memory.
    the boundaries, and leave the fragile fetch/render I/O to honest-failure + health monitoring (not
    unit tests). Don't chase a coverage number; cover the layer where regressions actually bite (see
    `tests/README.md`).
-4. **No PII in the repo** — no CV body facts, emails, phone numbers, or addresses (the 3a.8
+4. **Architecture self-review gate ("the Uncle Bob pass").** Before wrapping a PR that changes
+   `core/` control flow — new concurrency, a new abstraction/module boundary, or non-trivial
+   logic restructuring (NOT a config tweak, NOT a docs-only change) — re-read the diff cold, as
+   if reviewing a stranger's PR, against: SOLID (does each piece own one responsibility — policy
+   lives in the module that already owns related policy, not wherever was convenient to write),
+   DRY (duplicated logic instead of a shared helper), and the boring check that actually bit us
+   2026-07-21 — **does every declared constant/comment/log line match what the code ACTUALLY
+   enforces?** (a semaphore inside one unbounded shared pool logged a concurrency cap it never
+   enforced; caught only by asking "is this done properly" and re-reading cold, not by having
+   thought about it while writing it — see `docs/PROGRESS.md` 2026-07-21). Prefer the standard
+   pattern for the shape of the problem (e.g. a Bulkhead — dedicated per-resource-class pools —
+   over an ad hoc semaphore workaround) over whatever compiled first. This is a self-review, not
+   a rewrite-everything pass — fix what's actually wrong, don't invent scope. No hook enforces
+   this (unlike #1's GUIDED-FLOW nudge — "did this PR restructure core/ logic?" isn't
+   mechanically detectable); treat it as part of done the same way.
+5. **No PII in the repo** — no CV body facts, emails, phone numbers, or addresses (the 3a.8
    no-PII denylist enforces the binding files; keep it true everywhere).
-5. **Capture build-method lessons (the meta-layer).** Assess whether this session taught something
+6. **Capture build-method lessons (the meta-layer).** Assess whether this session taught something
    reusable about *how to build apps* — a pattern, discipline, or pitfall that is **product-agnostic**
    (not job-scout-specific). If it's valuable, fold it into `docs/BUILD_AND_FLIP_PLAYBOOK.md` (the
    generic framework). The transferable asset across apps is the **method**, not this product — so
    don't let a good lesson evaporate. Skip only if nothing generic was actually learned; don't force it.
-6. **Seed unbuildable ideas into the plan of record (never lose feedback).** Anything raised this
+7. **Seed unbuildable ideas into the plan of record (never lose feedback).** Anything raised this
    session — user feedback, an idea, a gap you found — that **can't be built now** (needs a later
    phase, the app, an integration that doesn't exist yet) must be **seeded into `docs/PROJECT_PLAN.md`**
    (the right phase's scope, or the §3x parked table) before wrapping — not left only in a side doc or
