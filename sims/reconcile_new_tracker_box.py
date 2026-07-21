@@ -54,9 +54,14 @@ class _Resp:
     def __init__(self, status: int, payload: dict | None = None):
         self.status_code = status
         self._payload = payload or {}
+        self.text = ""
 
     def json(self) -> dict:
         return self._payload
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
 
 
 class FakeNotion:

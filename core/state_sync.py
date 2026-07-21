@@ -128,6 +128,15 @@ def pull() -> None:
           "push will retry the merge", file=sys.stderr)
 
 
+def _is_push_race(stderr: str) -> bool:
+    """True only for a rejected-non-fast-forward push — "someone else pushed in between,"
+    the one push failure pull()+retry can actually fix (2026-07-21: the retry loop below
+    used to treat EVERY non-zero push as this case — auth failures, protected-branch
+    rejections, network errors aren't races; retrying them 4x with backoff just burns time
+    before failing with the same unfixable error anyway)."""
+    return "rejected" in (stderr or "").lower()
+
+
 def push(message: str | None = None) -> None:
     branch = _branch()
     _git("add", "--", *_state_paths(), check=False)
@@ -143,9 +152,11 @@ def push(message: str | None = None) -> None:
         if r.returncode == 0:
             print(f"[state_sync] pushed state to {branch}")
             return
+        if not _is_push_race(r.stderr or ""):
+            raise SystemExit(f"[state_sync] push failed (not a race — no retry): {r.stderr[-300:]}")
         time.sleep(2 ** attempt)
         pull()  # someone else pushed — merge their state and retry
-    raise SystemExit(f"[state_sync] push failed after retries: {r.stderr[-300:]}")
+    raise SystemExit(f"[state_sync] push failed after {attempt + 1} race-retry attempts: {r.stderr[-300:]}")
 
 
 if __name__ == "__main__":

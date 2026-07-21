@@ -19,7 +19,10 @@ Usage:
                               ledger is unchanged; a long silent run becomes watchable)
 
 What gets auto-logged to seen.jsonl by a scan (everything else is Claude's call):
-  dropped/Filtered Out    auto_drop_patterns or the closed-location-list detector matched
+  dropped/Filtered Out    auto_drop_patterns / auto_drop_title_patterns / the closed-location-
+                          list detector matched, OR (opt-in per profile) a hard-eligibility drop
+                          on work_arrangement_mismatch / employment_off_target /
+                          non_target_language when the profile sets that filter to "drop" mode
   dropped/Stale-Expired   liveness check said stale (mechanical) — incl. the sweep's
                           post-shortlist retirements (ARCHITECTURE.md §6)
   unverified_blocked      no JD obtainable AND liveness unverifiable — confirmed dead end
@@ -461,14 +464,23 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
         mid = (len(platforms) + 1) // 2
         platforms = platforms[:mid] if half == "AM" else platforms[mid:]
 
-    _log(f"fetching {len(platforms)} active platforms (tier order)…")
-    results = []
-    for i, p in enumerate(platforms, 1):
-        _log(f"  [{i}/{len(platforms)}] T{p.get('tier','?')} {p.get('name','?')}…")
-        r = fetch_boards.fetch_platform(p, cfg)
-        _log(f"      → {len(r.get('candidates') or [])} raw"
+    # Concurrent fetch (2026-07-21): platforms are different hosts, so fetching them in
+    # parallel doesn't add load to any single server beyond what it already tolerates
+    # sequentially (_polite() rate-limits per-host, unaffected by cross-platform concurrency).
+    # fetch_boards.fetch_many() owns the concurrency policy (bulkhead: separately-pooled caps
+    # for headless vs. HTTP platforms) and returns results in ORIGINAL tier-order, not
+    # completion order — so the rest of this function (ledger, candidates JSON) is
+    # byte-identical to the old sequential run, only faster.
+    _log(f"fetching {len(platforms)} active platforms (tier order, up to "
+         f"{fetch_boards.MAX_CONCURRENT_HTTP} concurrent / "
+         f"{fetch_boards.MAX_CONCURRENT_HEADLESS} concurrent headless)…")
+
+    def _log_progress(done: int, total: int, p: dict, r: dict) -> None:
+        _log(f"  [{done}/{total}] T{p.get('tier','?')} {p.get('name','?')} → "
+             f"{len(r.get('candidates') or [])} raw"
              + (" · SOURCE DOWN" if r.get('source_down') else ""))
-        results.append(r)
+
+    results = fetch_boards.fetch_many(platforms, cfg, on_progress=_log_progress)
     if cfg["linkedin_tripwire"].get("enabled", True):
         _log("  LinkedIn tripwire…")
         results.append(linkedin_tripwire.fetch_tripwire(cfg))
@@ -830,7 +842,7 @@ def run_scan(cfg: dict, half: str | None, full_sweep: bool, use_headless: bool =
               f"{reconcile['backfilled']} back-filled applied, {reconcile['already']} already, "
               f"{reconcile['unmatched']} unmatched")
     dq = {f: sum(1 for c in survivors if f in (c.get("flags") or []))
-          for f in ("non_english_jd", "start_date_passed", "missing_company",
+          for f in ("non_target_language", "start_date_passed", "missing_company",
                     "applied_variant_saturation")}
     dq = {k: v for k, v in dq.items() if v}
     if dq:

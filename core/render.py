@@ -20,6 +20,7 @@ now with an optional "nudge it to load more" step.
 from __future__ import annotations
 
 import os
+import threading
 from pathlib import Path
 
 UA = (
@@ -27,6 +28,18 @@ UA = (
     "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 )
 DEFAULT_TIMEOUT_MS = 30_000
+
+# Process-wide: at most ONE Chromium instance launches at a time (2026-07-21). Concurrent
+# per-thread launches are a PROVEN failure mode in this codebase, not a theoretical one —
+# check_links.py's own history (2026-07-11, 15 NoDesk leads) found that 8 threads each
+# launching their own browser silently degraded results (timeouts/truncated renders that
+# looked like ordinary board rot, not crashes) — its fix was to defer every headless need
+# and batch it through ONE shared browser (render_many). That's the only safe pattern this
+# module has ever validated, so it's enforced HERE, at the one real chromium.launch() call
+# site, rather than trusted to every caller to remember (fetch_boards.py's 2026-07-21
+# concurrent-fetch change needed exactly this and didn't have it until now — a caller
+# should not be able to reintroduce the 2026-07-11 bug by not knowing about it).
+_browser_lock = threading.Lock()
 
 # Managed environments pre-install Chromium outside the playwright cache;
 # honor an explicit executable path when the default launch can't find one.
@@ -59,11 +72,16 @@ def render(url: str, wait_selector: str | None = None, timeout_ms: int = DEFAULT
 
 def render_many(targets: list[tuple[str, str | None]], timeout_ms: int = DEFAULT_TIMEOUT_MS,
                 scroll_rounds: int = 0) -> dict[str, str]:
-    """Render several URLs reusing one browser. Returns {url: html}; failed URLs map to ''."""
+    """Render several URLs reusing one browser. Returns {url: html}; failed URLs map to ''.
+
+    Serialized process-wide via _browser_lock — see the module-level comment. A caller on
+    another thread blocks here until the current browser session finishes; that's the
+    proven-safe trade (queued, not concurrent) rather than a guess at a "safe" concurrency
+    number this codebase has never actually validated."""
     from playwright.sync_api import sync_playwright
 
     results: dict[str, str] = {}
-    with sync_playwright() as pw:
+    with _browser_lock, sync_playwright() as pw:
         launch_kwargs: dict = {"headless": True}  # headless only, per policy — never parameterized
         exe = _executable_path()
         if exe:

@@ -189,6 +189,38 @@ def typed_create_page(ds_id: str, properties: dict, body_lines: list[str] | None
     return page_id
 
 
+def _patch_verified(page_id: str, properties: dict, context: str) -> None:
+    """PATCH + the SAME post-write doctrine typed_create_page already applies to creates
+    ("silently-accepted ≠ verified"), generalized to any property set. Re-fetches and
+    compares each sent select's name / rich_text's joined text against what actually landed.
+    Raises RuntimeError on mismatch or a non-200 PATCH — a 200 that silently drops a property
+    (schema drift, a stale/renamed select option) must fail loud, not get marked synced.
+
+    2026-07-21 audit finding: 3 of this module's 4 write paths (sweep updates, the sync-scan
+    in-place refresh, the applied-flip) PATCHed and trusted a bare 200, skipping this
+    assertion entirely — inconsistent with typed_create_page's own stated invariant."""
+    r = _req("PATCH", f"{API}/pages/{page_id}", json={"properties": properties})
+    if r.status_code != 200:
+        raise RuntimeError(f"{context} failed {r.status_code}: {r.text[:300]}")
+    if not properties:
+        return  # nothing was actually asked to change — nothing to verify
+    chk = _req("GET", f"{API}/pages/{page_id}")
+    chk.raise_for_status()
+    got = chk.json().get("properties", {})
+    for key, val in properties.items():
+        if "select" in val:
+            want = (val.get("select") or {}).get("name")
+            got_val = ((got.get(key) or {}).get("select") or {}).get("name")
+        elif "rich_text" in val:
+            want = "".join(t.get("text", {}).get("content", "") for t in val["rich_text"])
+            got_val = "".join(t.get("plain_text", "") for t in (got.get(key) or {}).get("rich_text", []))
+        else:
+            continue  # property type we don't have a comparator for — not asserted, not silently trusted either
+        if got_val != want:
+            raise RuntimeError(f"post-write assertion FAILED for {page_id} ({context}): "
+                               f"{key} {got_val!r} vs {want!r}")
+
+
 def find_page_by_url(ds_id: str, url: str) -> str | None:
     """Locate an existing Passed/Seen row by its Job URL (the sweep-update path)."""
     r = _req("POST", f"{API}/data_sources/{ds_id}/query",
@@ -227,10 +259,11 @@ def flip_passed_seen_to_applied(ps_ds_id: str, url: str) -> str:
     current = _current_reason(page_id)
     if current != "New — Unreviewed":
         return f"skip:{current!r}"
-    r = _req("PATCH", f"{API}/pages/{page_id}",
-             json={"properties": {"Reason Passed": {"select": {"name": "User Applied Elsewhere"}}}})
-    if r.status_code != 200:
-        return f"error:{r.status_code}"
+    try:
+        _patch_verified(page_id, {"Reason Passed": {"select": {"name": "User Applied Elsewhere"}}},
+                        "applied-flip")
+    except RuntimeError as exc:
+        return f"error:{exc}"
     return "flipped"
 
 
@@ -265,9 +298,7 @@ def apply_sweep_update(ds_id: str, rec: dict, cfg: dict) -> bool:
         props["Reason Passed"] = {"select": {"name": reason}}
     if upd.get("note") or upd.get("reason"):
         props["Notes"] = {"rich_text": _rt(rec.get("notes") or upd.get("note") or "")}
-    r = _req("PATCH", f"{API}/pages/{page_id}", json={"properties": props})
-    if r.status_code != 200:
-        raise RuntimeError(f"sweep update failed {r.status_code}: {r.text[:300]}")
+    _patch_verified(page_id, props, "sweep update")
     return True
 
 
@@ -368,9 +399,7 @@ def sync_scan(dry_run: bool = False, digest_line: str | None = None) -> None:
                           f"(no duplicate), marking local synced", file=sys.stderr)
                 else:
                     # a still-live row exists — refresh it in place instead of duplicating.
-                    pr = _req("PATCH", f"{API}/pages/{existing}", json={"properties": props})
-                    if pr.status_code != 200:
-                        raise RuntimeError(f"in-place refresh failed {pr.status_code}: {pr.text[:200]}")
+                    _patch_verified(existing, props, "in-place refresh")
                 dedup.update(r.get("url") or r.get("key"), {"synced_to_notion": True})
                 ok += 1
                 continue

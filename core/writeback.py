@@ -5,7 +5,19 @@ The learning loop that lets dogfooding improve the shared template library WITHO
 leaking a person's data. With the profile's explicit consent (`writeback.consent: true`),
 GENERIC template enrichments — role-generic keyword/archetype additions, e.g. "kafka" for
 backend-java — are STAGED for a human curator to review into the template. Never merged
-automatically (D6 option a). Never CV text, names, employers, emails, or any PII.
+automatically (D6 option a).
+
+Honest scope of the PII guard below (2026-07-21 audit correction — the line this replaces
+overclaimed): `_is_generic_term` mechanically blocks only email/URL-shaped values (`@`,
+`http(s)://`, `www.`) and length/character-class outliers. It CANNOT distinguish a person's
+name or employer from a legitimate archetype — this codebase's real archetypes are
+title-cased 1-3 word phrases ("Delivery Manager", "Technical PM"), the same shape a name
+takes, so no regex can tell them apart without a name-detection model (out of scope here).
+The actual "never names/employers" guarantee is a PROCESS control, not this mechanical one:
+(1) the setup skill only ever stages CV-obvious concrete TECH terms, never free CV text, and
+(2) nothing here auto-merges — a human curator reviews every staged entry before it can reach
+a template (D6 option a). Treat this function as a narrow backstop against the cheapest
+mistake (an email/URL landing in a keyword list), not a full PII classifier.
 
 Staging target: `suggestions/<stream>/<subvariant>.yaml` — a top-level directory that
 deliberately mirrors the template tree but sits OUTSIDE `templates/`, because the platform
@@ -36,7 +48,9 @@ SUGGESTIONS_DIR = paths.REPO_ROOT / "suggestions"
 _ENTRY_KEYS = {"kind", "value", "sources", "first_seen", "last_seen", "frequency"}
 _KINDS = {"keyword_core", "keyword_expanded", "archetype"}
 # A generic term: letters/digits/spaces + the few tech-token punctuation marks (c++, next.js,
-# .net, ci/cd, node.js). Bounded length. Deliberately narrow so a name/sentence/email can't pass.
+# .net, ci/cd, node.js). Bounded length, blocks a sentence/paragraph and email/URL-shaped
+# values — but NOT a plain name ("Sarah Connor" matches this just as "Technical PM" does;
+# see the module docstring's honest-scope note). Not a name/employer detector.
 _GENERIC_TERM = re.compile(r"^[a-z0-9][a-z0-9 .+#/&-]{0,38}$", re.IGNORECASE)
 _EMAILISH = re.compile(r"[@]|https?://|\bwww\.")
 _KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
