@@ -20,6 +20,19 @@
 #   status: unverified ⇒ active MUST be false, so a new board stays OUT of every profile's
 #   tier-coverage (invariant #14) until a live smoke test flips status: verified + active:
 #   true together. Distinct from categories_verify_at_setup (per-slug, on active boards).
+# geo_skew: worldwide | eu | us (optional) — the board's GEOGRAPHIC/ELIGIBILITY skew. This is
+#   platform METADATA, never a reason to reject a board: whether to scan or skip it is a PER-PROFILE
+#   decision resolved against the profile's target markets (search.regions_acceptable) + eligibility
+#   (candidate.eligibility), NOT a global rule. A `us`-skewed board is genuine signal for a
+#   US-based / US-targeting / relocation-eligible profile and noise for an EU-only-by-choice profile
+#   — same board, opposite verdict. Symmetric: an `eu` board is noise for a US-only profile. The
+#   posting-level filters (us_only skipped-for-US-candidate, closed_location_list keyed off the
+#   candidate's own location terms) already resolve this at the ROW level; the platform-level
+#   scan/skip RESOLVER that reads geo_skew is a seeded engine follow-up (PROJECT_PLAN §3x) — until
+#   it ships, geo_skew is informative only. NOTE: some boards' fit runs on a non-region axis
+#   (Relocate.me = visa-sponsorship/relocation, resolved against candidate.eligibility.needs_visa_sponsorship,
+#   not region) — kept in that board's quirks. Only the 3 boards added 2026-07-20 carry geo_skew so
+#   far; back-filling the existing entries is part of the same seeded follow-up.
 #
 # Numeric ids preserved from job-scout-pm v3 config — they define rotation sort order.
 # New Phase 2 boards continue the id sequence (24+) and ship active: false + unverified.
@@ -671,6 +684,101 @@ platforms:
       SMOKE-TESTED live 2026-07-17: SSR HTML, generic harvester extracts postings
       (/jobs/<slug>). Data/analytics/AI niche board. Serves data + ai-ml streams only.
     notion_platform_name: { tracker: "icrunchdata", passed_seen: "icrunchdata" }
+
+  # -------------------------------------------------------------------------
+  # 2026-07-20 board-coverage audit adds (researched, NOT yet smoke-tested). Ship
+  # active: false + status: unverified so they stay OUT of tier-coverage (invariant #14)
+  # until a live smoke test flips status: verified + active: true together. geo_skew is
+  # metadata for the per-profile scan/skip resolver (header note), never a rejection.
+  - id: 29
+    slug: yc-startups
+    name: Y Combinator (Work at a Startup)
+    tier_default: 2
+    active: false
+    status: unverified
+    fetch_mode: direct
+    geo_skew: worldwide
+    url_patterns:
+      - "https://www.ycombinator.com/jobs/role/{category}/remote"
+    # YC lists jobs on two axes: role (/jobs/role/{role}) and location (/jobs/role/{role}/{location},
+    # or /remote). {category} = the ROLE slug; the /remote and /europe location variants are the
+    # anonymous-enumerable surfaces. Slugs unconfirmed at add-time — smoke test verifies.
+    categories:
+      project-management: product-manager
+      software-engineering: engineer
+    categories_verify_at_setup: [project-management, software-engineering]
+    mirrors: []
+    expired_markers: ["This job is no longer accepting applications", "no longer accepting applications"]
+    quirks: >-
+      RESEARCHED 2026-07-20 (not smoke-tested): SSR/anonymous-fetchable — an anonymous fetch of
+      /jobs/role/product-manager/remote returned a static list of real postings (no login wall;
+      the "create a profile, founders reach out" prompt is optional, enumeration works without it).
+      Salary-transparent, high-signal YC-startup jobs. geo_skew: worldwide — the same listing view
+      carries US (SF/NY/US-Remote), EU (Cogram/Berlin, Alguna EMEA GB/IE/DE) and India-remote roles,
+      so it serves every profile; the row-level us_only/closed_location_list filters do the market
+      fit. Role+location URL axes (role slug × {/remote,/europe,...}) — confirm the exact role slugs
+      and the best location variant at smoke test.
+    notion_platform_name: { tracker: "Y Combinator", passed_seen: "Y Combinator" }
+
+  - id: 30
+    slug: dice
+    name: Dice
+    tier_default: 3
+    active: false
+    status: unverified
+    fetch_mode: direct
+    geo_skew: us
+    url_patterns:
+      - "https://www.dice.com/jobs/q-{category}-jobs"
+    # Query-based (q-{query}); {category} is a url-encoded query string. A location param
+    # (l-{location}) narrows region. Confirm the JS/headless need + exact params at smoke test.
+    categories:
+      project-management: "project+manager"
+      software-engineering: "software+engineer"
+    categories_verify_at_setup: [project-management, software-engineering]
+    mirrors: []
+    expired_markers: ["This job is no longer available", "position has been filled"]
+    quirks: >-
+      RESEARCHED 2026-07-20 (not smoke-tested): public, NO login wall; a live "Europe" location
+      search returned overwhelmingly US staffing/contract postings (Pittsburgh, Houston, Columbus,
+      Frisco…) despite the filter — i.e. genuinely US-skewed inventory, NOT an EU board. That is
+      why geo_skew: us — this is NOT a rejection (contrast the legacy job-scout-pm rejected_platforms
+      list): it is real signal for a US-based / US-targeting-eligible profile and correctly SKIPPED
+      for an EU-only-by-choice profile like borjan-pm by the per-profile resolver. JS-heavy listing —
+      may need a headless fallback (direct fetch surfaced rows in research, but confirm at smoke test).
+    notion_platform_name: { tracker: "Dice", passed_seen: "Dice" }
+
+  - id: 31
+    slug: relocate-me
+    name: Relocate.me
+    tier_default: 3
+    active: false
+    status: unverified
+    fetch_mode: headless
+    geo_skew: worldwide
+    url_patterns:
+      - "https://relocate.me/international-jobs/remote"
+    # Category taxonomy is role-shaped (Back End, Full Stack, Manager, QA, DevOps/SRE, Team Lead,
+    # Support…) with no clean PM/SM/DM bucket — "Manager" is the broad catch-all (title filter
+    # narrows downstream, same shape as JustRemote's manager-exec). Slugs unconfirmed at add-time.
+    categories:
+      project-management: manager
+      software-engineering: back-end
+    categories_verify_at_setup: [project-management, software-engineering]
+    mirrors: []
+    expired_markers: ["This job is no longer available", "position is closed"]
+    quirks: >-
+      RESEARCHED 2026-07-20 (not smoke-tested) — Borjan will MANUALLY verify + possibly fix the
+      fetch next session. Its distinguishing axis is NOT region but ELIGIBILITY: it curates
+      visa-sponsorship + relocation roles, so fit is resolved against candidate.eligibility
+      (needs_visa_sponsorship / relocation-willingness), not geo_skew — geo_skew: worldwide only
+      says the inventory spans EU/US/Asia. This makes it high-value for exactly the India→EU/US
+      relocation-eligible profile and low-value for borjan-pm (needs_visa_sponsorship: false,
+      B2B contractor). JS-rendered (base64 placeholder logos → headless needed). No clean PM
+      category (broad "Manager" bucket). The hand-curated feed ("The Global Move") is paywalled
+      ($15/mo); the free international-jobs listing is the anonymous-enumerable surface — confirm
+      volume + selectors at smoke test.
+    notion_platform_name: { tracker: "Relocate.me", passed_seen: "Relocate.me" }
 
 # LinkedIn is NOT a platform entry: it is a discovery tripwire only
 # (core/linkedin_tripwire.py). No login, no cookies, guest endpoint only.
