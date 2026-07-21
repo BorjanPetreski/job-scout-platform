@@ -185,20 +185,37 @@ def fetch_remotive(p: dict, cfg: dict) -> dict:
 
 
 def fetch_remoteok(p: dict, cfg: dict) -> dict:
-    api = (p.get("api") or ["https://remoteok.com/api"])[0]
-    try:
-        data = _get(api).json()
-    except Exception as exc:
-        return _down(p["name"], f"API error: {type(exc).__name__}")
-    cands = []
-    for j in data:
-        if not isinstance(j, dict) or not j.get("position"):
-            continue  # first element is a legal notice
-        cands.append(_cand(j.get("position"), j.get("company"), j.get("location"),
-                           j.get("url"), p["name"], j.get("date"),
-                           f"{j.get('salary_min') or ''}-{j.get('salary_max') or ''}".strip("-") or None,
-                           _text_of(j.get("description", "")) or None))
-    return _ok(p["name"], cands)
+    """Prefers the per-category tag feed (`p["urls"]` + ".json", e.g.
+    remoteok.com/remote-project-manager-jobs.json) over the generic `/api` — 2026-07-21
+    platform audit: the catalog's `url_patterns` already declared this per-category URL and
+    the quirk note already called it a "tag URL", but the fetcher never actually used it,
+    always hitting the generic sitewide-newest-100 `/api` regardless of category (verified
+    live: the two feeds barely overlap — 3-10 shared ids out of ~100 each — so this was a
+    real, silent coverage gap, not a redundant fallback). Falls back to the generic `/api`
+    only when no category URL resolved for this stream (mirrors every other board's
+    honest-skip convention rather than guessing)."""
+    urls = [u if u.endswith(".json") else f"{u}.json" for u in (p.get("urls") or [])]
+    if not urls:
+        urls = [(p.get("api") or ["https://remoteok.com/api"])[0]]
+    cands: dict[str, dict] = {}
+    notes = []
+    for u in urls:
+        try:
+            data = _get(u).json()
+        except Exception as exc:
+            notes.append(f"{type(exc).__name__} on {u}")
+            continue
+        for j in data:
+            if not isinstance(j, dict) or not j.get("position"):
+                continue  # first element is a legal notice
+            c = _cand(j.get("position"), j.get("company"), j.get("location"),
+                      j.get("url"), p["name"], j.get("date"),
+                      f"{j.get('salary_min') or ''}-{j.get('salary_max') or ''}".strip("-") or None,
+                      _text_of(j.get("description", "")) or None)
+            cands[c["url"]] = c
+    if not cands and notes:
+        return _down(p["name"], "; ".join(notes))
+    return _ok(p["name"], list(cands.values()), "; ".join(notes) or None)
 
 
 def fetch_justjoinit(p: dict, cfg: dict) -> dict:

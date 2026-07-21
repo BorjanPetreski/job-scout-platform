@@ -549,7 +549,15 @@ platforms:
     categories_verify_at_setup: [ai-ml, data, design-ux, marketing, sales, it-support, content-writing, devops-sre-platform, qa]
     mirrors: []
     expired_markers: []
-    quirks: "HTML is JS-rendered; public JSON API exists (all categories; first element is a legal notice). Tag-based categories: remote-{category}-jobs is a tag URL — the keyword filter does the real scoping."
+    quirks: >-
+      HTML is JS-rendered; public JSON API exists. FIXED 2026-07-21 (platform audit): the
+      fetcher previously ignored this per-category tag URL entirely and always hit the
+      generic sitewide-newest-100 `/api` — the tag feed (this URL + ".json") barely
+      overlaps with the generic one (3-10 shared ids of ~100 each), so this was a real,
+      silent coverage gap, not a redundant fallback. `fetch_remoteok()` now fetches the
+      per-category tag JSON feed, falling back to the generic API only when no category
+      URL resolves. Tag classification is loose (mixed titles per tag) — the keyword
+      filter does the real scoping, same as WWR/Himalayas.
     notion_platform_name: { tracker: "Remote OK", passed_seen: "Remote OK" }
 
   - id: 16
