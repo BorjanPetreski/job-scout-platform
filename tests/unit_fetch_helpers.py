@@ -162,6 +162,28 @@ def main() -> list[str]:
         "caption present but doesn't match the expected 'Company - Title' shape -> "
         "falls back to the URL slug (_slug_title) rather than misparsing")
 
+    # --- _harvest_links title-length cliff: 2026-07-21 manual platform audit (Arc.dev, live)
+    # found two near-identical real postings on the SAME page treated differently — a 92-char
+    # anchor text ("...WW-FT" suffix) fell back to a garbled _slug_title while its 86-char twin
+    # (same role, no suffix) kept its real title, purely because the old cap was `< 90`. Pins
+    # that an ordinary long-but-real title now survives, while a genuinely oversized/junk blob
+    # still falls back to the slug (the cap still exists as a card-blurb-wrap backstop). -------
+    long_real_title = "Technical Project Manager for Health-tech Development Team - (AI & Tokenomic combined) WW-FT"
+    s.ok(len(long_real_title) > 90, "sanity: this real title is longer than the old 90-char cap")
+    arc_html = (
+        f'<a class="job-title" href="/remote-jobs/details/tpm-health-tech-p1u86exia6">{long_real_title}</a>'
+        '<a class="job-title" href="/remote-jobs/details/short-role-abc123">Short Real Title</a>'
+        '<a class="job-title" href="/remote-jobs/details/blurb-role-xyz789">' + ("x" * 200) + '</a>'
+    )
+    harvested = {c["url"]: c["title"] for c in fb._harvest_links(arc_html, "arc", "Arc.dev")}
+    s.eq(harvested["https://arc.dev/remote-jobs/details/tpm-health-tech-p1u86exia6"], long_real_title,
+         "92-char real title (was cliff-cut at 90) now kept verbatim, not slug-garbled")
+    s.eq(harvested["https://arc.dev/remote-jobs/details/short-role-abc123"], "Short Real Title",
+         "an ordinary short real title still keeps its anchor text (no regression)")
+    s.eq(harvested["https://arc.dev/remote-jobs/details/blurb-role-xyz789"], "blurb role xyz789",
+         "a 200-char blob (way past any real title length) still falls back to the slug title — "
+         "the cap still guards against a card-blurb wrap, just no longer at an unrealistically low bound")
+
     return s.done()
 
 
