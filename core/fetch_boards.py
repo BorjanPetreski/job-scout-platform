@@ -515,8 +515,13 @@ HARVEST_SPECS: dict[str, dict] = {
     "himalayas": {"href": r"/companies/[^/]+/jobs/[^/]+/?", "base": "https://himalayas.app", "company_idx": 2},
     "jobgether": {"href": r"/offer/[\w-]{10,}", "base": "https://jobgether.com"},
     "arc": {"href": r"/remote-jobs/details/[\w-]+", "base": "https://arc.dev"},
-    "remote-rocketship-worldwide": {"href": r"/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 2},
-    "remote-rocketship-europe": {"href": r"/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 2},
+    # 2026-07-21 (platform audit, same-day as the morning scan): postings moved from
+    # "/company/{co}/jobs/{slug}" to "/publicjobs/company/{co}/jobs/{slug}" mid-day —
+    # confirmed by the SAME slug (epi-company-eu/.../test-project-manager-freelance-
+    # belgium-remote) appearing un-prefixed in this morning's harvested candidates and
+    # prefixed on a same-day re-fetch. The old pattern now matches zero real postings.
+    "remote-rocketship-worldwide": {"href": r"/publicjobs/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 3},
+    "remote-rocketship-europe": {"href": r"/publicjobs/company/[^/]+/jobs/[^/]+/?", "base": "https://www.remoterocketship.com", "company_idx": 3},
     "wttj": {"href": r"/en/companies/[^/]+/jobs/[^/]+", "base": "https://www.welcometothejungle.com", "company_idx": 3},
     "nodesk": {"href": r"/remote-jobs/[a-z0-9-]+/?", "base": "https://nodesk.co", "min_hyphens": 3},
     # dynamite: removed 2026-07-21 — now a dedicated HANDLERS entry (fetch_dynamite,

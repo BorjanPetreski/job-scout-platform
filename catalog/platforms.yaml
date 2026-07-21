@@ -236,9 +236,13 @@ platforms:
     mirrors: []
     expired_markers: ["This job is no longer accepting applications"]
     quirks: >-
-      DEGRADED 2026-07-11: Cloudflare now 403s list pages AND sitemap, direct and headless
-      alike (was: per-job 403s only). Source reports down until RR loosens up; roles mostly
-      mirror in from teamtailor/ATS anyway. Candidate for tier demotion at next recompute.
+      2026-07-11 Cloudflare 403 on list pages has since eased (2026-07-21 platform audit:
+      direct still 403s, but headless render reaches real content again — no longer a
+      standing degradation). 2026-07-21 (same audit, later same day): posting URLs moved
+      from "/company/{co}/jobs/{slug}" to "/publicjobs/company/{co}/jobs/{slug}" — the
+      morning scan's harvested candidates still show the old un-prefixed path, a same-day
+      re-fetch shows the new prefix on the identical posting slug. Harvest regex updated to
+      match; watch for a rollback or mixed-prefix period.
     per_job_fetch_mode: headless
     notion_platform_name: { tracker: "Remote Rocketship", passed_seen: "Remote Rocketship" }
 
