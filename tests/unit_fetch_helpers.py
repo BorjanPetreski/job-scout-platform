@@ -116,6 +116,25 @@ def main() -> list[str]:
     finally:
         fb.fetch_platform = orig_fetch_platform
 
+    # --- jobgether_max_pages: found 2026-07-21 (manual platform audit) — Jobgether paginates
+    # at 50/page but the generic single-fetch harvester only ever saw page 1, a 3x undercount
+    # for any category exceeding 50 live postings. Pins the RSC-payload page-count extraction
+    # in isolation from the HTTP fetch, same split as himalayas_pages_for_gap.
+    def _jg_payload(total: int, limit: int, page: int, max_pages: int) -> str:
+        return (f'<script>{{&quot;total&quot;:[0,{total}],&quot;skip&quot;:[0,0],'
+                f'&quot;limit&quot;:[0,{limit}],&quot;page&quot;:[0,{page}],'
+                f'&quot;maxPages&quot;:[0,{max_pages}]}}</script>')
+
+    s.eq(fb.jobgether_max_pages(_jg_payload(156, 50, 1, 4)), 4,
+         "real payload (156 jobs / 50 per page) -> maxPages 4")
+    s.eq(fb.jobgether_max_pages(_jg_payload(4, 50, 1, 1)), 1,
+         "a category under the 50/page limit -> maxPages 1 (no pagination needed)")
+    s.eq(fb.jobgether_max_pages(_jg_payload(50_000, 50, 1, 1000)), fb.JOBGETHER_MAX_PAGES,
+         "an absurd maxPages -> capped at the safety ceiling, never runaway")
+    s.eq(fb.jobgether_max_pages("<html>no matching payload here</html>"), None,
+         "payload shape not found (site change) -> None, so the caller falls back honestly "
+         "instead of guessing")
+
     return s.done()
 
 

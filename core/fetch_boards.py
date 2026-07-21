@@ -638,6 +638,77 @@ def fetch_html_listing(p: dict, cfg: dict, headless: bool = False, scroll_rounds
     return _ok(p["name"], list(all_cands.values()), "; ".join(notes), healed=healed)
 
 
+# Jobgether embeds a Next.js RSC payload on every listing page carrying the real
+# total/limit/maxPages for that query, e.g. `"total":[0,156],"skip":[0,0],"limit":[0,50],
+# "page":[0,1],"maxPages":[0,4]` (HTML-entity-escaped in the raw response: &quot; not ").
+_JOBGETHER_PAGE_RE = re.compile(
+    r'&quot;total&quot;:\[0,(\d+)\],&quot;skip&quot;:\[0,\d+\],'
+    r'&quot;limit&quot;:\[0,(\d+)\],&quot;page&quot;:\[0,\d+\],&quot;maxPages&quot;:\[0,(\d+)\]'
+)
+JOBGETHER_MAX_PAGES = 20  # safety ceiling; observed maxPages in practice is single digits
+
+
+def jobgether_max_pages(html: str) -> int | None:
+    """Pure extraction of the real page count from a Jobgether listing page's embedded RSC
+    payload (unit-tested in isolation from the HTTP fetch, same split as
+    himalayas_pages_for_gap). Returns None if the payload shape isn't found (site change) —
+    the caller then falls back to a single-page harvest rather than guessing."""
+    m = _JOBGETHER_PAGE_RE.search(html)
+    return min(int(m.group(3)), JOBGETHER_MAX_PAGES) if m else None
+
+
+def fetch_jobgether(p: dict, cfg: dict) -> dict:
+    """Jobgether paginates at 50/page but fetch_html_listing (the generic harvester) only
+    ever fetches page 1 — invisible whenever a category's real inventory exceeds 50.
+
+    Found 2026-07-21 (manual platform audit): borjan-pm's `emea/project-manager` category
+    reports 156 live postings across 4 pages; page 1 alone surfaces ~50 (a 3x undercount for
+    that category, though `scrum-master`/`agile-delivery-manager` stayed under 50 and were
+    unaffected). Each listing page's HTML embeds a Next.js RSC payload with the query's real
+    total/limit/maxPages; page 1 discovers the page count, then `?page=N` walks the rest
+    (verified live: pages 2-4 returned distinct, non-overlapping links summing to exactly the
+    reported total of 156). Falls back to a single-page harvest if the payload shape isn't
+    found (site change) — degrades honestly like fetch_html_listing, never crashes.
+    """
+    urls = p.get("urls") or []
+    slug = p.get("slug", "")
+    if not urls:
+        return _down(p["name"], "no listing urls configured")
+    all_cands: dict[str, dict] = {}
+    notes: list[str] = []
+    reached_200 = False
+    for u in urls:
+        try:
+            r = _get(u)
+        except Exception as exc:
+            notes.append(f"{type(exc).__name__} on {u}")
+            continue
+        if r.status_code != 200:
+            notes.append(f"HTTP {r.status_code} on {u}")
+            continue
+        reached_200 = True
+        for c in _harvest_links(r.text, slug, p["name"]):
+            all_cands.setdefault(c["url"], c)
+        max_pages = jobgether_max_pages(r.text)
+        if max_pages is None:
+            continue
+        sep = "&" if "?" in u else "?"
+        for page in range(2, max_pages + 1):
+            try:
+                r2 = _get(f"{u}{sep}page={page}")
+            except Exception as exc:
+                notes.append(f"{type(exc).__name__} on page {page} of {u}, partial")
+                break
+            if r2.status_code != 200:
+                notes.append(f"HTTP {r2.status_code} on page {page} of {u}, partial")
+                break
+            for c in _harvest_links(r2.text, slug, p["name"]):
+                all_cands.setdefault(c["url"], c)
+    if not all_cands:
+        return _down(p["name"], "; ".join(notes) or "no candidates harvested", http_ok=reached_200)
+    return _ok(p["name"], list(all_cands.values()), "; ".join(notes))
+
+
 # ----------------------------------------------------------- JD fetch + mirrors
 
 ATS_URL_PATTERNS = re.compile(
@@ -713,6 +784,7 @@ def _visible_text(html: str) -> str:
 
 HANDLERS = {
     "wwr": fetch_wwr,
+    "jobgether": fetch_jobgether,
     "himalayas": fetch_himalayas,
     "remotive": fetch_remotive,
     "working-nomads": fetch_workingnomads,

@@ -89,7 +89,15 @@ platforms:
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This offer is no longer available"]
-    quirks: "Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no retry."
+    quirks: >-
+      Recurring 410s on posting pages (stale offender) — treat 410 as stale immediately, no
+      retry. FIXED 2026-07-21 (manual platform audit): listing pages paginate at 50/page —
+      borjan-pm's emea/project-manager category alone carries 156 live postings across 4
+      pages, but the generic single-fetch harvester only ever saw page 1 (a 3x undercount for
+      any category exceeding 50; scrum-master/agile-delivery-manager stayed under 50 and were
+      unaffected). Dedicated fetch_jobgether() now discovers the real page count from the
+      listing page's embedded Next.js RSC payload and walks ?page=N to the end. Verified
+      live: raw jumped from 66 -> 169 across the 3 categories.
     notion_platform_name: { tracker: "Jobgether", passed_seen: "Jobgether" }
 
   - id: 3
