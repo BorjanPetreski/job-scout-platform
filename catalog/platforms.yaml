@@ -218,7 +218,22 @@ platforms:
     categories_verify_at_setup: [software-engineering]
     mirrors: []
     expired_markers: ["This job is no longer available"]
-    quirks: ""
+    quirks: >-
+      2026-07-21 (manual platform-audit walkthrough): Arc.dev publicly exposes only a small
+      "Arc Exclusive" teaser slice of postings (confirmed live: exactly 6 native `details/` +
+      4 syndicated `j/` = 10 for the PM category) and gates the rest behind account sign-up —
+      the page's own static HTML carries a "Sign up to find 2,800+ jobs" banner
+      (`totalExternalJobCount`, sitewide) and Borjan's live signed-out browser view showed a
+      PM-specific "600+" figure. Confirmed this is a real wall, not a fetch/render gap: raw
+      `requests`, a Googlebot user-agent, and a full headless render (JS executed, scrolled)
+      all return the byte-identical 10-posting set and the same signup banner — no cloaking
+      difference, no hidden per-category API, no sitemap of individual job pages (arc.dev's
+      sitemap0.xml has 6,518 category/filter landing pages, zero `/details/` or `/j/` URLs).
+      Same structural shape as Remotive's already-documented paywall (see that row below) —
+      genuinely no fix available without a real authenticated session, which is a deliberate
+      scope decision, not attempted here. Corrects the 2026-07-21 automated pass's "genuinely
+      clean" verdict: the 10-posting count itself was right (no missed pagination/region
+      split), but that pass never checked whether the site discloses a much larger gated set.
     notion_platform_name: { tracker: "Arc.dev", passed_seen: "Arc.dev" }
 
   - id: 5

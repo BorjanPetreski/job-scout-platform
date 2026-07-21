@@ -564,6 +564,18 @@ def _slug_title(url: str) -> str:
     return re.sub(r"[-_]+", " ", re.sub(r"\b[0-9a-f]{6,}\b", "", slug)).strip()
 
 
+def _pick_title(text: str, url: str) -> str:
+    """Anchor text is the title when it looks like one; slug otherwise. The upper bound is a
+    backstop against a card-blurb wrap (a whole-card anchor dumping unrelated content as
+    "text"), not a real title-length limit — 2026-07-21 platform audit found it live-cutting
+    genuine titles at the old `< 90` bound: Arc.dev's "...WW-FT" posting (92 chars) fell back
+    to a garbled slug title while its 86-char twin (same role, no suffix) kept its real title.
+    Widened to 160 so ordinary long-but-real titles survive."""
+    if 3 < len(text) < 160 and not re.match(r"(?i)(view|apply|read|see) ", text):
+        return text
+    return _slug_title(url)
+
+
 def _harvest_links(html: str, platform_slug: str, platform_name: str) -> list[dict]:
     spec = HARVEST_SPECS[platform_slug]
     href_re = re.compile(rf"^{spec['href']}$")
@@ -593,8 +605,7 @@ def _harvest_links(html: str, platform_slug: str, platform_name: str) -> list[di
             parts = [s for s in path.split("/") if s]
             if len(parts) > spec["company_idx"] - 1:
                 company = parts[spec["company_idx"] - 1].replace("-", " ")
-        # anchor text is the title when it looks like one; slug otherwise
-        title = text if 3 < len(text) < 90 and not re.match(r"(?i)(view|apply|read|see) ", text) else _slug_title(url)
+        title = _pick_title(text, url)
         prev = cands.get(url)
         if prev is None or (prev["title"] == _slug_title(url) and title != prev["title"]):
             cands[url] = _cand(title, company, "", url, platform_name)
