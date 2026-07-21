@@ -797,12 +797,20 @@ def fetch_many(platforms: list[dict], cfg: dict, on_progress=None) -> list[dict]
     return results  # every index was submitted above, so every slot is filled
 
 
+def active_platforms(cfg: dict) -> list[dict]:
+    """Active platforms in canonical rotation order (tier, then catalog id). THE one
+    definition of "which platforms, in what order" — the identical filter+sort was copied
+    in fetch_all, scan.run_scan, and scan.print_plan (2026-07-21 DRY finding A#9), three
+    places that had to stay in lockstep on the tie-break policy."""
+    plats = [p for p in cfg["platforms"] if p.get("active")]
+    plats.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
+    return plats
+
+
 def fetch_all(cfg: dict) -> list[dict]:
     """Fetch every active platform concurrently (bounded — see fetch_many).
     Returns one result dict per platform, in tier order regardless of completion order."""
-    platforms = [p for p in cfg["platforms"] if p.get("active")]
-    platforms.sort(key=lambda p: (p.get("tier", 9), p.get("id", 99)))
-    return fetch_many(platforms, cfg)
+    return fetch_many(active_platforms(cfg), cfg)
 
 
 if __name__ == "__main__":

@@ -43,6 +43,7 @@ health:
   min_baseline: 3              # only flag collapse/selector when trailing median >= this
   never_produced_min_runs: 4   # active board seen in >= N runs, always 0 -> NEVER_PRODUCED
   systemic_frac: 0.7           # >= this share of active boards at ~0 in the latest run -> SYSTEMIC
+  systemic_min_boards: 4       # need at least this many active boards present before SYSTEMIC can fire
 
 # ---------------------------------------------------------------------------
 # Filter library — regex machinery for the machine FIRST-PASS only. Values that

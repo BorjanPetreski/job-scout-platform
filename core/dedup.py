@@ -33,6 +33,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import paths
 
+# The valid seen.jsonl statuses — hoisted to one named constant (2026-07-21 finding B2) so the
+# docstring, append()'s validation, and any future emitter share one source instead of re-listing
+# the strings (the convention profile_loader already follows for its enums).
+STATUSES = frozenset({"dropped", "shortlisted", "applied", "passed", "unverified_blocked"})
+
 LEGAL_SUFFIXES = re.compile(
     r"\b(gmbh|ltd|inc|llc|s\.?a\.?|s\.?r\.?l\.?|d\.?o\.?o\.?|b\.?v\.?|a\.?g\.?|"
     # Polish forms (JustJoin.it etc.): 'Sp. z o.o.' (LLC) incl. the combined
@@ -65,6 +70,23 @@ def norm_url(url: str) -> str:
 
 def make_key(company: str, role: str, locdom: str) -> str:
     return f"{norm_company(company)}|{_norm(role)}|{_norm(locdom)}"
+
+
+# The canonical field set of a seen.jsonl record. This is the ONE place the shape is
+# defined (2026-07-21 architecture-quality pass, coupling finding 4.1): before this, the
+# 11-field record was hand-built as a raw dict literal at four scan.py drop sites and read
+# field-by-field in notion_sync — so a renamed/added field drifted silently across the
+# scan→notion boundary. `append()` still fills key/first_seen/synced_to_notion defaults and
+# validates status; this only fixes the shape a caller emits. keyword_source defaults to the
+# role (every current caller passed the title as both).
+def make_seen_record(*, company: str, role: str, locdom: str, url: str, platform: str,
+                     status: str, reason: str, notes: str, fit: str = "N/A",
+                     archetype: str = "", keyword_source: str | None = None) -> dict:
+    return {"company": company, "role": role, "locdom": locdom, "url": url,
+            "platform": platform, "status": status, "reason": reason, "fit": fit,
+            "archetype": archetype,
+            "keyword_source": role if keyword_source is None else keyword_source,
+            "notes": notes}
 
 
 def role_family(role: str) -> str:
@@ -126,7 +148,7 @@ def append(rec: dict, path: Path | None = None) -> dict:
     rec.setdefault("key", make_key(rec.get("company", ""), rec.get("role", ""), rec.get("locdom", "")))
     rec.setdefault("first_seen", date.today().isoformat())
     rec.setdefault("synced_to_notion", False)
-    if rec.get("status") not in {"dropped", "shortlisted", "applied", "passed", "unverified_blocked"}:
+    if rec.get("status") not in STATUSES:
         raise ValueError(f"invalid status: {rec.get('status')!r}")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as fh:

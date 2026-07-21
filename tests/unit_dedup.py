@@ -53,6 +53,32 @@ def main() -> list[str]:
     s.eq(dedup.role_family("AI Project Manager"), "ai project manager",
          "role_family: no qualifier -> unchanged")
 
+    # make_seen_record: the canonical record-shape constructor (2026-07-21 coupling fix 4.1). Pin
+    # the exact field set + defaults so the scan→notion contract can't drift silently again. ------
+    rec = dedup.make_seen_record(company="Acme", role="PM", locdom="EU", url="u",
+                                 platform="Greenhouse", status="dropped",
+                                 reason="Filtered Out", notes="why")
+    s.eq(set(rec), {"company", "role", "locdom", "url", "platform", "status", "reason",
+                    "fit", "archetype", "keyword_source", "notes"},
+         "make_seen_record: exactly the 11 canonical fields, no more/less")
+    s.eq((rec["fit"], rec["archetype"], rec["keyword_source"]), ("N/A", "", "PM"),
+         "make_seen_record: fit/archetype defaults + keyword_source defaults to role")
+    s.eq(dedup.make_seen_record(company="A", role="PM", locdom="", url="u", platform="X",
+                                status="dropped", reason="R", notes="n",
+                                keyword_source="kw")["keyword_source"], "kw",
+         "make_seen_record: explicit keyword_source overrides the role default")
+    # append() must accept the constructor's output and round-trip through load_seen unchanged.
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as tmp:
+        p = Path(tmp) / "seen.jsonl"
+        dedup.append(dedup.make_seen_record(company="Acme", role="PM", locdom="EU", url="http://u",
+                                            platform="Greenhouse", status="dropped",
+                                            reason="Filtered Out", notes="why"), path=p)
+        got = dedup.load_seen(p)["by_url"][dedup.norm_url("http://u")]
+        s.eq((got["role"], got["status"], got["synced_to_notion"]), ("PM", "dropped", False),
+             "make_seen_record -> append -> load_seen round-trips + gets append's defaults")
+
     return s.done()
 
 

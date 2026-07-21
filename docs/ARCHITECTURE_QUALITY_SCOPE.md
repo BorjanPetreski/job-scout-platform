@@ -10,6 +10,58 @@
 
 ## Status
 
+**Second full pass ran 2026-07-21** (Opus 4.8, branch `claude/architecture-quality-review-ywgw58`)
+— the dedicated session that executed all 9 sections below. See `docs/PROGRESS.md` 2026-07-21 for
+the write-up. Method mirrored the first pass: re-measured `core/` (6,039 lines / 20 files, up from
+~5,900), split into 4 file-groups + 2 whole-system groups, ran 6 parallel research agents each given
+the SPECIFIC section text below (not "find problems"), then **independently re-verified every finding
+against the real code before acting** — which caught the pass's false positive (an agent claimed a
+`zł`-suffixed PLN salary is mis-parsed as USD ~4x; empirically it parses to `None`/unparseable = the
+safe side, the dead `_CUR_SYMBOL['zł']` map entry is merely unreachable). All 9 sections are now
+**covered**:
+
+1. **SOLID beyond SRP** — Open/Closed, DIP, Liskov/ISg traced across the functional codebase. Verdict:
+   the `(p,cfg)->dict` fetcher contract + `_ok`/`_down`/`_cand` constructors are clean; OCP costs
+   (new fetch mechanism = new `HANDLERS` fn; new filter TYPE = engine change) are real but acceptable
+   at current size, documented under §5. No OOP-shaped violations (mostly N/A by design, stated
+   explicitly).
+2. **Design-pattern fit** — Strategy/dispatch (`HANDLERS`), fault-isolation (`fetch_platform`),
+   Bulkhead (`fetch_many`), post-write-verify (`_patch_verified`) all sound. Anti-patterns found:
+   the seen-record 11-field literal duplication (FIXED via `dedup.make_seen_record`), stringly-typed
+   status/reason/vocab (partly FIXED — `dedup.STATUSES` hoisted; Notion vocab seeded).
+3. **Module boundary / file-size** — `scan.py` (888) + `notion_sync.py` (667) are the split
+   candidates; `run_scan` God-function + detector-extraction seeded (production-path, deferred).
+4. **Coupling/cohesion** — built the full import/call graph: clean DAG, no cycles, `paths` base →
+   `profile_loader` hub → `dedup` mid-layer. Real coupling is data-shape, not imports (seen-record
+   contract FIXED; enriched-candidate schema + `source_url`-in-sweep seeded; `dedup.unsynced` dead
+   code seeded).
+5. **Extensibility** — stress-traced two concrete scenarios (GraphQL/auth platform; non-regex filter
+   type). "Config not code" holds for values/regex/strategy-choice, breaks at the "new KIND of thing"
+   boundary; `HARVEST_SPECS`→catalog is the highest-leverage fix (seeded).
+6. **Naming/consistency** — `_private` prefix, verb-noun, docstring depth all principled. Minor: `norm_*`
+   vs `normalize_*`, duplicated `UA` string, mid-file constant placement (notes only).
+7. **Performance** — dedup match is O(n+m) (confirmed, not regressed); config regex compiles once at
+   load (confirmed). The one real per-candidate hot spot (`stated_language_requirement`'s 26 full-JD
+   scans rebuilding patterns) FIXED via module-level precompile; three cache-mitigated minor ones
+   seeded.
+8. **Testing-architecture** — `salary.py` (pure scoring driving a hard filter, ZERO tests) and the
+   `state_sync` mergers were the real gaps: both CLOSED this PR (`unit_salary.py`, extended
+   `unit_state_sync.py`). Sim-fidelity risks (single-page fakes can't catch pagination bugs; rich_text
+   round-trip un-modeled) seeded.
+9. **Security** — traced JD/API external input end-to-end into paths (hashed → no traversal),
+   subprocess (git list-form, no shell → no injection), Notion API structure (inert typed values,
+   fixed endpoints → no structure injection), and tokens (never logged/persisted). **No exploitable
+   injection path in any sink.** One low-severity note: `last_run_candidates.json` git-commits 1500
+   chars of truncated *public* JD text (not PII/secrets) — acceptable, noted.
+
+**Outstanding after this pass** (all seeded into PROJECT_PLAN.md §3x — nothing lost): the Notion
+sync/reconcile hardening bundle (deferred — live daily-critical path), `scan.py` decomposition
+(deferred — production orchestrator), candidate-schema + sweep-source_url, test/sim-fidelity
+hardening, `HARVEST_SPECS`→catalog, and the minor perf/consistency bundle. These are follow-up WORK
+items, not un-covered DIMENSIONS — every section above was actually executed. The next *full* pass
+isn't due until the codebase materially grows again (DoD #5's cadence); the seeded items are ordinary
+engine follow-ups, buildable without re-scoping.
+
 **First full pass ran 2026-07-21** (Sonnet 5, branch `claude/commit-9184cee-orphaned-6isb5r`,
 PR #61) — see `docs/PROGRESS.md` 2026-07-21 "Full `core/` architecture regression pass" for
 the write-up. That pass covered:
@@ -22,8 +74,9 @@ the write-up. That pass covered:
 - Resource/concurrency safety — thoroughly (it was the live trigger).
 - One named invariant (the Notion Tracker firewall) — verified end-to-end.
 
-**Explicitly NOT covered by the first pass** — this is the actual scope of the NEXT full
-pass, section by section below:
+The 9 sections below were **explicitly NOT covered by the first pass** and became the scope of the
+second (2026-07-21) pass above; they remain the section briefs a future pass re-runs against a
+materially larger codebase:
 1. SOLID: Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
 2. Design-pattern fit (deliberate catalog check, not incidental)
 3. Module boundary / file-size appropriateness
