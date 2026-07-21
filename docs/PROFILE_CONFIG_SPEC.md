@@ -226,9 +226,11 @@ platform_tiers:                              # v2 (Phase 2, D3/§3.3) — per-st
 seniority_titles:                            # v2 (Phase 2, D21) — extends core/data/seniority_lexicon.yaml
   sde ii: mid                                #   stream/region-specific title → base band
   staff engineer: staff
-interview:                                   # Phase 2 hints
-  emphasize: [work_model, compensation.floor, candidate.location]
-  skip_if_defaulted: [hard_filters.grind_culture, sweep]
+interview:                                   # Phase 2 hints — control PACING, never VISIBILITY:
+  emphasize: [work_model, compensation.floor, candidate.location]  # confirmed one-by-one
+  skip_if_defaulted: [hard_filters.grind_culture, sweep]  # not asked one-by-one, but still
+                                              # shown + overridable in the mandatory defaults
+                                              # summary before provisioning (rule 2, SKILL.md §6)
 ```
 
 Resolution: `stream defaults → subvariant → variant → user answers`, deep-merged in that
