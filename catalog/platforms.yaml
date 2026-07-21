@@ -46,10 +46,14 @@ platforms:
     tier_default: 3
     active: true
     fetch_mode: direct
+    # Category page ("/categories/remote-{category}-jobs") 301s to the homepage —
+    # confirmed live 2026-07-21 (manual platform audit) — do not use it for a manual
+    # spot-check. The fetcher already bypasses it (core/fetch_boards.py fetch_wwr) and
+    # pulls the all-jobs RSS; the human-browsable equivalent is /remote-jobs.
     url_patterns:
-      - "https://weworkremotely.com/categories/remote-{category}-jobs"
+      - "https://weworkremotely.com/remote-jobs"
     rss_patterns:
-      - "https://weworkremotely.com/categories/remote-{category}-jobs.rss"
+      - "https://weworkremotely.com/remote-jobs.rss"
     categories:
       project-management: project-management
       software-engineering: programming
