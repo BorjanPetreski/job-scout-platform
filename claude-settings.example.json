@@ -1,7 +1,42 @@
 {
-  "//": "job-scout platform v4.0.0 — zero-prompt permissions for unattended AND interactive scans (any profile).",
-  "//install": "On the machine that runs the scans: copy this file to .claude/settings.json at the REPO ROOT (mkdir -p .claude && cp claude-settings.example.json .claude/settings.json). Shipped as an example rather than live config so cloning the repo never silently grants permissions. Re-copy after engine updates. Your own 'Yes, don't ask again' clicks accumulate separately in .claude/settings.local.json and are preserved.",
+  "//": "job-scout platform v4.0.0 — zero-prompt permissions for unattended AND interactive scans (any profile), plus the session lifecycle hooks.",
+  "//install": "On the machine that runs the scans: copy this file to .claude/settings.json at the REPO ROOT (mkdir -p .claude && cp claude-settings.example.json .claude/settings.json). Re-copy after engine updates. Your own 'Yes, don't ask again' clicks accumulate separately in .claude/settings.local.json and are preserved. NOTE: this file must stay in sync with the committed .claude/settings.json — if you change hooks or permissions in one, mirror it in the other in the same PR.",
   "//scope": "Scoped to the scan workflow: core script execution (scripts do their own outbound HTTP), read-only shell inspection of results, git operations for state_sync, WebFetch/WebSearch for the judgment layer's occasional direct look at a posting, state writes under profiles/*/state only. No blanket skip-permissions flag; the cron fallback (claude -p) may additionally need --allowedTools set to the same list — a broader flag like --dangerously-skip-permissions trades safety for convenience and is NOT the default.",
+  "//hooks": "SessionStart installs core/'s Python deps AND injects docs/STATE.md + git status into context (the session dashboard — see CLAUDE.md Session START protocol). Stop nudges the Definition-of-Done wrap-up: GUIDED-FLOW prompt fold-in and the docs/STATE.md + PROGRESS.md state update.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-check.sh",
+            "statusMessage": "wrap-up check"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-compact.sh",
+            "statusMessage": "pre-compact lesson check"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(python3 core/*)",

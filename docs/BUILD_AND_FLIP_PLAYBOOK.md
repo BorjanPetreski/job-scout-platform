@@ -16,8 +16,23 @@ is *born sellable* (clean diligence, real retention hooks, low COGS) instead of 
 
 ### 1. Documentation-first, plan-of-record
 - **One source of truth** for vision/scope/principles (here: `PROJECT_PLAN.md`).
-- **A session-resume contract** the build never violates (here: `PROGRESS.md` — read first, never
-  redo done steps, update in the same session, push before ending).
+- **A session-resume contract** the build never violates — as a **state/history split, closed by
+  hooks** (revised 2026-07-24; the original single-file "read `PROGRESS.md` first" pattern rotted
+  at scale — state-as-prose inside a growing log drifted from its own checklists, and reading the
+  log at every session start cost ~40K tokens to extract ~1K of state):
+  - **`STATE.md`** — the dashboard: current lane / next actions / phase status / open threads /
+    standing constraints. Small with a strict shape; **rewritten every session end**; the ONLY
+    session-start read. Auto-**injected into context by a SessionStart hook** so orientation is
+    mechanical, not remembered.
+  - **`PROGRESS.md`** — append-only history: per-phase checklists + the session log. Never read at
+    session start; at write time read only the section being updated. Never redo done steps;
+    update in the same session; push before ending.
+  - **A Stop hook closes the loop** — branch changed files but not `STATE.md` → nudge. State out
+    at session end becomes state in at the next session start; a stale dashboard surfaces on the
+    very next injection instead of rotting silently.
+  - **A tiered docs map** in `CLAUDE.md` (injected-always / on-demand / task-scoped runbooks /
+    outputs-not-inputs / archive-never-plan-of-record) so no session re-reads reference docs, its
+    own outputs, or superseded plans to derive state.
 - **Per-phase detailed plans** written just before each phase (plans go stale — write them late).
 
 ### 2. The build pipeline (per phase)
@@ -95,9 +110,10 @@ new AI-native product's scaffolding before you write a line of domain logic.
 The whole `docs/` system transfers as templates:
 - **`PROJECT_PLAN.md`** — vision + standing principles + phase map + §3x parked-ideas + execution
   discipline. The single source of truth. *(Reusable structure; swap the product.)*
-- **`PROGRESS.md`** — the session-resume contract (read-first, never-redo-done, update-in-session,
-  push-before-end) + per-phase checklists + session log. **The biggest single reuse** — it's the
-  multi-session-build discipline itself.
+- **`STATE.md` + `PROGRESS.md`** — the session-resume contract as a pair (see §1): the injected
+  dashboard (state) + the append-only checklists/log (history), closed by the SessionStart/Stop
+  hooks. **The biggest single reuse** — it's the multi-session-build discipline itself; adopt the
+  split from day one rather than retrofitting it at the 100KB mark like we did.
 - **Per-phase `PHASE_N_PLAN.md`** + the **review-gate prompt** (see PHASE_3A_PLAN §11.1) + the
   **`*_ACCEPTANCE.md`** live-UAT runbook shape.
 - **`ARCHITECTURE.md`**, **`*_CONFIG_SPEC.md`**, **`PLATFORM_GUIDE.md`** (plain-language guide),
@@ -171,6 +187,14 @@ loop in `HEALTH_MONITORING.md` (Layer-1 signal emitter + Layer-2 diagnose/repair
   boundary. Turns an un-testable "confirm on first real use" box into a repeatable green check.
 - The **standing-rule enforcement pair** (a Stop hook + a `CLAUDE.md` Definition-of-Done) — lift
   the shape for any discipline that must survive a forgetful session (see §3).
+- The **session-lifecycle kit** (added 2026-07-24) — `.claude/hooks/session-start.sh` (env setup +
+  `STATE.md`/git context injection), `.claude/hooks/stop-check.sh` (wrap-up nudges incl. the
+  state-not-updated check and the always-on DoD-lesson-assessment check),
+  `.claude/hooks/pre-compact.sh` (bank un-folded lessons/prompts before compaction eats them), the `CLAUDE.md` Session START protocol + tiered docs map, and the
+  `STATE.md` shape. Lifts as-is; swap the doc names. One caveat learned the hard way: a Stop hook
+  can only nudge what it can *detect* from a diff — process rules with no file signature (e.g.
+  "fold the build-method lesson into the playbook" on a docs-only branch) stay judgment calls in
+  the DoD, so keep them written there even when a hook covers the common case.
 
 ### What does NOT transfer (product-specific — leave it)
 `core/fetch_boards.py`, `render.py`, `check_links.py`, `linkedin_tripwire.py`, `salary.py`,
